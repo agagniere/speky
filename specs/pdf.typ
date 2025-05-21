@@ -5,12 +5,53 @@
 #show link: set text(fill: blue)
 #show link: underline
 
-#let render(file, heading_depth: 1) = {
-  let data = yaml(file)
-  for spec in data.requirements [
-   #let title = if "short" in spec { spec.id + " " + spec.short } else { spec.id }
-   == #title
-   #spec.long
+#let speky(files) = {
+  let references = (:)
+  let specifications = (:)
+  let tests = (:)
+  for file in files {
+    let data = yaml(file)
+	if data.kind == "specifications" {
+	   let category = data.category
+	   for spec in data.requirements {
+	   	   let spec_list = specifications.at(category, default: ())
+		   spec_list.push(spec)
+		   specifications.insert(category, spec_list)
+		   //if ref in spec {
+		   //	   	  for
+		   //}
+	   }
+	} else if data.kind == "tests" {
+	  let category = data.category
+	  for test in data.tests {
+        let test_list = tests.at(category, default: ())
+        test_list.push(test)
+        tests.insert(category, test_list)
+	  }
+	}
+  }
+
+  [
+	= Functional specifications
+  	#for spec in specifications.at("functional") [
+	  #let title = if "short" in spec {spec.id + " " + spec.short} else { spec.id }
+	  == #title
+	  #spec.long
+	]
+	#pagebreak()
+	= Functional tests
+  	#for test in tests.at("functional") [
+	  #let title = if "short" in test {test.id + " " + test.short} else { test.id }
+	  == #title
+	  #test.long
+	]
+	#pagebreak()
+	= Non-functional specifications
+  	#for spec in specifications.at("non-functional") [
+	  #let title = if "short" in spec {spec.id + " " + spec.short} else { spec.id }
+	  == #title
+	  #spec.long
+	]
   ]
 }
 
@@ -26,9 +67,8 @@
 
 #set page(numbering: "1")
 
-= Functional requirements
-#render("functional.yaml")
-
-#pagebreak()
-= Non-functional requirements
-#render("nonfunctional.yaml")
+#speky((
+ "functional.yaml",
+ "nonfunctional.yaml",
+ "tests/functional.yaml"
+))

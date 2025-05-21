@@ -1,5 +1,5 @@
 kind: specifications
-categoray: non-functional
+category: non-functional
 requirements:
 - id: SN001
   ref:
