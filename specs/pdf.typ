@@ -7,7 +7,7 @@
 
 #let get_title(something) = {
  if "short" in something {
-  something.id + " " + something.short
+  raw(something.id) + " " + something.short
  } else {
   something.id
  }
@@ -95,15 +95,27 @@
 	  #for r in test.ref [
 	   - #r
 	  ]
+	  === Initial state
+	  #if "initial" in test [
+	    #test.initial
+	  ]
+	  #if "prereq" in test [
+	  	#for prereq in test.prereq [
+		  - #prereq.test
+		]
+	  ]
 	  === Procedure
 	  #for step in test.steps [
 	   - #[
 	     #step.action\
 	   #if "run" in step [
-	     #text(fill: blue)[ #raw("$ " + step.run) ]
+	     #text(fill: blue)[ #raw("$ " + step.run.trim()) ]\
 	   ]
 	   #if "sample" in step [
 	     #text(fill: purple)[ #raw(step.sample) ]
+	   ]
+	   #if "expected" in step [
+	     #text(fill: green)[ #raw(step.expected) ]
 	   ]
 	   ]
 	  ]

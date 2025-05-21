@@ -41,3 +41,36 @@ tests:
     - action: Open PDF
       run: open pdf.pdf
     - action: Verify the requirements are found inside
+- id: TF003
+  ref:
+    - SF004
+    - SN004
+  short: Use Git for versionning
+  long: Setup a git repo with the current files, to be able to revert any change if desired
+  prereq:
+    - test: TF002
+  steps:
+    - action: Initialize a git repository
+      run: git init
+      expected: Initialized empty Git repository in [...]
+    - action: Start tracking the specification files
+      run: git add specs.yaml pdf.typ
+    - action: Save current files version
+      run: |
+        git commit -m "Initial commit: first 2 requirements"
+    - action: Give a name to that version
+      run: git tag 0.0.1
+    - action: Delete a requirement in specs.yaml
+      sample: |
+        kind: specifications
+        category: functional
+        requirements:
+        - id: S01
+          long: The first requirement
+    - action: Confirm the requirement is gone
+      run: typst compile pdf.typ && open pdf.pdf
+    - action: Revert the deletion
+      run: |
+        git checkout -- .
+    - action: Confirm the requirement is back
+      run: typst compile pdf.typ && open pdf.pdf
