@@ -3,8 +3,8 @@ category: functional
 tests:
 - id: TF001
   ref:
-    - spec: SF001
-    - spec: SN001
+    - SF001
+    - SN001
   short: Writing requirements as text
   long: We write requirements in a text file and read them
   initial: Blank project
@@ -22,8 +22,8 @@ tests:
       run: cat specs.yaml
 - id: TF002
   ref:
-    - spec: SF002
-    - spec: SN003
+    - SF002
+    - SN003
   short: Generate a PDF
   long: Output requirements in PDF format
   prereq:
