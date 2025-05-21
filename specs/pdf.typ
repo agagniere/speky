@@ -17,7 +17,7 @@
  == #get_title(something) #label(something.id)
 ]
 
-#let display_spec(spec, testers, references) = [
+#let display_spec(spec, testers, references, comments) = [
  #display_title(spec)
  #spec.long
  #if spec.id in testers [
@@ -30,6 +30,12 @@
   === Referenced by
   #for other in references.at(spec.id) [
    - #get_title(other)
+  ]
+ ]
+ #if spec.id in comments [
+  === Comments
+  #for comment in comments.at(spec.id) [
+   - #comment.text
   ]
  ]
 ]
@@ -46,6 +52,8 @@
   let testers = (:)
   let specifications = (:)
   let tests = (:)
+  let comments = (:)
+
   for file in files {
     let data = yaml(file)
 	if data.kind == "specifications" {
@@ -66,13 +74,17 @@
 		  testers = append_at(testers, ref, test)
 	    }
 	  }
+	} else if data.kind == "comments" {
+	  for comment in data.comments {
+	    comments = append_at(comments, comment.about, comment)
+	  }
 	}
   }
 
   [
 	= Functional specifications
   	#for spec in specifications.at("functional") {
-	  display_spec(spec, testers, references)
+	  display_spec(spec, testers, references, comments)
 	}
 	#pagebreak()
 	= Functional tests
@@ -100,7 +112,7 @@
 	#pagebreak()
 	= Non-functional specifications
   	#for spec in specifications.at("non-functional") {
-     display_spec(spec, testers, references)
+     display_spec(spec, testers, references, comments)
 	}
 	]
   ]
@@ -121,5 +133,6 @@
 #speky((
  "functional.yaml",
  "nonfunctional.yaml",
- "tests/functional.yaml"
+ "tests/functional.yaml",
+ "comments/2025-05-21.yaml"
 ))

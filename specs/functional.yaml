@@ -16,3 +16,9 @@ requirements:
 - id: SF005
   short: Differential PDF
   long: The user shall be able to obtain a differential PDF highlighting the differences between a version and the previous
+- id: SF006
+  short: Support comments
+  long: The user shall be able to add comments to a specification and to tests
+- id: SF007
+  short: Index requirements by tags
+  long: The user shall be able add tags to requirements, and the outputs will contain the list of requirements for each tag

@@ -38,3 +38,6 @@ tests:
         #speky(("specs.yaml"))
     - action: Run Typst
       run: typst compile pdf.typ
+    - action: Open PDF
+      run: open pdf.pdf
+    - action: Verify the requirements are found inside
