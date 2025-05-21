@@ -1,0 +1,30 @@
+id: TF001
+ref:
+  - spec: SF001
+  - spec: SN001
+short: Writing requirements as text
+long: We write requirements in a text file and read them
+initial: Blank project
+steps:
+  - action: Open a file called specs.yaml in a text editor
+    run: emacs specs.yaml
+  - action: Write 2 requirements inside, save and exit
+    sample: |
+      id: S01
+      long: The first requirement
+      ---
+      id: S02
+      long: The second requirement
+  - action: Verify the requirements are human-readable
+    run: cat specs.yaml
+---
+id: TF002
+ref:
+  - spec: SF002
+  - spec: SN003
+short: Generate a PDF
+long: Output requirements in PDF format
+prereq:
+  - test: TF001
+steps:
+  - action: Run Typst

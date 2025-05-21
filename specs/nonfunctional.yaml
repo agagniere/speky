@@ -20,3 +20,9 @@ long: Version control will be achived using git
 ---
 id: SN005
 long: It should be possible to edit specifications without deep knowledge of git
+---
+id: SN006
+long: It should be possible to generate the PDF output without an internet connection
+---
+id: SN007
+long: It should be possible to generate the HTML output without an internet connection

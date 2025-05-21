@@ -1,6 +1,6 @@
 id: SF001
 short: Write requirements
-long: The user shall be able to write specifications / requirements
+long: The user shall be able to write specifications / requirements in a textual format
 ---
 id: SF002
 short: PDF output
