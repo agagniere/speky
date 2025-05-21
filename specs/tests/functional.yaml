@@ -13,11 +13,13 @@ tests:
       run: emacs specs.yaml
     - action: Write 2 requirements inside, save and exit
       sample: |
-        id: S01
-        long: The first requirement
-        ---
-        id: S02
-        long: The second requirement
+        kind: specifications
+        category: functional
+        requirements:
+        - id: S01
+          long: The first requirement
+        - id: S02
+          long: The second requirement
     - action: Verify the requirements are human-readable
       run: cat specs.yaml
 - id: TF002

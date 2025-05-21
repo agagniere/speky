@@ -23,13 +23,13 @@
  #if spec.id in testers [
   === Tested by
   #for test in testers.at(spec.id) [
-   - #test.id
+   - #get_title(test)
   ]
  ]
  #if spec.id in references [
   === Referenced by
   #for other in references.at(spec.id) [
-   - #other.id
+   - #get_title(other)
   ]
  ]
 ]
@@ -83,12 +83,26 @@
 	  #for r in test.ref [
 	   - #r
 	  ]
+	  === Procedure
+	  #for step in test.steps [
+	   - #[
+	     #step.action\
+	   #if "run" in step [
+	     #text(fill: blue)[ #raw("$ " + step.run) ]
+	   ]
+	   #if "sample" in step [
+	     #text(fill: purple)[ #raw(step.sample) ]
+	   ]
+	   ]
+	  ]
 	]
+	#if "non-functional" in specifications [
 	#pagebreak()
 	= Non-functional specifications
   	#for spec in specifications.at("non-functional") {
      display_spec(spec, testers, references)
 	}
+	]
   ]
 }
 
