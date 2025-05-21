@@ -5,6 +5,42 @@
 #show link: set text(fill: blue)
 #show link: underline
 
+#let get_title(something) = {
+ if "short" in something {
+  something.id + " " + something.short
+ } else {
+  something.id
+ }
+}
+
+#let display_title(something) = [
+ == #get_title(something) #label(something.id)
+]
+
+#let display_spec(spec, testers, references) = [
+ #display_title(spec)
+ #spec.long
+ #if spec.id in testers [
+  === Tested by
+  #for test in testers.at(spec.id) [
+   - #test.id
+  ]
+ ]
+ #if spec.id in references [
+  === Referenced by
+  #for other in references.at(spec.id) [
+   - #other.id
+  ]
+ ]
+]
+
+#let append_at(map, key, value) = {
+ let present = map.at(key, default: ())
+ present.push(value)
+ map.insert(key, present)
+ map
+}
+
 #let speky(files) = {
   let references = (:)
   let testers = (:)
@@ -15,27 +51,19 @@
 	if data.kind == "specifications" {
 	   let category = data.category
 	   for spec in data.requirements {
-	   	   let spec_list = specifications.at(category, default: ())
-		   spec_list.push(spec)
-		   specifications.insert(category, spec_list)
-		   if "ref" in spec {
+         specifications = append_at(specifications, category, spec)
+         if "ref" in spec {
              for ref in spec.ref {
-			   let ref_list = references.at(ref, default: ())
-			   ref_list.push(spec)
-			   references.insert(ref, ref_list)
+			   references = append_at(references, ref, spec)
 			 }
 		   }
 	   }
 	} else if data.kind == "tests" {
 	  let category = data.category
 	  for test in data.tests {
-        let test_list = tests.at(category, default: ())
-        test_list.push(test)
-        tests.insert(category, test_list)
+        tests = append_at(tests, category, test)
         for ref in test.ref {
-		  let ref_list = testers.at(ref, default: ())
-		  ref_list.push(test)
-          testers.insert(ref, ref_list)
+		  testers = append_at(testers, ref, test)
 	    }
 	  }
 	}
@@ -43,37 +71,24 @@
 
   [
 	= Functional specifications
-  	#for spec in specifications.at("functional") [
-	  #let title = if "short" in spec {spec.id + " " + spec.short} else { spec.id }
-	  == #title #label(spec.id)
-	  #spec.long
-	  #if spec.id in testers [
-	   === Tested by
-	   #for test in testers.at(spec.id) [
-	     - #test.id
-	   ]
-	  ]
-	  #if spec.id in references [
-	   === Referenced by
-	   #for other in references.at(spec.id) [
-	     - #other.id
-	   ]
-	  ]
-	]
+  	#for spec in specifications.at("functional") {
+	  display_spec(spec, testers, references)
+	}
 	#pagebreak()
 	= Functional tests
   	#for test in tests.at("functional") [
-	  #let title = if "short" in test {test.id + " " + test.short} else { test.id }
-	  == #title #label(test.id)
+	  #display_title(test)
 	  #test.long
+	  === Is a test for
+	  #for r in test.ref [
+	   - #r
+	  ]
 	]
 	#pagebreak()
 	= Non-functional specifications
-  	#for spec in specifications.at("non-functional") [
-	  #let title = if "short" in spec {spec.id + " " + spec.short} else { spec.id }
-	  == #title #label(spec.id)
-	  #spec.long
-	]
+  	#for spec in specifications.at("non-functional") {
+     display_spec(spec, testers, references)
+	}
   ]
 }
 

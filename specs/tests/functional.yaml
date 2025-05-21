@@ -29,4 +29,10 @@ tests:
   prereq:
     - test: TF001
   steps:
+    - action: Copy the typst template from speky
+      run: cp /tmp/speky/specs/pdf.typ .
+    - action: List the yamls files of the project inside
+      sample: |
+        #speky(("specs.yaml"))
     - action: Run Typst
+      run: typst compile pdf.typ
