@@ -53,12 +53,14 @@
   let specifications = (:)
   let tests = (:)
   let comments = (:)
+  let by_id = (:)
 
   for file in files {
     let data = yaml(file)
 	if data.kind == "specifications" {
 	   let category = data.category
 	   for spec in data.requirements {
+	     by_id.insert(spec.id, spec)
          specifications = append_at(specifications, category, spec)
          if "ref" in spec {
              for ref in spec.ref {
@@ -69,6 +71,7 @@
 	} else if data.kind == "tests" {
 	  let category = data.category
 	  for test in data.tests {
+	    by_id.insert(test.id, test)
         tests = append_at(tests, category, test)
         for ref in test.ref {
 		  testers = append_at(testers, ref, test)
@@ -93,15 +96,16 @@
 	  #test.long
 	  === Is a test for
 	  #for r in test.ref [
-	   - #r
+	   - #get_title(by_id.at(r))
 	  ]
 	  === Initial state
 	  #if "initial" in test [
 	    #test.initial
 	  ]
 	  #if "prereq" in test [
+	    The expected state is the final state of tests:
 	  	#for prereq in test.prereq [
-		  - #prereq.test
+         - #get_title(by_id.at(prereq))
 		]
 	  ]
 	  === Procedure

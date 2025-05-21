@@ -29,7 +29,7 @@ tests:
   short: Generate a PDF
   long: Output requirements in PDF format
   prereq:
-    - test: TF001
+    - TF001
   steps:
     - action: Copy the typst template from speky
       run: cp /tmp/speky/specs/pdf.typ .
@@ -48,7 +48,7 @@ tests:
   short: Use Git for versionning
   long: Setup a git repo with the current files, to be able to revert any change if desired
   prereq:
-    - test: TF002
+    - TF002
   steps:
     - action: Initialize a git repository
       run: git init
