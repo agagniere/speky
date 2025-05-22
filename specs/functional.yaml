@@ -7,15 +7,21 @@ requirements:
 - id: SF002
   short: PDF output
   long: The user shall be able to read the specifications as a PDF document
+  tags:
+    - outputs
 - id: SF003
   short: HTML output
   long: The user shall be able to read the specifications as a static website
+  tags:
+    - outputs
 - id: SF004
   short: Version controlled
   long: The user shall be able to rollback changes, view previous versions, review changes
 - id: SF005
   short: Differential PDF
   long: The user shall be able to obtain a differential PDF highlighting the differences between a version and the previous
+  tags:
+    - outputs
 - id: SF006
   short: Support comments
   long: The user shall be able to add comments to a specification and to tests
