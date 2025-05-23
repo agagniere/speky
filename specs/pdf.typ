@@ -13,26 +13,28 @@
     }
 }
 
-#let display_title(something) = [
-    == #get_title(something) #label(something.id)
-]
+#let display_title(something, supplement: "Requirement") = {
+    heading(get_title(something), level: 2, supplement: supplement)
+}
 
 #let display_spec(spec, testers, references, comments) = [
     #display_title(spec)
+    #label(spec.id)
     #if "tags" in spec {
         for tag in spec.tags {
             box(tag,
-                fill: rgb("#5c7"),
+                fill: rgb("#7d9"),
                 inset: 3pt,
                 radius: 10pt)
+            text(" ")
         }
         linebreak()
     }
-    #spec.long
+    #eval(spec.long, mode: "markup")
     #if spec.id in testers [
         === Tested by
         #for test in testers.at(spec.id) [
-            - #get_title(test)
+            - #link(label(test.id), get_title(test))
         ]
     ]
     #if spec.id in references [
@@ -123,18 +125,19 @@
     }
 
     [
-	    = Functional specifications
+	    #heading()[Functional specifications]
         #for spec in specifications.at("functional") {
 	        display_spec(spec, testers, references, comments)
 	    }
 	    #pagebreak()
-	    = Functional tests
+	    #heading()[Functional tests]
         #for test in tests.at("functional") [
-	        #display_title(test)
+	        #display_title(test, supplement: "Test")
+            #label(test.id)
 	        #test.long
 	        === Is a test for
 	        #for r in test.ref [
-	            - #get_title(by_id.at(r))
+	            - #link(label(r), get_title(by_id.at(r)))
 	        ]
 	        === Initial state
 	        #if "initial" in test [
@@ -142,9 +145,9 @@
 	        ]
 	        #if "prereq" in test [
 	            The expected state is the final state of tests:
-                #for prereq in test.prereq [
-                    - #get_title(by_id.at(prereq))
-		        ]
+                #for prereq in test.prereq {
+                    list.item(link(label(prereq), get_title(by_id.at(prereq))))
+		        }
 	        ]
 	        === Procedure
 	        #for step in test.steps {
@@ -165,7 +168,7 @@
                                     raw(step.sample, lang: step.at("sample_lang", default: "text"))
                                 }
                             },
-                            fill: rgb("#eee"),
+                            fill: rgb("#f5f5f5"),
                             inset: 8pt,
                             radius: 8pt,
                         )
@@ -184,12 +187,12 @@
 	    #if tags.len() > 0 [
 	        #pagebreak()
 	        = Requirements by tag
-	        #for (tag, specs) in tags.pairs() [
-	            == #upper(tag.at(0))#lower(tag.slice(1))
-	            #for spec in specs [
-	                - #get_title(spec)
-	            ]
-	        ]
+	        #for (tag, specs) in tags.pairs() {
+	            heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
+	            for spec in specs {
+	                list.item(link(label(spec.id), get_title(spec)))
+	            }
+	        }
 	    ]
     ]
 }

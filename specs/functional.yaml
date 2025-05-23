@@ -3,10 +3,24 @@ category: functional
 requirements:
 - id: SF001
   short: Write requirements
-  long: The user shall be able to write specifications / requirements in a textual format
+  long: |
+    The user shall be able to write requirements and functional tests in a textual format.
+
+    A requirement is a combination of:
+      - a unique identifier
+      - a statement
+      - the summary of the statement in a few words (optional)
+
+    A test is constituted by:
+      - one or more requirements that it validates at least partially
+      - A procedure to follow, with instructions and expected behaviors / outputs
 - id: SF002
   short: PDF output
-  long: The user shall be able to read the specifications as a PDF document
+  long: |
+    The user shall be able to read the specifications as a PDF document.
+
+    Each requirement shall appear as a section containing the various informations listed in `SF001`,
+    but also which tests validate this requirement and which other requirements refer to it.
   tags:
     - outputs
 - id: SF003
