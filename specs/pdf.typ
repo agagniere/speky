@@ -1,6 +1,4 @@
 #set document(title: [Speky --- Specifications], author: "Antoine GAGNIERE")
-#show link: set text(fill: blue)
-#show link: underline
 
 #let get_title(something) = {
   if "short" in something {
@@ -15,10 +13,10 @@
 }
 
 #let link_to(something) = {
-  link(label(something.id), get_title(something))
+  link(label(something.id), underline(text(get_title(something), fill: blue)))
 }
 
-#let display_spec(spec, testers, references, comments) = [
+#let display_spec(spec, testers, references, comments, by_id) = [
   #display_title(spec)
   #label(spec.id)
   #if "tags" in spec {
@@ -33,8 +31,7 @@
   #if spec.id in testers {
     let tests = testers.at(spec.id)
     if tests.len() == 1 [
-      #let test = tests.at(0)
-      #strong([Tested by]) #link_to(test)
+      *Tested by* #link_to(tests.at(0))
     ] else [
       === Tested by
       #for test in tests [
@@ -43,12 +40,30 @@
 
     ]
   }
-  #if spec.id in references [
-    === Referenced by
-    #for other in references.at(spec.id) [
-      - #link_to(other)
+
+  #if spec.id in references {
+    let refs = references.at(spec.id)
+    if refs.len() == 1 [
+      *Referenced by* #link_to(refs.at(0))
+    ] else [
+      === Referenced by
+      #for other in refs [
+        - #link_to(other)
+      ]
     ]
-  ]
+  }
+
+  #if "ref" in spec {
+    if spec.ref.len() == 1 [
+      *Relates to* #link_to(by_id.at(spec.ref.at(0)))
+    ] else [
+      === Relates to
+      #for other in spec.ref [
+        - #link_to(by_id.at(other))
+      ]
+    ]
+  }
+
   #if spec.id in comments [
     === Comments
     #for comment in comments.at(spec.id) {
@@ -136,7 +151,7 @@
   [
     #heading()[Functional specifications]
     #for spec in specifications.at("functional") {
-      display_spec(spec, testers, references, comments)
+      display_spec(spec, testers, references, comments, by_id)
     }
     #pagebreak()
     #heading()[Functional tests]
@@ -194,7 +209,7 @@
       #pagebreak()
       = Non-functional specifications
       #for spec in specifications.at("non-functional") {
-        display_spec(spec, testers, references, comments)
+        display_spec(spec, testers, references, comments, by_id)
       }
     ]
     #if tags.len() > 0 [
