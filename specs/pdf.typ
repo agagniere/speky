@@ -51,11 +51,11 @@
                     grid(
                         align(left, strong(comment.from)),
                         align(right, text(comment.date, fill: rgb("#999"))),
-                        grid.cell(comment.text, colspan: 2),
+                        grid.cell(eval(comment.text, mode: "markup"), colspan: 2),
                         columns: (1fr, 1fr),
                         gutter: 8pt
                     ),
-                    width: 70%,
+                    width: 80%,
                     inset: 5pt,
                     radius: 5pt,
                     fill: if external {rgb("#eee")} else {rgb("#eef")}))
@@ -107,7 +107,16 @@
 	            }
 	        }
 	    } else if data.kind == "comments" {
+            let default = data.at("default", default: (:))
+            if "external" not in default {
+                default.external = false
+            }
 	        for comment in data.comments {
+                for field in ("date", "from", "about", "external") {
+                    if field not in comment {
+                        comment.insert(field, default.at(field))
+                    }
+                }
 	            comments = append_at(comments, comment.about, comment)
 	        }
 	    }

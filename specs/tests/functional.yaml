@@ -77,3 +77,27 @@ tests:
         git checkout -- .
     - action: Confirm the requirement is back
       run: typst compile pdf.typ && open pdf.pdf
+- id: TF004
+  ref:
+    - SF006
+  short: Add comments
+  long: Write a comment file to add comments to specifications
+  prereq:
+    - TF002
+  steps:
+    - action: Create a comment file
+      sample_lang: yaml
+      sample: |
+        kind: comments
+        comments:
+        - about: S01
+          from: Some Person
+          date: 01/01/2025
+          text: The first comment
+    - action: Add it to the typst source
+      sample_lang: typ
+      sample: |
+        #speky(("specs.yaml", "comments.yaml"))
+    - action: Regenerate the PDF
+      run: typst compile pdf.typ
+    - action: Open the PDF and verify the comment is visible
