@@ -14,27 +14,39 @@
   heading(get_title(something), level: 2, supplement: supplement)
 }
 
+#let link_to(something) = {
+  link(label(something.id), get_title(something))
+}
+
 #let display_spec(spec, testers, references, comments) = [
   #display_title(spec)
   #label(spec.id)
   #if "tags" in spec {
     for tag in spec.tags {
-      box(tag, fill: rgb("#7d9"), inset: 3pt, radius: 10pt)
+      link(label(tag), box(tag, fill: rgb("#7d9"), inset: 3pt, radius: 10pt))
       text(" ")
     }
     linebreak()
   }
   #eval(spec.long, mode: "markup")
-  #if spec.id in testers [
-    === Tested by
-    #for test in testers.at(spec.id) [
-      - #link(label(test.id), get_title(test))
+
+  #if spec.id in testers {
+    let tests = testers.at(spec.id)
+    if tests.len() == 1 [
+      #let test = tests.at(0)
+      #strong([Tested by]) #link_to(test)
+    ] else [
+      === Tested by
+      #for test in tests [
+        - #link_to(test)
+      ]
+
     ]
-  ]
+  }
   #if spec.id in references [
     === Referenced by
     #for other in references.at(spec.id) [
-      - #get_title(other)
+      - #link_to(other)
     ]
   ]
   #if spec.id in comments [
@@ -59,6 +71,7 @@
       )
     }
   ]
+  #pagebreak(weak: true)
 ]
 
 #let append_at(map, key, value) = {
@@ -133,7 +146,7 @@
       #test.long
       === Is a test for
       #for r in test.ref [
-        - #link(label(r), get_title(by_id.at(r)))
+        - #link_to(by_id.at(r))
       ]
       === Initial state
       #if "initial" in test [
@@ -141,9 +154,9 @@
       ]
       #if "prereq" in test [
         The expected state is the final state of tests:
-        #for prereq in test.prereq {
-          list.item(link(label(prereq), get_title(by_id.at(prereq))))
-        }
+        #for prereq in test.prereq [
+          - #link_to(by_id.at(prereq))
+        ]
       ]
       === Procedure
       #for step in test.steps {
@@ -175,6 +188,7 @@
           }
         ]
       }
+      #pagebreak(weak: true)
     ]
     #if "non-functional" in specifications [
       #pagebreak()
@@ -186,12 +200,13 @@
     #if tags.len() > 0 [
       #pagebreak()
       = Requirements by tag
-      #for (tag, specs) in tags.pairs() {
-        heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
-        for spec in specs {
-          list.item(link(label(spec.id), get_title(spec)))
+      #for (tag, specs) in tags.pairs() [
+        #heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
+        #label(tag)
+        #for spec in specs {
+          list.item(link_to(spec))
         }
-      }
+      ]
     ]
   ]
 }
