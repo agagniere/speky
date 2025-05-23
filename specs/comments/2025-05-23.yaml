@@ -1,0 +1,15 @@
+kind: comments
+comments:
+- about: SF006
+  from: Antoine
+  date: 23/05/2025
+  text: Ability to apply a field to a whole list of comments will be added
+- about: SF006
+  from: Angry
+  external: true
+  date: 23/05/2025
+  text: We also need to be able to reply to a comment, with a visible cue
+- about: SF006
+  from: Antoine
+  date: 23/05/2025
+  text: It is a feature we are currently exploring

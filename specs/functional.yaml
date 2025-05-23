@@ -17,11 +17,14 @@ requirements:
 - id: SF004
   short: Version controlled
   long: The user shall be able to rollback changes, view previous versions, review changes
+  tags:
+    - versions
 - id: SF005
   short: Differential PDF
   long: The user shall be able to obtain a differential PDF highlighting the differences between a version and the previous
   tags:
     - outputs
+    - versions
 - id: SF006
   short: Support comments
   long: The user shall be able to add comments to a specification and to tests

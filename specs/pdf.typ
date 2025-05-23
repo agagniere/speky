@@ -1,4 +1,4 @@
-z#set document(
+#set document(
 	title: [Speky --- Specifications],
 	author: "Antoine GAGNIERE",
 )
@@ -19,6 +19,15 @@ z#set document(
 
 #let display_spec(spec, testers, references, comments) = [
     #display_title(spec)
+    #if "tags" in spec {
+        for tag in spec.tags {
+            box(tag,
+                fill: rgb("#5c7"),
+                inset: 3pt,
+                radius: 10pt)
+        }
+        linebreak()
+    }
     #spec.long
     #if spec.id in testers [
         === Tested by
@@ -34,9 +43,23 @@ z#set document(
     ]
     #if spec.id in comments [
         === Comments
-        #for comment in comments.at(spec.id) [
-            - #comment.text
-        ]
+        #for comment in comments.at(spec.id) {
+            let external = ("external" in comment) and comment.external
+            align(
+                if external {left} else {right},
+                box(
+                    grid(
+                        align(left, strong(comment.from)),
+                        align(right, text(comment.date, fill: rgb("#999"))),
+                        grid.cell(comment.text, colspan: 2),
+                        columns: (1fr, 1fr),
+                        gutter: 8pt
+                    ),
+                    width: 70%,
+                    inset: 5pt,
+                    radius: 5pt,
+                    fill: if external {rgb("#eee")} else {rgb("#eef")}))
+        }
     ]
 ]
 
@@ -115,29 +138,32 @@ z#set document(
 		        ]
 	        ]
 	        === Procedure
-	        #enum(tight: false,
-	            for step in test.steps {
-	                enum.item()[
-	                    #step.action\
-	                    #if "run" in step [
-	                        #raw(step.run.trim(), block: false, lang: "bash")\
-	                    ]
-	                    #if "sample" in step {
-	                        block(
-                                fill: rgb("#ddd"),
-                                inset: 8pt,
-                                radius: 5pt,
-                                text(
-	                                raw(step.sample, block: false, lang: "yaml")
-		                        ))
-	                    }
-	                    #if "expected" in step [
-	                        #raw(step.expected, block: false)
-	                    ]
-	                ]
-	            }
-	        )
-
+	        #for step in test.steps {
+	            enum.item()[
+	                #step.action
+	                #if ("run" in step) or ("sample" in step) {
+                        block(
+                            {
+                                if "run" in step {
+                                    raw("$ ")
+                                    raw(step.run.trim(), lang: "bash")
+                                    linebreak()
+                                }
+                                if "expected" in step {
+                                    text(raw(step.expected), fill: rgb("#999"))
+                                }
+                                if "sample" in step {
+                                    raw(step.sample, lang: step.at("sample_lang", default: "text"))
+                                }
+                            },
+                            fill: rgb("#eee"),
+                            inset: 8pt,
+                            radius: 8pt,
+                        )
+                        linebreak()
+	                }
+	            ]
+	        }
 	    ]
 	    #if "non-functional" in specifications [
 	        #pagebreak()
@@ -175,5 +201,6 @@ z#set document(
     "functional.yaml",
     "nonfunctional.yaml",
     "tests/functional.yaml",
-    "comments/2025-05-21.yaml"
+    "comments/2025-05-21.yaml",
+    "comments/2025-05-23.yaml",
 ))

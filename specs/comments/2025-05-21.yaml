@@ -1,14 +1,21 @@
 kind: comments
 comments:
 - about: SF001
-  from: Antoine
+  from: User
+  external: true
   date: 21/05/2025
   text: This requirement is not specific enough, what information is one expected to write, and what is not needed ?
 - about: SF001
-  from: Antoine
+  from: Angry
+  external: true
   date: 21/05/2025
   text: There is no mention of test procedures
 - about: SF002
   from: Antoine
   date: 21/05/2025
   text: Can we list the minimum info that must be present ?
+- about: SF006
+  from: Angry
+  external: true
+  date: 21/05/2025
+  text: Will I need to re-write all infos for each and every comment ?

@@ -12,6 +12,7 @@ tests:
     - action: Open a file called specs.yaml in a text editor
       run: emacs specs.yaml
     - action: Write 2 requirements inside, save and exit
+      sample_lang: yaml
       sample: |
         kind: specifications
         category: functional
@@ -34,6 +35,7 @@ tests:
     - action: Copy the typst template from speky
       run: cp /tmp/speky/specs/pdf.typ .
     - action: List the yamls files of the project inside
+      sample_lang: typ
       sample: |
         #speky(("specs.yaml"))
     - action: Run Typst
@@ -61,6 +63,7 @@ tests:
     - action: Give a name to that version
       run: git tag 0.0.1
     - action: Delete a requirement in specs.yaml
+      sample_lang: yaml
       sample: |
         kind: specifications
         category: functional
