@@ -9,4 +9,10 @@ comments:
   external: true
   text: We also need to be able to reply to a comment, with a visible cue
 - text: It is a feature we are currently exploring
-- text: Setting a default value to a list of comments is now supported since `0.0.2`
+- text: |
+    Setting a default value to a list of comments is now supported since `0.0.2`
+- about: SF003
+  text: Currently HTML output with Typst is experimental, lacks CSS and omits custom blocks.
+- about: SF001
+  text: |
+    Both concerns are addressed in `0.0.2`

@@ -159,9 +159,14 @@
       #display_title(test, supplement: "Test")
       #label(test.id)
       #test.long
-      === Is a test for
-      #for r in test.ref [
-        - #link_to(by_id.at(r))
+
+      #if test.ref.len() == 1 [
+        *Is a test for* #link_to(by_id.at(test.ref.at(0)))
+      ] else [
+        === Is a test for
+        #for r in test.ref [
+          - #link_to(by_id.at(r))
+        ]
       ]
       === Initial state
       #if "initial" in test [
@@ -176,7 +181,7 @@
       === Procedure
       #for step in test.steps {
         enum.item()[
-          #step.action
+          #eval(step.action, mode: "markup")
           #if ("run" in step) or ("sample" in step) {
             block(
               {
