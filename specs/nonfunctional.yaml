@@ -9,13 +9,11 @@ requirements:
   ref: [SF001]
   short: Do not contraint file names
   long: Requirements can be split in any number of files
-- id: SN005
+- id: SN003
   long: It should be possible to edit specifications without deep knowledge of git
-- id: SN006
+- id: SN004
   long: It should be possible to generate the PDF output without an internet connection
-- id: SN007
-  long: It should be possible to generate the HTML output without an internet connection
-- id: SN008
+- id: SN005
   ref: [SF006]
   short: Apply fields to lists of comments
   long: It should be possible to set a default value to comment fields in the same comment file
