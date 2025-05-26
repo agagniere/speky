@@ -6,7 +6,7 @@ tests:
     - SF001
     - SN001
   short: Writing requirements as text
-  long: We write requirements in a text file
+  long: We write requirements and functional tests in text files
   initial: Blank project
   steps:
     - action: |

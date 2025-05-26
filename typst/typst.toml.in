@@ -1,0 +1,6 @@
+[package]
+name = "speky"
+version = "${PACKAGE_VERSION}"
+entrypoint = "speky.typ"
+license = "MIT"
+authors = ["Antoine GAGNIERE"]
