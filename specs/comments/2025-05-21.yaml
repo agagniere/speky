@@ -11,7 +11,8 @@ comments:
   external: true
   text: There is no mention of test procedures
 - about: SF002
-  from: Antoine
+  from: User
+  external: true
   text: Can we list the minimum info that must be present ?
 - about: SF006
   from: Angry

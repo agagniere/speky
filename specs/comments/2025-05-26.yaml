@@ -1,0 +1,9 @@
+kind: comments
+default:
+  date: 26/05/2025
+  from: Antoine
+comments:
+- about: SF002
+  text: Done in `0.0.3`
+- about: SF005
+  text: A first attempt with pandiff proved inconclusive. More work will be required.

@@ -173,10 +173,14 @@
         #test.initial
       ]
       #if "prereq" in test [
-        The expected state is the final state of tests:
-        #for prereq in test.prereq [
-          - #link_to(by_id.at(prereq))
-        ]
+        The expected state is the final state of
+        #if test.prereq.len() == 1 {
+          link_to(by_id.at(test.prereq.at(0)))
+        } else {
+          for prereq in test.prereq [
+            - #link_to(by_id.at(prereq))
+          ]
+        }
       ]
       === Procedure
       #for step in test.steps {
@@ -246,4 +250,5 @@
   "tests/functional.yaml",
   "comments/2025-05-21.yaml",
   "comments/2025-05-23.yaml",
+  "comments/2025-05-26.yaml",
 ))

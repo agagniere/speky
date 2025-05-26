@@ -49,47 +49,43 @@ tests:
         - The validated requirement(s) in `ref`
         - A procedure to follow in `steps`
 - id: TF002
-  ref:
-    - SF002
-    - SN003
+  ref: [SF002]
   short: Generate a PDF
-  long: Output requirements in PDF format
-  prereq:
-    - TF001
+  long: Output requirements and tests in PDF format
+  prereq: [TF001]
   steps:
-    - action: Copy the typst template from speky
-      run: cp /tmp/speky/specs/pdf.typ .
-    - action: List the yamls files of the project inside
+    - action: List the yamls files of the project inside a typst file
+      run: cat specifications.typ
       sample_lang: typ
       sample: |
-        #speky(("specs.yaml"))
-    - action: Run Typst
-      run: typst compile pdf.typ
-    - action: Open PDF
-      run: open pdf.pdf
+        #speky(("specs.yaml",  "tests.yaml"))
+    - action: Run Typst and open PDF
+      run: typst compile specifications.typ && open specifications.pdf
     - action: |
         Verify the requirements are found inside:
-        - The unique ID and
+        - The unique ID and short summary as section title
+        - The statement as a paragraph
+        Verify that:
+        - the test `T01` links to the requirement `S01`: "Is a test for `S01` Lorem ipsum"
+        - the requiremenmt `S01` links to the test `T01`: "Tested by `T01`"
 - id: TF003
-  ref:
-    - SF004
-    - SN004
+  ref: [SF004]
   short: Use Git for versionning
   long: Setup a git repo with the current files, to be able to revert any change if desired
-  prereq:
-    - TF002
+  prereq: [TF002]
   steps:
     - action: Initialize a git repository
       run: git init
       expected: Initialized empty Git repository in [...]
     - action: Start tracking the specification files
-      run: git add specs.yaml pdf.typ
+      run: git add specs.yaml specifications.typ
     - action: Save current files version
       run: |
-        git commit -m "Initial commit: first 2 requirements"
+        git commit -m "Initial commit: first 2 requirements and 1 test"
     - action: Give a name to that version
       run: git tag 0.0.1
     - action: Delete a requirement in specs.yaml
+      run: cat specifications.typ
       sample_lang: yaml
       sample: |
         kind: specifications
@@ -99,21 +95,20 @@ tests:
           short: Lorem ipsum
           long: The first requirement
     - action: Confirm the requirement is gone
-      run: typst compile pdf.typ && open pdf.pdf
+      run: typst compile specifications.typ && open specifications.pdf
     - action: Revert the deletion
       run: |
         git checkout -- .
     - action: Confirm the requirement is back
-      run: typst compile pdf.typ && open pdf.pdf
+      run: typst compile specifications.typ && open specifications.pdf
 - id: TF004
-  ref:
-    - SF006
+  ref: [SF006]
   short: Add comments
   long: Write a comment file to add comments to specifications
-  prereq:
-    - TF002
+  prereq: [TF002]
   steps:
     - action: Create a comment file
+      run: cat comments.yaml
       sample_lang: yaml
       sample: |
         kind: comments
@@ -123,20 +118,19 @@ tests:
           date: 01/01/2025
           text: The first comment
     - action: Add it to the typst source
+      run: cat specifications.typ
       sample_lang: typ
       sample: |
-        #speky(("specs.yaml", "comments.yaml"))
-    - action: Regenerate the PDF
-      run: typst compile pdf.typ
-    - action: Open the PDF and verify the comment is visible
-      run: open pdf.pdf
+        #speky(("specs.yaml", "tests.yaml", "comments.yaml"))
+    - action: Regenerate the PDF and open it
+      run: typst compile specifications.typ && open specifications.typ
+    - action: |
+        Verify the comment appears in requirement `S01`, in the "Comments" subsection.
 - id: TF005
   short: Tags
   long: Adding a tag to a requirements adds this requirement to the list of that tag.
-  ref:
-    - SF007
-  prereq:
-    - TF002
+  ref: [SF007]
+  prereq: [TF002]
   steps:
     - action: |
         Add tags to specs: edit `specs.yaml` for it to become:
@@ -158,8 +152,8 @@ tests:
             - bar
             - baz
     - action: Regenerate the PDF and verify the tags index is present and listing the right requirements
-      run: typst compile pdf.typ && open pdf.pdf
+      run: typst compile specifications.typ && open specifications.pdf
     - action: |
-        Click on the `bar` label to jump to the list of Bar
+        In the `S01` section, click on the `bar` label to jump to the list of Bar
     - action: |
         Verify both `S01` and `S02` are listed
