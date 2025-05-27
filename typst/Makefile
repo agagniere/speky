@@ -24,7 +24,10 @@ install: typst.toml speky.typ | $(InstallFolder)
 clean:
 	$(RM) typst.toml
 
-.PHONY: install clean
+format: | speky.typ
+	typstyle -i $|
+
+.PHONY: install clean format
 
 # Concrete rules
 

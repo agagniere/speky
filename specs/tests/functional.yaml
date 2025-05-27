@@ -37,8 +37,7 @@ tests:
         category: functional
         tests:
           - id: T01
-            ref:
-              - S01
+            ref: [S01]
             long: The first test, that validates the first requirement
             steps:
               - action: A first step
@@ -148,12 +147,31 @@ tests:
             - bar
         - id: S02
           long: The second requirement
-          tags:
-            - bar
-            - baz
+          tags: [bar, baz]
     - action: Regenerate the PDF and verify the tags index is present and listing the right requirements
       run: typst compile specifications.typ && open specifications.pdf
     - action: |
         In the `S01` section, click on the `bar` label to jump to the list of Bar
     - action: |
         Verify both `S01` and `S02` are listed
+- id: TF006
+  short: Client requirement
+  long: Add the original wording of a requirement from the client
+  ref: [SF008]
+  prereq: [TF002]
+  steps:
+    - action: Add the client wording of a requirement
+      run: cat specs.yaml
+      sample_lang: yaml
+      sample: |
+        kind: specifications
+        category: functional
+        requirements:
+        - id: S01
+          short: Lorem ipsum
+          long: The first requirement
+        - id: S02
+          long: The second requirement
+          client_statement: I want this and that
+    - action: Regenerate the PDF and verify the client statement appears above the regular statement
+      run: typst compile specifications.typ && open specifications.pdf

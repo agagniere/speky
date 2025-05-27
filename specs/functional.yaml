@@ -45,3 +45,7 @@ requirements:
 - id: SF007
   short: Index requirements by tags
   long: The user shall be able add tags to requirements, and the outputs will contain the list of requirements for each tag
+- id: SF008
+  short: Quote client requirement
+  client_statement: We need to be able to read the original statement a requirement is based on
+  long: The user shall be able to provide a variant of a requirement, as it was worded by the client. It shall be displayed atop the requirement, in the style of a quote.

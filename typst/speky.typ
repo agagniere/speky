@@ -17,6 +17,7 @@
 #let display_spec(spec, testers, references, comments, by_id) = [
   #display_title(spec)
   #label(spec.id)
+
   #if "tags" in spec {
     for tag in spec.tags {
       link(label(tag), box(tag, fill: rgb("#7d9"), inset: 3pt, radius: 10pt))
@@ -24,6 +25,18 @@
     }
     linebreak()
   }
+
+  #if "client_statement" in spec {
+    block(
+      spec.client_statement,
+      fill: rgb("#eee"),
+      breakable: false,
+      inset: 10pt,
+      radius: 3pt,
+      stroke: ("left": 5pt + rgb("#888")),
+    )
+  }
+
   #eval(spec.long, mode: "markup")
 
   #if spec.id in testers {
