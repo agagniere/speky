@@ -1,4 +1,4 @@
-#import "@local/speky:0.0.3": speky
+#import "@local/speky:0.0.4": speky, table_to_comments, table_to_requirements
 
 #set document(title: [Speky --- Specifications], author: "Antoine GAGNIERE")
 
@@ -11,11 +11,17 @@
 
 #set page(numbering: "1")
 
-#speky((
-  "functional.yaml",
-  "nonfunctional.yaml",
-  "tests/functional.yaml",
-  "comments/2025-05-21.yaml",
-  "comments/2025-05-23.yaml",
-  "comments/2025-05-26.yaml",
-).map(yaml))
+#speky(
+  (
+    "functional.yaml",
+    "nonfunctional.yaml",
+    "tests/functional.yaml",
+    "comments/2025-05-21.yaml",
+    "comments/2025-05-23.yaml",
+    "comments/2025-05-26.yaml",
+  ).map(yaml)
+    + (
+        table_to_requirements(csv("as_table.csv"), "functional"),
+        table_to_comments(csv("comments/2025-05-27.csv")),
+    ),
+)

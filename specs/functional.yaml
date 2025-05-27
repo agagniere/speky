@@ -49,3 +49,4 @@ requirements:
   short: Quote client requirement
   client_statement: We need to be able to read the original statement a requirement is based on
   long: The user shall be able to provide a variant of a requirement, as it was worded by the client. It shall be displayed atop the requirement, in the style of a quote.
+# SF009 is in a CSV

@@ -12,14 +12,15 @@ else
 	.SHELLFLAGS := -o errexit -o nounset -o pipefail -c
 endif
 
-InstallFolder := $(DataFolder)typst/packages/$(PACKAGE_NAMESPACE)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)
+Files          := typst.toml speky.typ
+InstallFolder  := $(DataFolder)typst/packages/$(PACKAGE_NAMESPACE)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)
+InstalledFiles := $(addprefix $(InstallFolder)/,$(Files))
 
 $(eval export PACKAGE_VERSION)
 
 # Phony rules
 
-install: typst.toml speky.typ | $(InstallFolder)
-	cp $^ "$|"
+install: $(InstalledFiles)
 
 clean:
 	$(RM) typst.toml
@@ -27,9 +28,15 @@ clean:
 format: | speky.typ
 	typstyle -i $|
 
-.PHONY: install clean format
+purge:
+	$(RM) -rv $(InstallFolder)
+
+.PHONY: install clean format purge
 
 # Concrete rules
+
+$(InstalledFiles) &: $(Files) | $(InstallFolder)
+	cp $^ "$|"
 
 typst.toml: typst.toml.in
 	envsubst '$$PACKAGE_VERSION' < $< > $@

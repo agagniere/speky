@@ -1,0 +1,8 @@
+id,client_statement,short,long
+SF009,"We are currently using Excel and want to easily import an existing requirements table","CSV for requirements","The user shall be able to provide a CSV for the `specifications` kind of input file.
+
+The first row must specify the field of the column, valid values include:
+- `id`
+- `client_statement`
+- `short`
+- `long`"

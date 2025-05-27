@@ -59,6 +59,7 @@ tests:
       run: cat specifications.typ
       sample_lang: typ
       sample: |
+        #import "@local/speky:0.0.4": speky
         #speky(("specs.yaml",  "tests.yaml").map(yaml))
     - action: Run Typst and open PDF
       run: typst compile specifications.typ && open specifications.pdf
@@ -122,6 +123,7 @@ tests:
       run: cat specifications.typ
       sample_lang: typ
       sample: |
+        #import "@local/speky:0.0.4": speky
         #speky(("specs.yaml", "tests.yaml", "comments.yaml").map(yaml))
     - action: Regenerate the PDF and open it
       run: typst compile specifications.typ && open specifications.typ
