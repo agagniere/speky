@@ -197,12 +197,12 @@
 
   [
     #heading()[Functional specifications]
-    #for spec in specifications.at("functional") {
+    #for spec in specifications.at("functional").sorted(key: s => s.id) {
       display_spec(spec, testers, references, comments, by_id)
     }
     #pagebreak()
     #heading()[Functional tests]
-    #for test in tests.at("functional") [
+    #for test in tests.at("functional").sorted(key: t => t.id) [
       #display_title(test, supplement: "Test")
       #label(test.id)
       #test.long
@@ -264,14 +264,14 @@
     #if "non-functional" in specifications [
       #pagebreak()
       = Non-functional specifications
-      #for spec in specifications.at("non-functional") {
+      #for spec in specifications.at("non-functional").sorted(key: s => s.id) {
         display_spec(spec, testers, references, comments, by_id)
       }
     ]
     #if tags.len() > 0 [
       #pagebreak()
       = Requirements by tag
-      #for (tag, specs) in tags.pairs() [
+      #for (tag, specs) in tags.pairs().sorted() [
         #heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
         #label(tag)
         #for spec in specs {
