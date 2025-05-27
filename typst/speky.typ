@@ -51,7 +51,15 @@
   link(label(something.id), underline(text(get_title(something), fill: blue)))
 }
 
-#let display_spec(spec, testers, references, comments, by_id) = [
+#let display_spec(
+  spec,
+  testers,
+  references,
+  comments,
+  by_id,
+  f_link,
+  f_eval,
+) = [
   #display_title(spec)
   #label(spec.id)
 
@@ -74,16 +82,16 @@
     )
   }
 
-  #eval(spec.long, mode: "markup")
+  #f_eval(spec.long)
 
   #if spec.id in testers {
     let tests = testers.at(spec.id)
     if tests.len() == 1 [
-      *Tested by* #link_to(tests.at(0))
+      *Tested by* #f_link(tests.at(0))
     ] else [
       === Tested by
       #for test in tests [
-        - #link_to(test)
+        - #f_link(test)
       ]
 
     ]
@@ -92,22 +100,22 @@
   #if spec.id in references {
     let refs = references.at(spec.id)
     if refs.len() == 1 [
-      *Referenced by* #link_to(refs.at(0))
+      *Referenced by* #f_link(refs.at(0))
     ] else [
       === Referenced by
       #for other in refs [
-        - #link_to(other)
+        - #f_link(other)
       ]
     ]
   }
 
   #if "ref" in spec {
     if spec.ref.len() == 1 [
-      *Relates to* #link_to(by_id.at(spec.ref.at(0)))
+      *Relates to* #f_link(by_id.at(spec.ref.at(0)))
     ] else [
       === Relates to
       #for other in spec.ref [
-        - #link_to(by_id.at(other))
+        - #f_link(by_id.at(other))
       ]
     ]
   }
@@ -122,7 +130,7 @@
           grid(
             align(left, strong(comment.from)),
             align(right, text(comment.date, fill: rgb("#999"))),
-            grid.cell(eval(comment.text, mode: "markup"), colspan: 2),
+            grid.cell(f_eval(comment.text), colspan: 2),
             columns: (1fr, 1fr),
             gutter: 8pt
           ),
@@ -144,7 +152,15 @@
   map
 }
 
-#let speky(files) = {
+#let eval_markup(string) = {
+  eval(string, mode: "markup")
+}
+
+#let no_eval(string) = {
+  text(string)
+}
+
+#let speky(files, f_link: link_to, f_eval: eval_markup) = {
   let references = (:)
   let testers = (:)
   let specifications = (:)
@@ -198,7 +214,7 @@
   [
     #heading()[Functional specifications]
     #for spec in specifications.at("functional").sorted(key: s => s.id) {
-      display_spec(spec, testers, references, comments, by_id)
+      display_spec(spec, testers, references, comments, by_id, f_link, f_eval)
     }
     #pagebreak()
     #heading()[Functional tests]
@@ -208,11 +224,11 @@
       #test.long
 
       #if test.ref.len() == 1 [
-        *Is a test for* #link_to(by_id.at(test.ref.at(0)))
+        *Is a test for* #f_link(by_id.at(test.ref.at(0)))
       ] else [
         === Is a test for
         #for r in test.ref [
-          - #link_to(by_id.at(r))
+          - #f_link(by_id.at(r))
         ]
       ]
       === Initial state
@@ -222,17 +238,17 @@
       #if "prereq" in test [
         The expected state is the final state of
         #if test.prereq.len() == 1 {
-          link_to(by_id.at(test.prereq.at(0)))
+          f_link(by_id.at(test.prereq.at(0)))
         } else {
           for prereq in test.prereq [
-            - #link_to(by_id.at(prereq))
+            - #f_link(by_id.at(prereq))
           ]
         }
       ]
       === Procedure
       #for step in test.steps {
         enum.item()[
-          #eval(step.action, mode: "markup")
+          #f_eval(step.action)
           #if ("run" in step) or ("sample" in step) {
             block(
               {
@@ -265,7 +281,7 @@
       #pagebreak()
       = Non-functional specifications
       #for spec in specifications.at("non-functional").sorted(key: s => s.id) {
-        display_spec(spec, testers, references, comments, by_id)
+        display_spec(spec, testers, references, comments, by_id, f_link, f_eval)
       }
     ]
     #if tags.len() > 0 [
@@ -275,7 +291,7 @@
         #heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
         #label(tag)
         #for spec in specs {
-          list.item(link_to(spec))
+          list.item(f_link(spec))
         }
       ]
     ]
