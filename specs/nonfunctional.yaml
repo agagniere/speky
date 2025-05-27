@@ -4,14 +4,28 @@ requirements:
 - id: SN001
   ref: [SF001]
   short: Format is YAML
-  long: The requirements will be written in the YAML format.
+  long: |
+    The requirements, functional tests and comments will be written in the YAML format.
+
+    Other formats will be supported as alternative inputs.
+    For example, for the PDF output, other formats can already be used:
+      - JSON
+      - XML
+      - TOML
 - id: SN002
   ref: [SF001]
   short: Do not contraint file names
-  long: Requirements can be split in any number of files
+  long: |
+    Requirements can be split in any number of files.
+
+    More specifically, there can be any number of requirement files, test files and comment files,
+    the filename of which can be anything.
+
+    The type of a file is determined by the `kind` top-level field, not the filename.
 - id: SN003
-  long: It should be possible to edit specifications without deep knowledge of git
+  long: It should be possible to edit specifications without deep knowledge of git.
 - id: SN004
+  short: Offline development
   long: It should be possible to generate the PDF output without an internet connection
 - id: SN005
   ref: [SF006]

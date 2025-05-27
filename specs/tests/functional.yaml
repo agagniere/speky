@@ -48,7 +48,9 @@ tests:
         - The validated requirement(s) in `ref`
         - A procedure to follow in `steps`
 - id: TF002
-  ref: [SF002]
+  ref:
+    - SF002
+    - SN004
   short: Generate a PDF
   long: Output requirements and tests in PDF format
   prereq: [TF001]
@@ -57,7 +59,7 @@ tests:
       run: cat specifications.typ
       sample_lang: typ
       sample: |
-        #speky(("specs.yaml",  "tests.yaml"))
+        #speky(("specs.yaml",  "tests.yaml").map(yaml))
     - action: Run Typst and open PDF
       run: typst compile specifications.typ && open specifications.pdf
     - action: |
@@ -120,7 +122,7 @@ tests:
       run: cat specifications.typ
       sample_lang: typ
       sample: |
-        #speky(("specs.yaml", "tests.yaml", "comments.yaml"))
+        #speky(("specs.yaml", "tests.yaml", "comments.yaml").map(yaml))
     - action: Regenerate the PDF and open it
       run: typst compile specifications.typ && open specifications.typ
     - action: |
