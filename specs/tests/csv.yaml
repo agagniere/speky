@@ -1,0 +1,33 @@
+kind: tests
+category: functional
+tests:
+- id: TF007
+  short: CSVs
+  ref:
+    - SF009
+    - SF010
+  long: Load requirements and comments from CSVs
+  initial: Blank project
+  steps:
+  - action: Write a CSV file for requirements
+    run: cat specs.csv
+    sample_lang: csv
+    sample: |
+      id,short,long
+      S01,"Lorem ipsum","A requirement from CSV"
+  - action: Write a CSV file for comments
+    run: cat comments.csv
+    sample_lang: csv
+    sample: |
+      from,about,date,text
+      "Some Person",S01,"01/01/2025","A comment from CSV"
+  - action: Write a typst file importing the CSVs
+    run: cat dummy.typ
+    sample_lang: typ
+    sample: |
+      #import "@local/speky:0.0.4": speky, table_to_comments, table_to_requirements
+      #speky((table_to_requirements(csv("specs.csv"), "functional"),
+              table_to_comments(csv("comments.csv"))))
+  - action: Generate the PDF
+    run: typst compile dummy.typ && open dummy.pdf
+  - action: Verify the requirement and comment appear properly

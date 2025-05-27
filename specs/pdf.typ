@@ -16,6 +16,7 @@
     "functional.yaml",
     "nonfunctional.yaml",
     "tests/functional.yaml",
+    "tests/csv.yaml",
     "comments/2025-05-21.yaml",
     "comments/2025-05-23.yaml",
     "comments/2025-05-26.yaml",

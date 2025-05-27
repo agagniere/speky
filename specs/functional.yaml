@@ -50,3 +50,16 @@ requirements:
   client_statement: We need to be able to read the original statement a requirement is based on
   long: The user shall be able to provide a variant of a requirement, as it was worded by the client. It shall be displayed atop the requirement, in the style of a quote.
 # SF009 is in a CSV
+- id: SF010
+  short: CSV for comments
+  long: |
+    The user shall be able to provide a CSV for the `comments` kind of input file.
+
+    The first row must specify the field of the column, valid values are:
+    - `date`
+    - `from`
+    - `external`
+    - `about`
+    - `text`
+
+    The `external` column must contain booleans, either `true` or `false`.

@@ -1,3 +1,4 @@
 date,from,external,about,text
 "27/05/2025","Client",true,SF009,"I want to be able to use CSV for comments too !"
 "27/05/2025","Antoine",false,SF009,"Feature added in `0.0.4`"
+"27/05/2025","Antoine",false,SF010,"Note that default values cannot be set in CSVs"
