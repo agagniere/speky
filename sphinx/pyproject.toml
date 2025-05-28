@@ -1,0 +1,23 @@
+[project]
+name = "speky"
+dynamic = ["version"]
+description = "Git track specifications with YAML"
+requires-python = ">=3.13"
+dependencies = [
+    "furo>=2024.8.6",
+    "myst-parser>=4.0.1",
+    "pyyaml>=6.0.2",
+    "sphinx>=8.2.3",
+    "sphinx-copybutton>=0.5.2",
+]
+
+[build-system]
+requires = ["hatchling", "uv-dynamic-versioning"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "uv-dynamic-versioning"
+
+[tool.uv-dynamic-versioning]
+fallback-version = "0.0.0"
+pattern = "(?P<base>\\d+[.]\\d+[.]\\d+)"
