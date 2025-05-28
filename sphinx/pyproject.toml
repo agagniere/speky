@@ -10,10 +10,16 @@ dependencies = [
     "sphinx>=8.2.3",
     "sphinx-copybutton>=0.5.2",
 ]
+authors = [{name = "Antoine GAGNIERE"}]
+license = 'MIT'
+license-files = ['../LICENSE']
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
+
+[project.scripts]
+speky = "speky:main"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
@@ -21,3 +27,7 @@ source = "uv-dynamic-versioning"
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"
 pattern = "(?P<base>\\d+[.]\\d+[.]\\d+)"
+
+[tool.uv]
+required-version = ">= 0.7.0"
+package = true

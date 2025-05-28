@@ -1,3 +1,4 @@
 *.html
 *.pdf
+__pycache__
 typst/typst.toml
