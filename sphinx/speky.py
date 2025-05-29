@@ -1,25 +1,19 @@
 import argparse
-from collections import defaultdict
 import logging
-from types import SimpleNamespace
-import yaml
 import sys
+from collections import defaultdict
+from types import SimpleNamespace
+
+import yaml
+
 from generators import specification_to_myst
-
-# your_package/__init__.py
-import importlib.metadata
-
-try:
-    __version__ = importlib.metadata.version(__name__)
-except importlib.metadata.PackageNotFoundError:
-    __version__ = "0.0.0"  # Fallback for development mode
 
 if __name__ == "__main__":
     main()
 
 def main():
     cli_parser = argparse.ArgumentParser(
-        prog = f'Speky {__version__}',
+        prog = f'Speky',
         description = "Write your project's specification in YAML, display it as a static website",
         epilog = 'Copyright (c) 2025 Antoine  GAGNIERE')
     cli_parser.add_argument('paths',
@@ -34,7 +28,7 @@ def main():
     for filename in cli_args.paths:
         print(f'Loading {filename}')
         specs.read_yaml(filename)
-    specification_to_myst(specs, f'Speky {__version__}', 'pages')
+    specification_to_myst(specs, 'pages')
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """
@@ -125,7 +119,6 @@ class Specification:
         with open(file_name, encoding='utf8') as f:
             data = yaml.safe_load(f)
             ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
-            print('Found a file of kind', data['kind'])
             match data['kind']:
                 case 'requirements':
                     ensure_fields(f'Top-level of requirements file "{file_name}"',
