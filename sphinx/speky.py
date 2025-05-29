@@ -2,6 +2,9 @@ import argparse
 from collections import defaultdict
 import logging
 from types import SimpleNamespace
+import yaml
+import sys
+from generators import requirement_to_myst
 
 # your_package/__init__.py
 import importlib.metadata
@@ -25,10 +28,12 @@ def main():
                             nargs = '+',
                             help = 'The path of a file to parse as ublox stream')
     cli_args = cli_parser.parse_args()
-    print(cli_args.paths)
 
+    specs = Specifications()
     for filename in cli_args.paths:
         print(filename)
+        specs.read_yaml(filename)
+    requirement_to_myst(specs.specifications['functional'][0], sys.stdout, specs)
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """
@@ -58,14 +63,18 @@ class Requirement(SimpleNamespace):
         ensure_fields(f'Definition of a requirement in "{location}"', data, ['id'])
         ensure_fields(f"Definition of requirement {data['id']} in '{location}'", data, ['long'])
         import_fields(result, data, cls.FIELDS)
-        return cls(**result)
+        return cls(**result.__dict__)
+
+    @property
+    def title(self):
+        return f'`{self.id}` {self.short}' if self.short else f'`{self.id}`'
 
 class Specifications:
     def __init__(self):
         self.specifications = defaultdict(list)
         self.tests = defaultdict(list)
         self.references = defaultdict(list)
-        self.tested_by = defaultdict(list)
+        self.testers_of = defaultdict(list)
         self.comments = defaultdict(list)
         self.by_id = dict()
         self.tags = defaultdict(list)
@@ -73,10 +82,12 @@ class Specifications:
     def load_requirement(self, requirement: Requirement, category: str):
         self.by_id[requirement.id] = requirement
         self.specifications[category].append(requirement)
-        for referred in requirement.ref:
-            self.references[referred].append(requirement)
-        for tag in requirement.tags:
-            self.tags[tag].append(requirement)
+        if requirement.ref:
+            for referred in requirement.ref:
+                self.references[referred].append(requirement)
+        if requirement.tags:
+            for tag in requirement.tags:
+                self.tags[tag].append(requirement)
 
     def read_yaml(self, file_name: str):
         with open(file_name, encoding='utf8') as f:
@@ -87,4 +98,4 @@ class Specifications:
                     ensure_fields(f'Top-level of specification file "{file_name}"',
                                   data, ['requirements', 'category'])
                     for req in data['requirements']:
-                        self.load_requirement(Requirements.from_yaml(req), data['category'])
+                        self.load_requirement(Requirement.from_yaml(req, file_name), data['category'])
