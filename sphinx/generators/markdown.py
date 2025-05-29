@@ -91,26 +91,51 @@ class MystWriter(MarkdownWriter):
     def table_of_content(self, height: int = 0):
         return TableOfContent(self, height = height)
 
-def specification_to_myst(self, folder_name: str):
-    os.makedirs(folder_name, exist_ok = True)
-    index = os.path.join(folder_name, 'index.md')
-    with open(index, encoding='utf8', mode='w') as f:
+def specification_to_myst(self, project_name: str, folder_name: str):
+    os.makedirs(os.path.join(folder_name, 'requirements'), exist_ok = True)
+    os.makedirs(os.path.join(folder_name, 'tests'), exist_ok = True)
+    with open(os.path.join(folder_name, 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
-        output.heading('Specification', 0)
-        output.empty_line()
-        output.heading("Requirements", 1)
-        output.empty_line()
-        for category, requirements in self.requirements.items():
-            output.heading(category[0].upper() + category[1:].lower(), 2)
+        output.heading(f'{project_name} Specification', 0)
+        with output.table_of_content() as toc:
+            toc.write_line('requirements/index')
+            toc.write_line('tests/index')
+    with open(os.path.join(folder_name, 'requirements', 'index.md'), encoding='utf8', mode='w') as f:
+        output = MystWriter(f)
+        output.heading('Requirements', 0)
+        with output.table_of_content() as toc:
+            for category in self.requirements.keys():
+                toc.write_line(category)
+    with open(os.path.join(folder_name, 'tests', 'index.md'), encoding='utf8', mode='w') as f:
+        output = MystWriter(f)
+        output.heading('Tests', 0)
+        with output.table_of_content() as toc:
+            for category in self.tests.keys():
+                toc.write_line(category)
+
+    for category, requirements in self.requirements.items():
+        with open(os.path.join(folder_name, 'requirements', f'{category}.md'), encoding='utf8', mode='w') as f:
+            output = MystWriter(f)
+            output.heading(category.title(), 0)
             with output.table_of_content() as toc:
                 for requirement in requirements:
                     toc.write_line(requirement.id)
-                    file_name = os.path.join(folder_name, f'{requirement.id}.md')
-                    with open(file_name, encoding='utf8', mode='w') as r:
-                        requirement_to_myst(requirement, MystWriter(r), self)
-        output.empty_line()
-        output.heading("Tests", 1)
-        output.empty_line()
+
+        for requirement in requirements:
+            with open(os.path.join(folder_name, 'requirements', f'{requirement.id}.md'), encoding='utf8', mode='w') as f:
+                requirement_to_myst(requirement, MystWriter(f), self)
+
+    for category, tests in self.tests.items():
+        with open(os.path.join(folder_name, 'tests', f'{category}.md'), encoding='utf8', mode='w') as f:
+            output = MystWriter(f)
+            output.heading(category.title(), 0)
+            with output.table_of_content() as toc:
+                for test in tests:
+                    toc.write_line(test.id)
+        for test in tests:
+            with open(os.path.join(folder_name, 'tests', f'{test.id}.md'), encoding='utf8', mode='w') as f:
+                test_to_myst(test, MystWriter(f), self)
+
 
 def requirement_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
@@ -127,3 +152,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
             for test in specs.testers_of[self.id]:
                 dropdown.write_line(f'- {test.title}')
         output.empty_line()
+
+def test_to_myst(self, output: MystWriter, specs):
+    output.heading(self.title, 0)
+    output.write_line(self.long)

@@ -21,6 +21,11 @@ def main():
                             metavar = 'FILE',
                             nargs = '+',
                             help = 'The path of a file to parse as ublox stream')
+    cli_parser.add_argument('-o', '--output-folder',
+                          type = str,
+                          metavar = 'PATH',
+                          default = 'markdown',
+                          help = 'The folder where to place all generated files')
     cli_args = cli_parser.parse_args()
 
     print(cli_args.paths)
@@ -28,7 +33,7 @@ def main():
     for filename in cli_args.paths:
         print(f'Loading {filename}')
         specs.read_yaml(filename)
-    specification_to_myst(specs, 'pages')
+    specification_to_myst(specs, 'Speky', cli_args.output_folder)
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """

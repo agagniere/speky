@@ -2,10 +2,28 @@
 PROJECT_VERSION ?= $(shell git tag --sort '-version:refname' --merged | head -1)
 # ============================================
 
-Sphinx     := uv run sphinx-build
-SphinxHtml := html/index.html
+YamlSources    := $(shell find ../specs -type f -name '*.yaml')
+
+MarkdownFolder := markdown
+MarkdownIndex  := $(MarkdownFolder)/index.md
+
+SphinxFolder   := sphinx
+SphinxHtml     := $(SphinxFolder)/html/index.html
+
+Run            := uv run
+Speky          := $(Run) speky
+Sphinx         := $(Run) sphinx-build
+
 
 $(eval export PROJECT_VERSION)
 
-$(SphinxHtml):
-	$(Sphinx) -M html pages . --conf-dir . --nitpicky
+html: $(SphinxHtml)
+
+clean:
+	$(RM) -r $(SphinxFolder) $(MarkdownFolder)
+
+$(MarkdownIndex): $(YamlSources)
+	$(Speky) $^ --output-folder $(@D)
+
+$(SphinxHtml): $(MarkdownIndex) conf.py Makefile
+	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) --conf-dir . --nitpicky
