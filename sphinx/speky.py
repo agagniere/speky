@@ -4,7 +4,7 @@ import logging
 from types import SimpleNamespace
 import yaml
 import sys
-from generators import requirement_to_myst
+from generators import specification_to_myst
 
 # your_package/__init__.py
 import importlib.metadata
@@ -20,7 +20,7 @@ if __name__ == "__main__":
 def main():
     cli_parser = argparse.ArgumentParser(
         prog = 'Speky',
-        description = 'Write specifications in YAML, display it as a static website',
+        description = "Write your project's specification in YAML, display it as a static website",
         epilog = 'Copyright (c) 2025 Antoine  GAGNIERE')
     cli_parser.add_argument('paths',
                             type = str,
@@ -29,11 +29,12 @@ def main():
                             help = 'The path of a file to parse as ublox stream')
     cli_args = cli_parser.parse_args()
 
-    specs = Specifications()
+    print(cli_args.paths)
+    specs = Specification()
     for filename in cli_args.paths:
-        print(filename)
+        print(f'Loading {filename}')
         specs.read_yaml(filename)
-    requirement_to_myst(specs.specifications['functional'][0], sys.stdout, specs)
+    specification_to_myst(specs, 'Speky 0.0.5', 'generated')
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """
@@ -69,9 +70,9 @@ class Requirement(SimpleNamespace):
     def title(self):
         return f'`{self.id}` {self.short}' if self.short else f'`{self.id}`'
 
-class Specifications:
+class Specification:
     def __init__(self):
-        self.specifications = defaultdict(list)
+        self.requirements = defaultdict(list)
         self.tests = defaultdict(list)
         self.references = defaultdict(list)
         self.testers_of = defaultdict(list)
@@ -81,7 +82,7 @@ class Specifications:
 
     def load_requirement(self, requirement: Requirement, category: str):
         self.by_id[requirement.id] = requirement
-        self.specifications[category].append(requirement)
+        self.requirements[category].append(requirement)
         if requirement.ref:
             for referred in requirement.ref:
                 self.references[referred].append(requirement)
@@ -93,9 +94,10 @@ class Specifications:
         with open(file_name, encoding='utf8') as f:
             data = yaml.safe_load(f)
             ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
+            print('Found a file of kind', data['kind'])
             match data['kind']:
-                case 'specifications':
-                    ensure_fields(f'Top-level of specification file "{file_name}"',
+                case 'requirements':
+                    ensure_fields(f'Top-level of requirements file "{file_name}"',
                                   data, ['requirements', 'category'])
                     for req in data['requirements']:
                         self.load_requirement(Requirement.from_yaml(req, file_name), data['category'])

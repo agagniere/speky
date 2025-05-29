@@ -1,4 +1,5 @@
 from typing import TextIO
+import os
 
 class MarkdownWriter:
 
@@ -83,11 +84,26 @@ class MystWriter(MarkdownWriter):
     def dropdown(self, title, color, opened, icon):
         return Dropdown(self, title, color, opened, icon)
 
-def specifications_to_myst(self, output: TextIO):
-    pass
+def specification_to_myst(self, project_name: str, folder_name: str):
+    os.makedirs(folder_name, exist_ok = True)
+    index = os.path.join(folder_name, 'index.md')
+    with open(index, encoding='utf8', mode='w') as f:
+        output = MystWriter(f)
+        output.heading(f"{project_name} Specification", 1)
+        output.empty_line()
+        output.heading("Requirements", 1)
+        output.empty_line()
+        for category, requirements in self.requirements.items():
+            output.heading(category[0].upper() + category[1:].lower(), 2)
+            for requirement in requirements:
+                file_name = os.path.join(folder_name, f'{requirement.id}.md')
+                with open(file_name, encoding='utf8', mode='w') as r:
+                    requirement_to_myst(requirement, MystWriter(r), self)
+        output.empty_line()
+        output.heading("Tests", 1)
+        output.empty_line()
 
-def requirement_to_myst(self, _output: MystWriter, specs):
-    output = MystWriter(_output)
+def requirement_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
 
     # @TODO: tags

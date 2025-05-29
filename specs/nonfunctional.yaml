@@ -1,4 +1,4 @@
-kind: specifications
+kind: requirements
 category: non-functional
 requirements:
 - id: SN001
