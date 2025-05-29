@@ -9,6 +9,7 @@ dependencies = [
     "pyyaml>=6.0.2",
     "sphinx>=8.2.3",
     "sphinx-copybutton>=0.5.2",
+    "sphinx-design>=0.6.1",
 ]
 authors = [{name = "Antoine GAGNIERE"}]
 license = 'MIT'

@@ -88,24 +88,26 @@ class MystWriter(MarkdownWriter):
     def dropdown(self, height, title, color, opened, icon):
         return Dropdown(height, self, title, color, opened, icon)
 
-    def table_of_content(self, height):
-        return Table_Of_Content(self, height = height)
+    def table_of_content(self, height: int = 0):
+        return TableOfContent(self, height = height)
 
-def specification_to_myst(self, project_name: str, folder_name: str):
+def specification_to_myst(self, folder_name: str):
     os.makedirs(folder_name, exist_ok = True)
     index = os.path.join(folder_name, 'index.md')
     with open(index, encoding='utf8', mode='w') as f:
         output = MystWriter(f)
-        output.heading(f"{project_name} Specification", 1)
+        output.heading('Specification', 0)
         output.empty_line()
         output.heading("Requirements", 1)
         output.empty_line()
         for category, requirements in self.requirements.items():
             output.heading(category[0].upper() + category[1:].lower(), 2)
-            for requirement in requirements:
-                file_name = os.path.join(folder_name, f'{requirement.id}.md')
-                with open(file_name, encoding='utf8', mode='w') as r:
-                    requirement_to_myst(requirement, MystWriter(r), self)
+            with output.table_of_content() as toc:
+                for requirement in requirements:
+                    toc.write_line(requirement.id)
+                    file_name = os.path.join(folder_name, f'{requirement.id}.md')
+                    with open(file_name, encoding='utf8', mode='w') as r:
+                        requirement_to_myst(requirement, MystWriter(r), self)
         output.empty_line()
         output.heading("Tests", 1)
         output.empty_line()
