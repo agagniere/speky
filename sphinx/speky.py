@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
 def main():
     cli_parser = argparse.ArgumentParser(
-        prog = 'Speky',
+        prog = f'Speky {__version__}',
         description = "Write your project's specification in YAML, display it as a static website",
         epilog = 'Copyright (c) 2025 Antoine  GAGNIERE')
     cli_parser.add_argument('paths',
@@ -34,7 +34,7 @@ def main():
     for filename in cli_args.paths:
         print(f'Loading {filename}')
         specs.read_yaml(filename)
-    specification_to_myst(specs, 'Speky 0.0.5', 'generated')
+    specification_to_myst(specs, f'Speky {__version__}', 'pages')
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """
@@ -55,22 +55,44 @@ def ensure_fields(location: str, obj: dict[str], fields: list[str]):
         if not field in obj:
             raise Exception(f'Missing the "{field}" from {location}')
 
-class Requirement(SimpleNamespace):
-    FIELDS = ['id', 'short', 'long', 'tags', 'ref', 'client_statement']
+class SpecItem(SimpleNamespace):
+    id_field = 'id'
+    mandatory_fields = ['long']
+    fields = [id_field] + mandatory_fields + ['short', 'ref']
 
     @classmethod
     def from_yaml(cls, data: dict, location: str):
         result = SimpleNamespace()
-        ensure_fields(f'Definition of a requirement in "{location}"', data, ['id'])
-        ensure_fields(f"Definition of requirement {data['id']} in '{location}'", data, ['long'])
-        import_fields(result, data, cls.FIELDS)
+        ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, [cls.id_field])
+        ensure_fields(f"Definition of {cls.__name__} {data[cls.id_field]} in '{location}'",
+                      data, cls.mandatory_fields)
+        import_fields(result, data, cls.fields)
         return cls(**result.__dict__)
 
     @property
     def title(self):
         return f'`{self.id}` {self.short}' if self.short else f'`{self.id}`'
 
+
+class Requirement(SpecItem):
+    fields = SpecItem.fields + ['tags', 'client_statement']
+
+class Test(SpecItem):
+    fields = SpecItem.fields + ['initial', 'prereq', 'steps']
+
+class Comment(SimpleNamespace):
+    fields = ['about', 'from', 'date', 'text', 'external']
+
+    @classmethod
+    def from_yaml(cls, data: dict, location: str):
+        result = SimpleNamespace()
+        ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, cls.fields)
+        import_fields(result, data, cls.fields)
+        return cls(**result.__dict__)
+
+
 class Specification:
+
     def __init__(self):
         self.requirements = defaultdict(list)
         self.tests = defaultdict(list)
@@ -90,6 +112,15 @@ class Specification:
             for tag in requirement.tags:
                 self.tags[tag].append(requirement)
 
+    def load_test(self, test: Test, category: str):
+        self.by_id[test.id] = test
+        self.tests[category].append(test)
+        for req in test.ref:
+            self.testers_of[req].append(test)
+
+    def load_comment(self, comment: Comment):
+        self.comments[comment.about].append(comment)
+
     def read_yaml(self, file_name: str):
         with open(file_name, encoding='utf8') as f:
             data = yaml.safe_load(f)
@@ -101,3 +132,15 @@ class Specification:
                                   data, ['requirements', 'category'])
                     for req in data['requirements']:
                         self.load_requirement(Requirement.from_yaml(req, file_name), data['category'])
+                case 'tests':
+                    ensure_fields(f'Top-level of tests file "{file_name}"',
+                                  data, ['tests', 'category'])
+                    for test in data['tests']:
+                        self.load_test(Test.from_yaml(test, file_name), data['category'])
+                case 'comments':
+                    ensure_fields(f'Top-level of comments file "{file_name}"', data, ['comments'])
+                    default = {'external': "false"}
+                    if 'default' in data:
+                        default |= data['default']
+                    for comment in data['comments']:
+                        self.load_comment(Comment.from_yaml(default | comment, file_name))
