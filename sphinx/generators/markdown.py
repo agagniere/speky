@@ -51,6 +51,7 @@ class MystEnvironment(MarkdownWriter):
             for key, value in self.args.items():
                 self.write_line(f':{key}: {value}')
             self.empty_line()
+        return self
 
     def __exit__(self, exception_type, exception_value, traceback):
         self.write_line(self.delimiter * (3 + self.height))
@@ -66,13 +67,16 @@ class MarkdownCodeBlock(MystEnvironment):
 class Dropdown(MystEnvironment):
     name = 'dropdown'
 
-    def __init__(self, output: MarkdownWriter, title: str, color: str, opened: bool, icon: str | None = None):
-        super().__init__()
+    def __init__(self, height: int, output: MarkdownWriter, title: str, color: str, opened: bool, icon: str | None = None):
+        super().__init__(output, title, height)
         if opened:
             self.args['open'] = ''
         if icon:
             self.args['icon'] = icon
         self.args['color'] = color
+
+class TableOfContent(MystEnvironment):
+    name = 'toctree'
 
 class MystWriter(MarkdownWriter):
 
@@ -81,8 +85,11 @@ class MystWriter(MarkdownWriter):
             self.write_line('{' + f'attribution="{attribution}"' '}')
         super().quote(quote_lines)
 
-    def dropdown(self, title, color, opened, icon):
-        return Dropdown(self, title, color, opened, icon)
+    def dropdown(self, height, title, color, opened, icon):
+        return Dropdown(height, self, title, color, opened, icon)
+
+    def table_of_content(self, height):
+        return Table_Of_Content(self, height = height)
 
 def specification_to_myst(self, project_name: str, folder_name: str):
     os.makedirs(folder_name, exist_ok = True)
@@ -114,7 +121,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
     output.write_line(self.long)
     output.empty_line()
     if self.id in specs.testers_of:
-        with output.dropdown("Tested by", 'success', True, 'check-circle-fill') as dropdown:
+        with output.dropdown(0, "Tested by", 'success', True, 'check-circle-fill') as dropdown:
             for test in specs.testers_of[self.id]:
                 dropdown.write_line(f'- {test.title}')
         output.empty_line()
