@@ -10,12 +10,12 @@ tests:
   initial: Blank project
   steps:
     - action: |
-        Open a file called `specs.yaml` in a text editor,
+        Open a file called `spec.yaml` in a text editor,
         write 2 requirements inside, so that it contains:
-      run: cat specs.yaml
+      run: cat spec.yaml
       sample_lang: yaml
       sample: |
-        kind: specifications
+        kind: requirements
         category: functional
         requirements:
         - id: S01
@@ -56,13 +56,13 @@ tests:
   prereq: [TF001]
   steps:
     - action: List the yamls files of the project inside a typst file
-      run: cat specifications.typ
+      run: cat specification.typ
       sample_lang: typst
       sample: |
-        #import "@local/speky:0.0.4": speky
-        #speky(("specs.yaml",  "tests.yaml").map(yaml))
+        #import "@local/speky:0.0.5": speky
+        #speky(("spec.yaml",  "tests.yaml").map(yaml))
     - action: Run Typst and open PDF
-      run: typst compile specifications.typ && open specifications.pdf
+      run: typst compile specification.typ && open specification.pdf
     - action: |
         Verify the requirements are found inside:
         - The unique ID and short summary as section title
@@ -80,33 +80,33 @@ tests:
       run: git init
       expected: Initialized empty Git repository in [...]
     - action: Start tracking the specification files
-      run: git add specs.yaml specifications.typ
+      run: git add spec.yaml specification.typ
     - action: Save current files version
       run: |
         git commit -m "Initial commit: first 2 requirements and 1 test"
     - action: Give a name to that version
       run: git tag 0.0.1
-    - action: Delete a requirement in specs.yaml
-      run: cat specifications.typ
+    - action: Delete a requirement in spec.yaml
+      run: cat spec.yaml
       sample_lang: yaml
       sample: |
-        kind: specifications
+        kind: requirements
         category: functional
         requirements:
         - id: S01
           short: Lorem ipsum
           long: The first requirement
     - action: Confirm the requirement is gone
-      run: typst compile specifications.typ && open specifications.pdf
+      run: typst compile specification.typ && open specification.pdf
     - action: Revert the deletion
       run: |
         git checkout -- .
     - action: Confirm the requirement is back
-      run: typst compile specifications.typ && open specifications.pdf
+      run: typst compile specification.typ && open specification.pdf
 - id: TF004
   ref: [SF006]
   short: Add comments
-  long: Write a comment file to add comments to specifications
+  long: Write a comment file to add comments to requirements
   prereq: [TF002]
   steps:
     - action: Create a comment file
@@ -120,13 +120,13 @@ tests:
           date: 01/01/2025
           text: The first comment
     - action: Add it to the typst source
-      run: cat specifications.typ
+      run: cat specification.typ
       sample_lang: typst
       sample: |
-        #import "@local/speky:0.0.4": speky
-        #speky(("specs.yaml", "tests.yaml", "comments.yaml").map(yaml))
+        #import "@local/speky:0.0.5": speky
+        #speky(("spec.yaml", "tests.yaml", "comments.yaml").map(yaml))
     - action: Regenerate the PDF and open it
-      run: typst compile specifications.typ && open specifications.typ
+      run: typst compile specification.typ && open specification.typ
     - action: |
         Verify the comment appears in requirement `S01`, in the "Comments" subsection.
 - id: TF005
@@ -136,11 +136,11 @@ tests:
   prereq: [TF002]
   steps:
     - action: |
-        Add tags to specs: edit `specs.yaml` for it to become:
-      run: cat specs.yaml
+        Add tags to requirements: edit `spec.yaml` for it to become:
+      run: cat spec.yaml
       sample_lang: yaml
       sample: |
-        kind: specifications
+        kind: requirements
         category: functional
         requirements:
         - id: S01
@@ -153,7 +153,7 @@ tests:
           long: The second requirement
           tags: [bar, baz]
     - action: Regenerate the PDF and verify the tags index is present and listing the right requirements
-      run: typst compile specifications.typ && open specifications.pdf
+      run: typst compile specification.typ && open specification.pdf
     - action: |
         In the `S01` section, click on the `bar` label to jump to the list of Bar
     - action: |
@@ -165,10 +165,10 @@ tests:
   prereq: [TF002]
   steps:
     - action: Add the client wording of a requirement
-      run: cat specs.yaml
+      run: cat spec.yaml
       sample_lang: yaml
       sample: |
-        kind: specifications
+        kind: requirements
         category: functional
         requirements:
         - id: S01
@@ -178,4 +178,4 @@ tests:
           long: The second requirement
           client_statement: I want this and that
     - action: Regenerate the PDF and verify the client statement appears above the regular statement
-      run: typst compile specifications.typ && open specifications.pdf
+      run: typst compile specification.typ && open specification.pdf

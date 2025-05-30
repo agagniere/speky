@@ -20,7 +20,7 @@
 
 #let table_to_requirements(table, category) = {
   (
-    "kind": "specifications",
+    "kind": "requirements",
     "category": category,
     "requirements": table_to_dict_list(table),
   )
@@ -154,7 +154,7 @@
   let tags = (:)
 
   for data in files {
-    if data.kind == "specifications" {
+    if data.kind == "requirements" {
       let category = data.category
       for spec in data.requirements {
         by_id.insert(spec.id, spec)
@@ -196,12 +196,12 @@
   }
 
   [
-    #heading()[Functional specifications]
+    = Functional Requirements
     #for spec in specifications.at("functional").sorted(key: s => s.id) {
       display_spec(spec, testers, references, comments, by_id)
     }
     #pagebreak()
-    #heading()[Functional tests]
+    = Functional Tests
     #for test in tests.at("functional").sorted(key: t => t.id) [
       #display_title(test, supplement: "Test")
       #label(test.id)
@@ -259,11 +259,33 @@
           }
         ]
       }
+  #if test.id in comments [
+    === Comments
+    #for comment in comments.at(test.id) {
+      let external = ("external" in comment) and comment.external
+      align(
+        if external { left } else { right },
+        box(
+          grid(
+            align(left, strong(comment.from)),
+            align(right, text(comment.date, fill: rgb("#999"))),
+            grid.cell(eval(comment.text, mode: "markup"), colspan: 2),
+            columns: (1fr, 1fr),
+            gutter: 8pt
+          ),
+          width: 80%,
+          inset: 5pt,
+          radius: 5pt,
+          fill: if external { rgb("#eee") } else { rgb("#eef") },
+        ),
+      )
+    }
+  ]
       #pagebreak(weak: true)
     ]
     #if "non-functional" in specifications [
       #pagebreak()
-      = Non-functional specifications
+      = Non-Functional Requirements
       #for spec in specifications.at("non-functional").sorted(key: s => s.id) {
         display_spec(spec, testers, references, comments, by_id)
       }

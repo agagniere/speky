@@ -207,7 +207,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
 
     if self.tags:
         for tag in self.tags:
-            output.write_line('{bdg-primary}`' + f'{tag}`')
+            output.write_line('{bdg-ref-primary}`' + f'{tag} </by_tag>`')
 
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
