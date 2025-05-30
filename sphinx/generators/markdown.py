@@ -84,6 +84,31 @@ class Dropdown(MystEnvironment):
 class TableOfContent(MystEnvironment):
     name = 'toctree'
 
+class Card(MystEnvironment):
+    name = 'card'
+
+    def __init__(self, height: int, output: MarkdownWriter, title: str, text_align: str, width: str = 'auto', margin: str = 'auto', header: str | None = None, footer: str | None = None):
+        super().__init__(output, title, height)
+        self.args['text-align'] = text_align
+        self.args['width'] = width
+        self.args['margin'] = margin
+        self.header = header
+        self.footer = footer
+
+    def __enter__(self):
+        super().__enter__()
+        if self.header:
+            self.write_line(self.header)
+            self.write_line('^^^')
+        return self
+
+    def __exit__(self, *args):
+        if self.footer:
+            self.write_line('+++')
+            self.write_line(self.footer)
+        super().__exit__(*args)
+
+
 class MystWriter(MarkdownWriter):
 
     def quote(self, quote_lines: list[str], attribution: str | None = None):
@@ -96,6 +121,9 @@ class MystWriter(MarkdownWriter):
 
     def table_of_content(self, height: int = 0):
         return TableOfContent(self, height = height)
+
+    def card(self, height, title, align, **kwargs):
+        return Card(height, self, title, align, **kwargs)
 
 def specification_to_myst(self, project_name: str, folder_name: str):
     os.makedirs(os.path.join(folder_name, 'requirements'), exist_ok = True)
@@ -180,7 +208,8 @@ def requirement_to_myst(self, output: MystWriter, specs):
         output.write_line('-' * 10)
         output.write_line('Comments')
         for comment in specs.comments[self.id]:
-            output.write_line(f'- {comment.text}')
+            with output.card(0, getattr(comment, 'from'), 'left' if comment.external else 'right') as card:
+                output.write_line(comment.text)
 
 def test_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)

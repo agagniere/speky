@@ -2,7 +2,8 @@
 PROJECT_VERSION ?= $(shell git tag --sort '-version:refname' --merged | head -1)
 # ============================================
 
-PythonSources  := $(shell find generators -type f -name '*.py')
+PythonSources  := speky.py
+PythonSources  += $(shell find generators -type f -name '*.py')
 YamlSources    := $(shell find ../specs -type f -name '*.yaml')
 
 MarkdownFolder := markdown

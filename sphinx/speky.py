@@ -28,7 +28,6 @@ def main():
                           help = 'The folder where to place all generated files')
     cli_args = cli_parser.parse_args()
 
-    print(cli_args.paths)
     specs = Specification()
     for filename in cli_args.paths:
         print(f'Loading {filename}')
@@ -90,6 +89,7 @@ class Comment(SimpleNamespace):
         result = SimpleNamespace()
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, cls.fields)
         import_fields(result, data, cls.fields)
+        result.external = (result.external in ['True', 'true', True, 1, '1'])
         return cls(**result.__dict__)
 
 
@@ -140,7 +140,7 @@ class Specification:
                         self.load_test(Test.from_yaml(test, file_name), data['category'])
                 case 'comments':
                     ensure_fields(f'Top-level of comments file "{file_name}"', data, ['comments'])
-                    default = {'external': "false"}
+                    default = {'external': False}
                     if 'default' in data:
                         default |= data['default']
                     for comment in data['comments']:
