@@ -149,6 +149,7 @@ def specification_to_myst(self, project_name: str, folder_name: str):
         with output.table_of_content(max_depth = 3) as toc:
             toc.write_line('requirements/index')
             toc.write_line('tests/index')
+            toc.write_line('by_tag')
     with open(os.path.join(folder_name, 'requirements', 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('Requirements', 0)
@@ -184,8 +185,13 @@ def specification_to_myst(self, project_name: str, folder_name: str):
         for test in tests:
             with open(os.path.join(folder_name, 'tests', f'{test.id}.md'), encoding='utf8', mode='w') as f:
                 test_to_myst(test, MystWriter(f), self)
-
-
+    with open(os.path.join(folder_name, 'by_tag.md'), encoding='utf8', mode='w') as f:
+        output = MystWriter(f)
+        output.heading('Tags', 0)
+        for tag, requirements in sorted(self.tags.items()):
+            output.heading(tag.title(), 1)
+            for requirement in requirements:
+                output.write_line(f'- {link_to(requirement)}')
 def link_to(item):
     return Markdown.link(item.title, f'/{item.folder}/{item.id}')
 
@@ -193,7 +199,7 @@ def write_list_of_links(output: MarkdownWriter, items):
     if len(items) == 1:
         output.write_line(link_to(items[0]))
     else:
-        for item in items:
+        for item in sorted(items):
             output.write_line(f'- {link_to(item)}')
 
 def requirement_to_myst(self, output: MystWriter, specs):
