@@ -72,6 +72,9 @@ class SpecItem(SimpleNamespace):
     def title(self):
         return f'`{self.id}` {self.short}' if self.short else f'`{self.id}`'
 
+    def __lt__(self, other):
+        return self.id < other.id
+
 
 class Requirement(SpecItem):
     fields = SpecItem.fields + ['tags', 'client_statement']
