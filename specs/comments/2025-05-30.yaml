@@ -1,0 +1,10 @@
+kind: comments
+default:
+  date: 30/05/2025
+  about: TF004
+comments:
+- from: User
+  external: true
+  text: Can I leave comments on tests too
+- from: Antoine
+  text: !!str Yes

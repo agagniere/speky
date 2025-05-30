@@ -20,6 +20,7 @@
     "comments/2025-05-21.yaml",
     "comments/2025-05-23.yaml",
     "comments/2025-05-26.yaml",
+    "comments/2025-05-30.yaml",
   ).map(yaml)
     + (
         table_to_requirements(csv("as_table.csv"), "functional"),

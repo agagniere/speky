@@ -23,7 +23,7 @@ tests:
       "Some Person",S01,"01/01/2025","A comment from CSV"
   - action: Write a typst file importing the CSVs
     run: cat dummy.typ
-    sample_lang: typ
+    sample_lang: typst
     sample: |
       #import "@local/speky:0.0.4": speky, table_to_comments, table_to_requirements
       #speky((table_to_requirements(csv("specs.csv"), "functional"),
