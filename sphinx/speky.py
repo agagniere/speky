@@ -54,6 +54,7 @@ def ensure_fields(location: str, obj: dict[str], fields: list[str]):
             raise Exception(f'Missing the "{field}" from {location}')
 
 class SpecItem(SimpleNamespace):
+    folder = 'misc'
     id_field = 'id'
     mandatory_fields = ['long']
     fields = [id_field] + mandatory_fields + ['short', 'ref']
@@ -76,9 +77,11 @@ class SpecItem(SimpleNamespace):
 
 
 class Requirement(SpecItem):
+    folder = 'requirements'
     fields = SpecItem.fields + ['tags', 'client_statement']
 
 class Test(SpecItem):
+    folder = 'tests'
     fields = SpecItem.fields + ['initial', 'prereq', 'steps']
 
 class Comment(SimpleNamespace):
