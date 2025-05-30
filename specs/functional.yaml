@@ -14,6 +14,7 @@ requirements:
     A test is constituted by:
       - one or more requirements that it validates at least partially
       - A procedure to follow, with instructions and expected behaviors / outputs
+  tags: [input]
 - id: SF002
   short: PDF output
   long: |
@@ -21,18 +22,15 @@ requirements:
 
     Each requirement shall appear as a section containing the various informations listed in `SF001`,
     but also which tests validate this requirement and which other requirements refer to it.
-  tags:
-    - outputs
+  tags: [outputs]
 - id: SF003
   short: HTML output
   long: The user shall be able to read the specifications as a static website
-  tags:
-    - outputs
+  tags: [outputs]
 - id: SF004
   short: Version controlled
   long: The user shall be able to rollback changes, view previous versions, review changes
-  tags:
-    - versions
+  tags: [versions]
 - id: SF005
   short: Differential PDF
   long: The user shall be able to obtain a differential PDF highlighting the differences between a version and the previous
@@ -42,6 +40,7 @@ requirements:
 - id: SF006
   short: Support comments
   long: The user shall be able to add comments to a specification and to tests
+  tags: [input]
 - id: SF007
   short: Index requirements by tags
   long: The user shall be able add tags to requirements, and the outputs will contain the list of requirements for each tag
@@ -49,7 +48,19 @@ requirements:
   short: Quote client requirement
   client_statement: We need to be able to read the original statement a requirement is based on
   long: The user shall be able to provide a variant of a requirement, as it was worded by the client. It shall be displayed atop the requirement, in the style of a quote.
-# SF009 is in a CSV
+  tags: [input]
+- id: SF009
+  short: CSV for requirements
+  client_statement: We are currently using Excel and want to easily import an existing requirements table
+  long: |
+    The user shall be able to provide a CSV for the `specifications` kind of input file.
+
+    The first row must specify the field of the column, valid values include:
+    - `id`
+    - `client_statement`
+    - `short`
+    - `long`
+  tags: [input]
 - id: SF010
   short: CSV for comments
   long: |
@@ -62,4 +73,5 @@ requirements:
     - `about`
     - `text`
 
-    The `external` column must contain booleans, either `true` or `false`.
+    The `external` column must contain booleans, either `true`, `false`, `1` or `0`.
+  tags: [input]
