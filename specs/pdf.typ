@@ -1,4 +1,4 @@
-#import "@local/speky:0.0.4": speky, table_to_comments, table_to_requirements
+#import "@local/speky:0.0.5": speky, table_to_comments, table_to_requirements
 
 #set document(title: [Speky --- Specifications], author: "Antoine GAGNIERE")
 
@@ -23,7 +23,6 @@
     "comments/2025-05-30.yaml",
   ).map(yaml)
     + (
-        table_to_requirements(csv("as_table.csv"), "functional"),
-        table_to_comments(csv("comments/2025-05-27.csv")),
-    ),
+      "comments/2025-05-27.csv",
+    ).map(f => table_to_comments(csv(f))),
 )
