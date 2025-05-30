@@ -7,6 +7,11 @@ class Markdown:
     def bold(string: str):
         return f'__{string}__'
 
+    @staticmethod
+    def link(text: str, link: str):
+        return f'[{text}]({link})'
+
+
 class MarkdownWriter:
 
     def __init__(self, output: TextIO):
@@ -30,6 +35,7 @@ class MarkdownWriter:
 
     def code_block(self, code: str, language: str = ''):
         return MarkdownCodeBlock(language, self)
+
 
 class MystEnvironment(MarkdownWriter):
     delimiter = ':'
@@ -87,11 +93,15 @@ class TableOfContent(MystEnvironment):
 class Card(MystEnvironment):
     name = 'card'
 
-    def __init__(self, height: int, output: MarkdownWriter, title: str, text_align: str, width: str = 'auto', margin: str = 'auto', header: str | None = None, footer: str | None = None):
+    def __init__(self, height: int, output: MarkdownWriter, title: str, text_align: str,
+                 width: str | None = None, margin: str | None = None,
+                 header: str | None = None, footer: str | None = None):
         super().__init__(output, title, height)
         self.args['text-align'] = text_align
-        self.args['width'] = width
-        self.args['margin'] = margin
+        if width:
+            self.args['width'] = width
+        if margin:
+            self.args['margin'] = margin
         self.header = header
         self.footer = footer
 
@@ -171,6 +181,16 @@ def specification_to_myst(self, project_name: str, folder_name: str):
                 test_to_myst(test, MystWriter(f), self)
 
 
+def link_to(item):
+    return Markdown.link(item.title, f'/{item.folder}/{item.id}')
+
+def write_list_of_links(output: MarkdownWriter, items):
+    if len(items) == 1:
+        output.write_line(link_to(items[0]))
+    else:
+        for item in items:
+            output.write_line(f'- {link_to(item)}')
+
 def requirement_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
 
@@ -185,28 +205,21 @@ def requirement_to_myst(self, output: MystWriter, specs):
     output.empty_line()
     if self.id in specs.testers_of:
         with output.dropdown(0, "Tested by", 'success', True, 'check-circle-fill') as dropdown:
-            if len(specs.testers_of[self.id]) == 1:
-                dropdown.write_line(specs.testers_of[self.id][0].title)
-            else:
-                for test in specs.testers_of[self.id]:
-                    dropdown.write_line(f'- {test.title}')
+            write_list_of_links(dropdown, specs.testers_of[self.id])
         output.empty_line()
     if self.id in specs.references or self.ref:
         with output.dropdown(0, "References", 'secondary', False, 'link') as dropdown:
             if self.ref:
                 output.write_line(Markdown.bold('Relates to:'))
-                for other_id in self.ref:
-                    other = specs.by_id[other_id]
-                    dropdown.write_line(f'- {other.title}')
+                write_list_of_links(dropdown, list(map(specs.by_id.__getitem__, self.ref)))
                 dropdown.empty_line()
             if self.id in specs.references:
                 output.write_line(Markdown.bold('Referenced by:'))
-                for other in specs.references[self.id]:
-                    dropdown.write_line(f'- {other.title}')
+                write_list_of_links(dropdown, specs.references[self.id])
         output.empty_line()
     if self.id in specs.comments:
         output.write_line('-' * 10)
-        output.write_line('Comments')
+        output.write_line(Markdown.bold('Comments'))
         for comment in specs.comments[self.id]:
             with output.card(0, getattr(comment, 'from'), 'left' if comment.external else 'right') as card:
                 output.write_line(comment.text)
