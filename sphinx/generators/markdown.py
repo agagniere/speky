@@ -33,7 +33,7 @@ class MarkdownWriter:
         for line in quote_lines:
             self.write_line(f'> {line}')
 
-    def code_block(self, code: str, language: str = ''):
+    def code_block(self, language: str = ''):
         return MarkdownCodeBlock(language, self)
 
 
@@ -90,6 +90,11 @@ class Dropdown(MystEnvironment):
 class TableOfContent(MystEnvironment):
     name = 'toctree'
 
+    def __init__(self, output, max_depth: int | None):
+        super().__init__(output)
+        if max_depth is not None:
+            self.args['maxdepth'] = max_depth
+
 class Card(MystEnvironment):
     name = 'card'
 
@@ -129,8 +134,8 @@ class MystWriter(MarkdownWriter):
     def dropdown(self, height, title, color, opened, icon):
         return Dropdown(height, self, title, color, opened, icon)
 
-    def table_of_content(self, height: int = 0):
-        return TableOfContent(self, height = height)
+    def table_of_content(self, max_depth = None):
+        return TableOfContent(self, max_depth = max_depth)
 
     def card(self, height, title, align, **kwargs):
         return Card(height, self, title, align, **kwargs)
@@ -141,19 +146,19 @@ def specification_to_myst(self, project_name: str, folder_name: str):
     with open(os.path.join(folder_name, 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading(f'{project_name} Specification', 0)
-        with output.table_of_content() as toc:
+        with output.table_of_content(max_depth = 3) as toc:
             toc.write_line('requirements/index')
             toc.write_line('tests/index')
     with open(os.path.join(folder_name, 'requirements', 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('Requirements', 0)
-        with output.table_of_content() as toc:
+        with output.table_of_content(max_depth = 2) as toc:
             for category in sorted(self.requirements.keys()):
                 toc.write_line(category)
     with open(os.path.join(folder_name, 'tests', 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('Tests', 0)
-        with output.table_of_content() as toc:
+        with output.table_of_content(max_depth = 2) as toc:
             for category in sorted(self.tests.keys()):
                 toc.write_line(category)
 
@@ -161,7 +166,7 @@ def specification_to_myst(self, project_name: str, folder_name: str):
         with open(os.path.join(folder_name, 'requirements', f'{category}.md'), encoding='utf8', mode='w') as f:
             output = MystWriter(f)
             output.heading(category.title(), 0)
-            with output.table_of_content() as toc:
+            with output.table_of_content(max_depth = 1) as toc:
                 for requirement in sorted(requirements):
                     toc.write_line(requirement.id)
 
@@ -173,7 +178,7 @@ def specification_to_myst(self, project_name: str, folder_name: str):
         with open(os.path.join(folder_name, 'tests', f'{category}.md'), encoding='utf8', mode='w') as f:
             output = MystWriter(f)
             output.heading(category.title(), 0)
-            with output.table_of_content() as toc:
+            with output.table_of_content(max_depth = 1) as toc:
                 for test in sorted(tests):
                     toc.write_line(test.id)
         for test in tests:
@@ -226,4 +231,27 @@ def requirement_to_myst(self, output: MystWriter, specs):
 
 def test_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
+    output.empty_line()
     output.write_line(self.long)
+    output.empty_line()
+    with output.dropdown(0, "Is a test for", 'primary', True, 'check-circle-fill') as dropdown:
+        write_list_of_links(dropdown, [specs.by_id[r] for r in self.ref])
+    output.empty_line()
+    output.heading('Initial state', 1)
+    if self.initial:
+        output.write_line(self.initial)
+    if self.prereq:
+        output.write_line('The expected state is the final state of')
+        write_list_of_links(output, [specs.by_id[p] for p in self.prereq])
+    output.heading('Procedure', 1)
+    for i, step in enumerate(self.steps, 1):
+        output.heading(f'Step {i}', 2)
+        output.write_line(step['action'])
+        if 'run' in step:
+            with output.code_block('console') as codeblock:
+                codeblock.write_line('$ ' + step['run'])
+                if 'expected' in step:
+                    codeblock.write_line(step['expected'])
+        if 'sample' in step:
+            with output.code_block(step.get('sample_lang', 'text')) as codeblock:
+                codeblock.write_line(step['sample'])
