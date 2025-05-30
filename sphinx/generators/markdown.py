@@ -227,7 +227,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
         output.write_line(Markdown.bold('Comments'))
         for comment in specs.comments[self.id]:
             with output.card(0, getattr(comment, 'from'), 'left' if comment.external else 'right') as card:
-                output.write_line(comment.text)
+                card.write_line(comment.text)
 
 def test_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
@@ -255,3 +255,9 @@ def test_to_myst(self, output: MystWriter, specs):
         if 'sample' in step:
             with output.code_block(step.get('sample_lang', 'text')) as codeblock:
                 codeblock.write_line(step['sample'])
+    if self.id in specs.comments:
+        output.heading('Comments', 1)
+        for comment in specs.comments[self.id]:
+            with output.card(0, getattr(comment, 'from'),
+                             'left' if comment.external else 'right') as card:
+                card.write_line(comment.text)

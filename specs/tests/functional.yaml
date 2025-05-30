@@ -57,7 +57,7 @@ tests:
   steps:
     - action: List the yamls files of the project inside a typst file
       run: cat specifications.typ
-      sample_lang: typ
+      sample_lang: typst
       sample: |
         #import "@local/speky:0.0.4": speky
         #speky(("specs.yaml",  "tests.yaml").map(yaml))
@@ -121,7 +121,7 @@ tests:
           text: The first comment
     - action: Add it to the typst source
       run: cat specifications.typ
-      sample_lang: typ
+      sample_lang: typst
       sample: |
         #import "@local/speky:0.0.4": speky
         #speky(("specs.yaml", "tests.yaml", "comments.yaml").map(yaml))
