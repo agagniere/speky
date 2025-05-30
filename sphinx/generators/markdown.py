@@ -1,6 +1,12 @@
 from typing import TextIO
 import os
 
+class Markdown:
+
+    @staticmethod
+    def bold(string: str):
+        return f'__{string}__'
+
 class MarkdownWriter:
 
     def __init__(self, output: TextIO):
@@ -104,13 +110,13 @@ def specification_to_myst(self, project_name: str, folder_name: str):
         output = MystWriter(f)
         output.heading('Requirements', 0)
         with output.table_of_content() as toc:
-            for category in self.requirements.keys():
+            for category in sorted(self.requirements.keys()):
                 toc.write_line(category)
     with open(os.path.join(folder_name, 'tests', 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('Tests', 0)
         with output.table_of_content() as toc:
-            for category in self.tests.keys():
+            for category in sorted(self.tests.keys()):
                 toc.write_line(category)
 
     for category, requirements in self.requirements.items():
@@ -118,7 +124,7 @@ def specification_to_myst(self, project_name: str, folder_name: str):
             output = MystWriter(f)
             output.heading(category.title(), 0)
             with output.table_of_content() as toc:
-                for requirement in requirements:
+                for requirement in sorted(requirements):
                     toc.write_line(requirement.id)
 
         for requirement in requirements:
@@ -130,7 +136,7 @@ def specification_to_myst(self, project_name: str, folder_name: str):
             output = MystWriter(f)
             output.heading(category.title(), 0)
             with output.table_of_content() as toc:
-                for test in tests:
+                for test in sorted(tests):
                     toc.write_line(test.id)
         for test in tests:
             with open(os.path.join(folder_name, 'tests', f'{test.id}.md'), encoding='utf8', mode='w') as f:
@@ -140,7 +146,9 @@ def specification_to_myst(self, project_name: str, folder_name: str):
 def requirement_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
 
-    # @TODO: tags
+    if self.tags:
+        for tag in self.tags:
+            output.write_line('{bdg-primary}`' + f'{tag}`')
 
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
@@ -149,9 +157,30 @@ def requirement_to_myst(self, output: MystWriter, specs):
     output.empty_line()
     if self.id in specs.testers_of:
         with output.dropdown(0, "Tested by", 'success', True, 'check-circle-fill') as dropdown:
-            for test in specs.testers_of[self.id]:
-                dropdown.write_line(f'- {test.title}')
+            if len(specs.testers_of[self.id]) == 1:
+                dropdown.write_line(specs.testers_of[self.id][0].title)
+            else:
+                for test in specs.testers_of[self.id]:
+                    dropdown.write_line(f'- {test.title}')
         output.empty_line()
+    if self.id in specs.references or self.ref:
+        with output.dropdown(0, "References", 'secondary', False, 'link') as dropdown:
+            if self.ref:
+                output.write_line(Markdown.bold('Relates to:'))
+                for other_id in self.ref:
+                    other = specs.by_id[other_id]
+                    dropdown.write_line(f'- {other.title}')
+                dropdown.empty_line()
+            if self.id in specs.references:
+                output.write_line(Markdown.bold('Referenced by:'))
+                for other in specs.references[self.id]:
+                    dropdown.write_line(f'- {other.title}')
+        output.empty_line()
+    if self.id in specs.comments:
+        output.write_line('-' * 10)
+        output.write_line('Comments')
+        for comment in specs.comments[self.id]:
+            output.write_line(f'- {comment.text}')
 
 def test_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
