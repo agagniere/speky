@@ -67,6 +67,7 @@ tests:
         Verify the requirements are found inside:
         - The unique ID and short summary as section title
         - The statement as a paragraph
+
         Verify that:
         - the test `T01` links to the requirement `S01`: "Is a test for `S01` Lorem ipsum"
         - the requiremenmt `S01` links to the test `T01`: "Tested by `T01`"
@@ -179,3 +180,46 @@ tests:
           client_statement: I want this and that
     - action: Regenerate the PDF and verify the client statement appears above the regular statement
       run: typst compile specification.typ && open specification.pdf
+# TF007 is
+- id: TF008
+  short: HTML output
+  long: Generate Myst Markdown from the specification in YAML, then have sphinx generate a static website
+  ref: [SF003]
+  initial: The [uv](https://docs.astral.sh/uv/getting-started/installation/) tool is required.
+  prereq: [TF004]
+  steps:
+    - action: Install the speky CLI tool
+      run: uv tool install /path/to/speky/sphinx
+      expected: |
+        [...]
+        Installed 1 executable: speky
+    - action: Use it to generate Myst Markdown from the specification in YAML
+      run: speky spec.yaml tests.yaml comments.yaml --output-folder pages
+      expected: |
+        Loading spec.yaml
+        Loading tests.yaml
+        Loading comments.yaml
+    - action: Configure sphinx
+      run: cat conf.py
+      sample_lang: python
+      sample: |
+        project   = 'Dummy'
+        language  = 'en'
+        extensions = [ 'myst_parser', 'sphinx_design' ]
+        myst_enable_extensions = [ 'colon_fence' ]
+    - action: Run sphinx to generate HTML
+      run: uv run sphinx-build -M html pages output --conf-dir .
+      expected: |
+        [...]
+        The HTML pages are in output/html.
+    - action: View the static website
+      run: open output/html/index.html
+    - action: |
+        Validate the site contains a page for `S01`, which contains:
+        - The unique identifier and summary as the page title
+        - The statement as a paragraph
+        - A link to `T01` in a dropdown: "Tested by"
+    - action: |
+        Click on the link to `T01`, and verify that:
+        - `S01` is listed as a tested requirement: "Is a test for"
+        - The procedure is displaye, with each step in the expected order
