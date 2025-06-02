@@ -1,10 +1,10 @@
 #import "@local/speky:0.0.5": speky, table_to_comments, table_to_requirements
 
-#set document(title: [Speky --- Specifications], author: "Antoine GAGNIERE")
+#set document(title: [Speky --- Specification], author: "Antoine GAGNIERE")
 
 #align(center, text(size: 2em, weight: "bold")[
   _Speky_\
-  Specifications
+  Specification
 ])
 #align(bottom, outline(depth: 2))
 #pagebreak()

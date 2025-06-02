@@ -1,4 +1,4 @@
-# Specifications with YAML and PDF
+# Speky: Specifications in YAML
 
 Write your requirements and functional tests in a textual format to easily version it with Git,
 then generate a PDF and a static website.

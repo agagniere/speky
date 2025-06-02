@@ -12,7 +12,8 @@ else
 	.SHELLFLAGS := -o errexit -o nounset -o pipefail -c
 endif
 
-Files          := typst.toml speky.typ
+TypstSources   := $(shell find . -type f -name '*.typ')
+Files          := typst.toml $(TypstSources)
 InstallFolder  := $(DataFolder)typst/packages/$(PACKAGE_NAMESPACE)/$(PACKAGE_NAME)/$(PACKAGE_VERSION)
 InstalledFiles := $(addprefix $(InstallFolder)/,$(Files))
 
@@ -25,7 +26,7 @@ install: $(InstalledFiles)
 clean:
 	$(RM) typst.toml
 
-format: | speky.typ
+format: | $(TypstSources)
 	typstyle -i $|
 
 purge:

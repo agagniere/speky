@@ -1,6 +1,8 @@
 [package]
 name = "speky"
+description = "Manage your specifications with git, render them as PDF"
 version = "${PACKAGE_VERSION}"
 entrypoint = "speky.typ"
 license = "MIT"
-authors = ["Antoine GAGNIERE"]
+authors = ["Antoine GAGNIERE <https://github.com/agagniere>"]
+repository = "https://github.com/agagniere/speky"
