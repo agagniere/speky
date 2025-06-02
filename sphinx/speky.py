@@ -3,7 +3,7 @@ import logging
 import sys
 from collections import defaultdict
 from types import SimpleNamespace
-
+import datetime
 import yaml
 import csv
 
@@ -103,7 +103,11 @@ class Comment(SimpleNamespace):
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, cls.fields)
         import_fields(result, data, cls.fields)
         result.external = (result.external in ['True', 'true', True, 1, '1'])
+        result.time = datetime.datetime.strptime(result.date, "%d/%m/%Y")
         return cls(**result.__dict__)
+
+    def __lt__(self, other):
+        return self.time < other.time
 
 
 class Specification:
