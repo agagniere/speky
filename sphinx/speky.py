@@ -5,6 +5,7 @@ from collections import defaultdict
 from types import SimpleNamespace
 
 import yaml
+import csv
 
 from generators import specification_to_myst
 
@@ -20,18 +21,27 @@ def main():
                             type = str,
                             metavar = 'FILE',
                             nargs = '+',
-                            help = 'The path of a file to parse as ublox stream')
+                            help = 'The path to a YAML file containing requirements, tests or comments')
     cli_parser.add_argument('-o', '--output-folder',
-                          type = str,
-                          metavar = 'PATH',
-                          default = 'markdown',
-                          help = 'The folder where to place all generated files')
+                            type = str,
+                            metavar = 'PATH',
+                            default = 'markdown',
+                            help = 'The folder where to place all generated files')
+    cli_parser.add_argument('-C', '--comment-csv',
+                            dest = 'comment_csvs',
+                            metavar = 'FILE',
+                            type = str,
+                            action = 'append',
+                            help = 'The path to a CSV file containing comments')
     cli_args = cli_parser.parse_args()
 
     specs = Specification()
     for filename in cli_args.paths:
         print(f'Loading {filename}')
         specs.read_yaml(filename)
+    for filename in cli_args.comment_csvs:
+        print(f'Loading {filename} as comments')
+        specs.read_comment_csv(filename)
     specification_to_myst(specs, 'Speky', cli_args.output_folder)
 
 def import_fields(destination, source: dict[str], fields: list[str]):
@@ -148,3 +158,9 @@ class Specification:
                         default |= data['default']
                     for comment in data['comments']:
                         self.load_comment(Comment.from_yaml(default | comment, file_name))
+
+    def read_comment_csv(self, file_name: str):
+        with open(file_name, encoding = 'utf8', newline = '') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                self.load_comment(Comment.from_yaml(row, file_name))

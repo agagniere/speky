@@ -5,6 +5,7 @@ PROJECT_VERSION ?= $(shell git tag --sort '-version:refname' --merged | head -1)
 PythonSources  := speky.py
 PythonSources  += $(shell find generators -type f -name '*.py')
 YamlSources    := $(shell find ../specs -type f -name '*.yaml')
+CSVComments    := $(shell find ../specs/comments -type f -name '*.csv')
 
 MarkdownFolder := markdown
 MarkdownIndex  := $(MarkdownFolder)/index.md
@@ -24,8 +25,8 @@ html: $(SphinxHtml)
 clean:
 	$(RM) -r $(SphinxFolder) $(MarkdownFolder)
 
-$(MarkdownIndex): $(YamlSources) $(PythonSources)
-	$(Speky) $(YamlSources) --output-folder $(@D)
+$(MarkdownIndex): $(YamlSources) $(PythonSources) $(CSVComments)
+	$(Speky) $(YamlSources) $(addprefix -C ,$(CSVComments)) --output-folder $(@D)
 
 $(SphinxHtml): $(MarkdownIndex) conf.py Makefile
 	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) --conf-dir . --nitpicky
