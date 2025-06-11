@@ -25,6 +25,12 @@ speky = "speky:main"
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
+[tool.hatch.build.targets.sdist]
+include = [
+	'speky.py',
+	'/generators',
+]
+
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"
 pattern = "(?P<base>\\d+[.]\\d+[.]\\d+)"

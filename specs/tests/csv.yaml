@@ -25,7 +25,7 @@ tests:
     run: cat dummy.typ
     sample_lang: typst
     sample: |
-      #import "@local/speky:0.0.5": speky, table_to_comments, table_to_requirements
+      #import "@local/speky:0.0.6": speky, table_to_comments, table_to_requirements
       #speky((table_to_requirements(csv("spec.csv"), "functional"),
               table_to_comments(csv("comments.csv"))))
   - action: Generate the PDF
