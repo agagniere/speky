@@ -24,13 +24,13 @@ requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-speky = "python.__main__:main"
+speky = "speky.__main__:main"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
 [tool.hatch.build.targets.wheel]
-packages = [ 'python' ]
+packages = [ 'python/speky' ]
 
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"

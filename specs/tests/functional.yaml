@@ -189,7 +189,7 @@ tests:
   prereq: [TF004]
   steps:
     - action: Install the speky CLI tool
-      run: uv tool install /path/to/speky/sphinx
+      run: uv tool install git+https://github.com/agagniere/speky#master
       expected: |
         [...]
         Installed 1 executable: speky
