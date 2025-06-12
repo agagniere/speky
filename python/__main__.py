@@ -1,16 +1,15 @@
 import argparse
+import csv
+import datetime
 import logging
 import sys
 from collections import defaultdict
 from types import SimpleNamespace
-import datetime
+
 import yaml
-import csv
 
-from generators import specification_to_myst
+from .generators import specification_to_myst
 
-if __name__ == "__main__":
-    main()
 
 def main():
     cli_parser = argparse.ArgumentParser(
@@ -43,6 +42,9 @@ def main():
         print(f'Loading {filename} as comments')
         specs.read_comment_csv(filename)
     specification_to_myst(specs, 'Speky', cli_args.output_folder)
+
+if __name__ == "__main__":
+    main()
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """

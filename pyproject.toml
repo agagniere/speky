@@ -4,32 +4,33 @@ dynamic = ["version"]
 description = "Git track specifications with YAML"
 requires-python = ">=3.13"
 dependencies = [
+    "pyyaml>=6.0.2",
+]
+authors = [{name = "Antoine GAGNIERE"}]
+license = 'MIT'
+license-files = ['LICENSE']
+
+[dependency-groups]
+docs = [
     "furo>=2024.8.6",
     "myst-parser>=4.0.1",
-    "pyyaml>=6.0.2",
     "sphinx>=8.2.3",
     "sphinx-copybutton>=0.5.2",
     "sphinx-design>=0.6.1",
 ]
-authors = [{name = "Antoine GAGNIERE"}]
-license = 'MIT'
-license-files = ['../LICENSE']
 
 [build-system]
 requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-speky = "speky:main"
+speky = "python.__main__:main"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
-[tool.hatch.build.targets.sdist]
-include = [
-	'speky.py',
-	'/generators',
-]
+[tool.hatch.build.targets.wheel]
+packages = [ 'python' ]
 
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"

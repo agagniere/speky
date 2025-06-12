@@ -2,8 +2,7 @@
 PROJECT_VERSION ?= $(shell git tag --sort '-version:refname' --merged | head -1)
 # ============================================
 
-PythonSources  := speky.py
-PythonSources  += $(shell find generators -type f -name '*.py')
+PythonSources  := $(shell find ../python -type f -name '*.py')
 YamlSources    := $(shell find ../specs -type f -name '*.yaml')
 CSVComments    := $(shell find ../specs/comments -type f -name '*.csv')
 
@@ -15,7 +14,7 @@ SphinxHtml     := $(SphinxFolder)/html/index.html
 
 Run            := uv run
 Speky          := $(Run) speky
-Sphinx         := $(Run) sphinx-build
+Sphinx         := $(Run) --group docs sphinx-build
 
 
 $(eval export PROJECT_VERSION)
