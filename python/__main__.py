@@ -32,16 +32,21 @@ def main():
                             type = str,
                             action = 'append',
                             help = 'The path to a CSV file containing comments')
+    cli_parser.add_argument('-p', '--project-name',
+                            type = str,
+                            required = True,
+                            help = 'Name of the project used for the title')
     cli_args = cli_parser.parse_args()
 
     specs = Specification()
     for filename in cli_args.paths:
         print(f'Loading {filename}')
         specs.read_yaml(filename)
-    for filename in cli_args.comment_csvs:
-        print(f'Loading {filename} as comments')
-        specs.read_comment_csv(filename)
-    specification_to_myst(specs, 'Speky', cli_args.output_folder)
+    if cli_args.comment_csvs:
+        for filename in cli_args.comment_csvs:
+            print(f'Loading {filename} as comments')
+            specs.read_comment_csv(filename)
+    specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
 
 if __name__ == "__main__":
     main()

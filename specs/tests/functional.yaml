@@ -194,7 +194,7 @@ tests:
         [...]
         Installed 1 executable: speky
     - action: Use it to generate Myst Markdown from the specification in YAML
-      run: speky spec.yaml tests.yaml comments.yaml --output-folder pages
+      run: speky spec.yaml tests.yaml comments.yaml --output-folder pages --project-name Foo
       expected: |
         Loading spec.yaml
         Loading tests.yaml

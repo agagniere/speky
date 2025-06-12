@@ -25,7 +25,10 @@ clean:
 	$(RM) -r $(SphinxFolder) $(MarkdownFolder)
 
 $(MarkdownIndex): $(YamlSources) $(PythonSources) $(CSVComments)
-	$(Speky) $(YamlSources) $(addprefix -C ,$(CSVComments)) --output-folder $(@D)
+	$(Speky) $(YamlSources) \
+		$(addprefix -C ,$(CSVComments)) \
+		--output-folder $(@D) \
+		--project-name Speky
 
 $(SphinxHtml): $(MarkdownIndex) conf.py Makefile
 	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) --conf-dir . --nitpicky

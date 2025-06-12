@@ -21,7 +21,7 @@ make -C typst
 ### Use from typst
 
 ```typst
-#import "@local/speky:0.0.5": speky
+#import "@local/speky:0.0.6": speky
 
 #speky((
   "requirements.yaml",
@@ -32,6 +32,22 @@ make -C typst
 
 ## Generate a static website
 
-```bash
-make -C sphinx
-```
+1. Install speky
+   ```shell
+   uv tool install git+https://github.com/agagniere/speky#master
+   ```
+1. Generate Myst Markdown:
+   ```shell
+   speky requirements.yaml tests.yaml comments.yaml \
+	   --output-folder markdown \
+	   --project-name Toto
+   ```
+1. Generate HTML with sphinx:
+   ```shell
+   uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
+   sphinx-build -M html markdown sphinx --conf-dir .
+   ```
+1. Open the website in a browser
+   ```shell
+   open sphinx/html/index.html
+   ```
