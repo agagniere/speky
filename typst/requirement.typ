@@ -14,7 +14,7 @@
 
   #if "client_statement" in req {
     block(
-      req.client_statement,
+      eval(req.client_statement, mode: "markup"),
       fill: rgb("#eee"),
       breakable: false,
       inset: 10pt,
@@ -30,7 +30,7 @@
     if tests.len() == 1 [
       *Tested by* #link_to(tests.at(0))
     ] else [
-      === Tested by
+      ==== Tested by
       #for test in tests [
         - #link_to(test)
       ]
@@ -43,7 +43,7 @@
     if refs.len() == 1 [
       *Referenced by* #link_to(refs.at(0))
     ] else [
-      === Referenced by
+      ==== Referenced by
       #for other in refs [
         - #link_to(other)
       ]
@@ -54,7 +54,7 @@
     if req.ref.len() == 1 [
       *Relates to* #link_to(by_id.at(req.ref.at(0)))
     ] else [
-      === Relates to
+      ==== Relates to
       #for other in req.ref [
         - #link_to(by_id.at(other))
       ]
@@ -62,7 +62,7 @@
   }
 
   #if req.id in comments [
-    === Comments
+    ==== Comments
     #for comment in comments.at(req.id) {
       let external = ("external" in comment) and comment.external
       align(
@@ -71,7 +71,7 @@
           grid(
             align(left, strong(comment.from)),
             align(right, text(comment.date, fill: rgb("#999"))),
-            grid.cell(eval(comment.text, mode: "markup"), colspan: 2),
+            grid.cell(align(left, eval(comment.text, mode: "markup")), colspan: 2),
             columns: (1fr, 1fr),
             gutter: 8pt
           ),

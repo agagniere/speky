@@ -1,6 +1,7 @@
 #import "conversions.typ": table_to_comments, table_to_requirements
 #import "requirement.typ": display_requirement
 #import "common.typ": append_at, display_title, link_to
+#import "@preview/suboutline:0.3.0": suboutline
 
 #let speky(files) = {
   let references = (:)
@@ -55,6 +56,8 @@
 
   [
     = Requirements
+    #suboutline(depth: 2)
+    #pagebreak()
     #for (cat, specs) in specifications.pairs().sorted() [
       == #upper(cat.at(0))#lower(cat.slice(1))
       #for spec in specs {
@@ -63,6 +66,8 @@
     ]
     #pagebreak()
     = Tests
+    #suboutline(depth: 2)
+    #pagebreak()
     #for (cat, _tests) in tests.pairs().sorted() [
       == #upper(cat.at(0))#lower(cat.slice(1))
       #for test in _tests [
@@ -73,12 +78,12 @@
         #if test.ref.len() == 1 [
           *Is a test for* #link_to(by_id.at(test.ref.at(0)))
         ] else [
-          === Is a test for
+          ==== Is a test for
           #for r in test.ref [
             - #link_to(by_id.at(r))
           ]
         ]
-        === Initial state
+        ==== Initial state
         #if "initial" in test [
           #test.initial
         ]
@@ -92,7 +97,7 @@
             ]
           }
         ]
-        === Procedure
+        ==== Procedure
         #for step in test.steps {
           enum.item()[
             #eval(step.action, mode: "markup")
@@ -123,7 +128,7 @@
           ]
         }
         #if test.id in comments [
-          === Comments
+          ==== Comments
           #for comment in comments.at(test.id) {
             let external = ("external" in comment) and comment.external
             align(
