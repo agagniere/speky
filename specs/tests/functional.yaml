@@ -194,21 +194,29 @@ tests:
         [...]
         Installed 1 executable: speky
     - action: Use it to generate Myst Markdown from the specification in YAML
-      run: speky spec.yaml tests.yaml comments.yaml --output-folder pages --project-name Foo
+      run: |
+        speky spec.yaml tests.yaml comments.yaml \
+              --output-folder pages --project-name Foo
       expected: |
         Loading spec.yaml
         Loading tests.yaml
         Loading comments.yaml
+    - action: Install sphinx with dependencies
+      run: uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
+      expected: |
+        [...]
+        Installed 4 executables: sphinx-apidoc, sphinx-autogen, sphinx-build, sphinx-quickstart
     - action: Configure sphinx
       run: cat conf.py
       sample_lang: python
       sample: |
-        project   = 'Dummy'
-        language  = 'en'
+        project    = 'Dummy'
+        language   = 'en'
         extensions = [ 'myst_parser', 'sphinx_design' ]
+        html_theme = 'furo'
         myst_enable_extensions = [ 'colon_fence' ]
     - action: Run sphinx to generate HTML
-      run: uv run sphinx-build -M html pages output --conf-dir .
+      run: sphinx-build -M html pages output --conf-dir .
       expected: |
         [...]
         The HTML pages are in output/html.
