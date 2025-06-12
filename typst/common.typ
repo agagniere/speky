@@ -6,7 +6,7 @@
   }
 }
 
-#let display_title(something, level: 2, supplement: "Requirement") = {
+#let display_title(something, level: 3, supplement: "Requirement") = {
   heading(get_title(something), level: level, supplement: supplement)
 }
 

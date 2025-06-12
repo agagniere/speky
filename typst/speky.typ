@@ -54,99 +54,98 @@
   }
 
   [
-    = Functional Requirements
-    #for spec in specifications.at("functional").sorted(key: s => s.id) {
-      display_requirement(spec, testers, references, comments, by_id)
-    }
-    #pagebreak()
-    = Functional Tests
-    #for test in tests.at("functional").sorted(key: t => t.id) [
-      #display_title(test, supplement: "Test")
-      #label(test.id)
-      #test.long
-
-      #if test.ref.len() == 1 [
-        *Is a test for* #link_to(by_id.at(test.ref.at(0)))
-      ] else [
-        === Is a test for
-        #for r in test.ref [
-          - #link_to(by_id.at(r))
-        ]
-      ]
-      === Initial state
-      #if "initial" in test [
-        #test.initial
-      ]
-      #if "prereq" in test [
-        The expected state is the final state of
-        #if test.prereq.len() == 1 {
-          link_to(by_id.at(test.prereq.at(0)))
-        } else {
-          for prereq in test.prereq [
-            - #link_to(by_id.at(prereq))
-          ]
-        }
-      ]
-      === Procedure
-      #for step in test.steps {
-        enum.item()[
-          #eval(step.action, mode: "markup")
-          #if ("run" in step) or ("sample" in step) {
-            block(
-              {
-                if "run" in step {
-                  raw("$ ")
-                  raw(step.run.trim(), lang: "bash")
-                  linebreak()
-                }
-                if "expected" in step {
-                  text(raw(step.expected), fill: rgb("#999"))
-                }
-                if "sample" in step {
-                  raw(step.sample, lang: step.at(
-                    "sample_lang",
-                    default: "text",
-                  ))
-                }
-              },
-              fill: rgb("#f5f5f5"),
-              inset: 8pt,
-              radius: 8pt,
-            )
-            linebreak()
-          }
-        ]
-      }
-      #if test.id in comments [
-        === Comments
-        #for comment in comments.at(test.id) {
-          let external = ("external" in comment) and comment.external
-          align(
-            if external { left } else { right },
-            box(
-              grid(
-                align(left, strong(comment.from)),
-                align(right, text(comment.date, fill: rgb("#999"))),
-                grid.cell(eval(comment.text, mode: "markup"), colspan: 2),
-                columns: (1fr, 1fr),
-                gutter: 8pt
-              ),
-              width: 80%,
-              inset: 5pt,
-              radius: 5pt,
-              fill: if external { rgb("#eee") } else { rgb("#eef") },
-            ),
-          )
-        }
-      ]
-      #pagebreak(weak: true)
-    ]
-    #if "non-functional" in specifications [
-      #pagebreak()
-      = Non-Functional Requirements
-      #for spec in specifications.at("non-functional").sorted(key: s => s.id) {
+    = Requirements
+    #for (cat, specs) in specifications.pairs().sorted() [
+      == #upper(cat.at(0))#lower(cat.slice(1))
+      #for spec in specs {
         display_requirement(spec, testers, references, comments, by_id)
       }
+    ]
+    #pagebreak()
+    = Tests
+    #for (cat, _tests) in tests.pairs().sorted() [
+      == #upper(cat.at(0))#lower(cat.slice(1))
+      #for test in _tests [
+        #display_title(test, supplement: "Test")
+        #label(test.id)
+        #test.long
+
+        #if test.ref.len() == 1 [
+          *Is a test for* #link_to(by_id.at(test.ref.at(0)))
+        ] else [
+          === Is a test for
+          #for r in test.ref [
+            - #link_to(by_id.at(r))
+          ]
+        ]
+        === Initial state
+        #if "initial" in test [
+          #test.initial
+        ]
+        #if "prereq" in test [
+          The expected state is the final state of
+          #if test.prereq.len() == 1 {
+            link_to(by_id.at(test.prereq.at(0)))
+          } else {
+            for prereq in test.prereq [
+              - #link_to(by_id.at(prereq))
+            ]
+          }
+        ]
+        === Procedure
+        #for step in test.steps {
+          enum.item()[
+            #eval(step.action, mode: "markup")
+            #if ("run" in step) or ("sample" in step) {
+              block(
+                {
+                  if "run" in step {
+                    raw("$ ")
+                    raw(step.run.trim(), lang: "bash")
+                    linebreak()
+                  }
+                  if "expected" in step {
+                    text(raw(step.expected), fill: rgb("#999"))
+                  }
+                  if "sample" in step {
+                    raw(step.sample, lang: step.at(
+                      "sample_lang",
+                      default: "text",
+                    ))
+                  }
+                },
+                fill: rgb("#f5f5f5"),
+                inset: 8pt,
+                radius: 8pt,
+              )
+              linebreak()
+            }
+          ]
+        }
+        #if test.id in comments [
+          === Comments
+          #for comment in comments.at(test.id) {
+            let external = ("external" in comment) and comment.external
+            align(
+              if external { left } else { right },
+              box(
+                grid(
+                  align(left, strong(comment.from)),
+                  align(right, text(comment.date, fill: rgb("#999"))),
+                  grid.cell(eval(comment.text, mode: "markup"), colspan: 2),
+                  columns: (1fr, 1fr),
+                  gutter: 8pt,
+                ),
+                width: 80%,
+                inset: 5pt,
+                radius: 5pt,
+                fill: if external { rgb("#eee") } else { rgb("#eef") },
+              ),
+            )
+          }
+        ]
+        #pagebreak(weak: true)
+      ]
     ]
     #if tags.len() > 0 [
       #pagebreak()
