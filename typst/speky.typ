@@ -56,20 +56,20 @@
 
   [
     = Requirements
-    #suboutline(depth: 2)
-    #pagebreak()
     #for (cat, specs) in specifications.pairs().sorted() [
       == #upper(cat.at(0))#lower(cat.slice(1))
+      #suboutline(depth: 1)
+      #pagebreak()
       #for spec in specs {
         display_requirement(spec, testers, references, comments, by_id)
       }
     ]
     #pagebreak()
     = Tests
-    #suboutline(depth: 2)
-    #pagebreak()
     #for (cat, _tests) in tests.pairs().sorted() [
       == #upper(cat.at(0))#lower(cat.slice(1))
+      #suboutline(depth: 1)
+      #pagebreak()
       #for test in _tests [
         #display_title(test, supplement: "Test")
         #label(test.id)
