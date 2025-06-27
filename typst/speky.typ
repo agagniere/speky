@@ -60,7 +60,7 @@
       == #upper(cat.at(0))#lower(cat.slice(1))
       #suboutline(depth: 1)
       #pagebreak()
-      #for spec in specs {
+      #for spec in specs.sorted(key: s => s.id) {
         display_requirement(spec, testers, references, comments, by_id)
       }
     ]
@@ -70,7 +70,7 @@
       == #upper(cat.at(0))#lower(cat.slice(1))
       #suboutline(depth: 1)
       #pagebreak()
-      #for test in _tests [
+      #for test in _tests.sorted(key: t => t.id) [
         #display_title(test, supplement: "Test")
         #label(test.id)
         #test.long
