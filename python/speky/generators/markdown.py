@@ -79,13 +79,14 @@ class MarkdownCodeBlock(MystEnvironment):
 class Dropdown(MystEnvironment):
     name = 'dropdown'
 
-    def __init__(self, height: int, output: MarkdownWriter, title: str, color: str, opened: bool, icon: str | None = None):
+    def __init__(self, height: int, output: MarkdownWriter, title: str, opened: bool, color: str | None = None, icon: str | None = None):
         super().__init__(output, title, height)
         if opened:
             self.args['open'] = ''
         if icon:
             self.args['icon'] = icon
-        self.args['color'] = color
+        if color:
+            self.args['color'] = color
 
 class TableOfContent(MystEnvironment):
     name = 'toctree'
@@ -132,7 +133,7 @@ class MystWriter(MarkdownWriter):
         super().quote(quote_lines)
 
     def dropdown(self, height, title, color, opened, icon):
-        return Dropdown(height, self, title, color, opened, icon)
+        return Dropdown(height, self, title, opened, color, icon)
 
     def table_of_content(self, max_depth = None):
         return TableOfContent(self, max_depth = max_depth)
@@ -211,6 +212,13 @@ def requirement_to_myst(self, output: MystWriter, specs):
 
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
+    if self.keyvalues:
+        with output.dropdown(0, "Associated values", None, False, "note") as dropdown:
+            for item in self.keyvalues:
+                key = next(iter(item))
+                output.write_line(f"- {key}: {item[key]}")
+        output.empty_line()
+
     output.empty_line()
     output.write_line(self.long)
     output.empty_line()
