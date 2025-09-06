@@ -95,7 +95,7 @@ class SpecItem(SimpleNamespace):
 
 class Requirement(SpecItem):
     folder = 'requirements'
-    fields = SpecItem.fields + ['tags', 'client_statement']
+    fields = SpecItem.fields + ['tags', 'client_statement', 'keyvalues']
 
 class Test(SpecItem):
     folder = 'tests'

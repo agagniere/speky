@@ -31,4 +31,5 @@ $(MarkdownIndex): $(YamlSources) $(PythonSources) $(CSVComments)
 		--project-name Speky
 
 $(SphinxHtml): $(MarkdownIndex) conf.py Makefile
-	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) --conf-dir . --nitpicky
+	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) \
+		--conf-dir . --nitpicky --jobs auto

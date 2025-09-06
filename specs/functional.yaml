@@ -75,3 +75,11 @@ requirements:
 
     The `external` column must contain booleans, either `true`, `false`, `1` or `0`.
   tags: [input]
+- id: SF011
+  short: "Support having free key:value"
+  client_statement: We may associate a version to our statement, as well as an author
+  long: The user shall be able to associate many free "key:value" appearing next to the requirement
+  tags: [input, outputs]
+  keyvalues:
+    - version: 1
+    - author: Gloutch
