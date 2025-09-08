@@ -1,0 +1,20 @@
+kind: comments
+default:
+  date: 07/09/2025
+  about: SF011
+comments:
+- from: Gloutch
+  external: true
+  text: |
+    This could take the form:
+    ```
+    keyvalues:
+      - key: value
+    ```
+- from: Antoine
+  text: |
+    What about:
+    ```
+    properties:
+      key: value
+    ```

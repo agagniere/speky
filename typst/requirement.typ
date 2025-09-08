@@ -61,6 +61,13 @@
     ]
   }
 
+  #if "keyvalues" in req [
+    ==== Properties
+    #for (key, value) in req.keyvalues.pairs() [
+      - *#key*: #value
+    ]
+  ]
+
   #if req.id in comments [
     ==== Comments
     #for comment in comments.at(req.id) {
