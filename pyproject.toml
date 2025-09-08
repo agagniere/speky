@@ -11,6 +11,9 @@ license = 'MIT'
 license-files = ['LICENSE']
 
 [dependency-groups]
+dev = [
+    "yamale>=6.0.0",
+]
 docs = [
     "furo>=2024.8.6",
     "myst-parser>=4.0.1",
