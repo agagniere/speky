@@ -21,6 +21,9 @@ $(eval export PROJECT_VERSION)
 
 html: $(SphinxHtml)
 
+open: $(SphinxHtml)
+	open $<
+
 clean:
 	$(RM) -r $(SphinxFolder) $(MarkdownFolder)
 

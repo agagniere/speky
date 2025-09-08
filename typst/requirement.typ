@@ -78,7 +78,10 @@
           grid(
             align(left, strong(comment.from)),
             align(right, text(comment.date, fill: rgb("#999"))),
-            grid.cell(align(left, eval(comment.text, mode: "markup")), colspan: 2),
+            grid.cell(
+              align(left, eval(comment.text, mode: "markup")),
+              colspan: 2,
+            ),
             columns: (1fr, 1fr),
             gutter: 8pt
           ),
