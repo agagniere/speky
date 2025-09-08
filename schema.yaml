@@ -1,0 +1,53 @@
+any(include('requirements'), include('comments'), include('tests'))
+---
+requirements:
+  kind: str(equals='requirements')
+  category: str(min=2)
+  requirements: list(include('requirement'))
+
+requirement:
+  id: include('id')
+  short: str(max=60, required=False)
+  client_statement: str(required=False)
+  long: str()
+  tags: list(str(min=2, max=20), required=False)
+  ref: list(include('id'), required=False)
+  properties: map(str(), str(), required=False)
+
+---
+comments:
+  kind: str(equals='comments')
+  default: include('comment', required=False)
+  comments: list(include('comment'))
+
+comment:
+  about: include('id', required=False)
+  from: str(required=False)
+  text: str(required=False)
+  external: bool(required=False)
+  date: str(required=False)
+
+---
+tests:
+  kind: str(equal='tests')
+  category: str(min=2)
+  tests: list(include('test'))
+
+test:
+  id: include('id')
+  short: str(max=60, required=False)
+  ref: list(include('id'))
+  long: str()
+  initial: str(required=False)
+  prereq: list(include('id'), required=False)
+  steps: list(include('step'))
+
+step:
+  action: str()
+  run: str(required=False)
+  expected: str(required=False)
+  sample_lang: str(required=False)
+  sample: str(required=False)
+
+---
+id: str(min=2, matches='[A-Z0-9_-]+')
