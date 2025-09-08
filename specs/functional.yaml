@@ -83,7 +83,7 @@ requirements:
 
     This allows having project-specific fields.
   tags: [input, outputs]
-  keyvalues:
+  properties:
     version: 1
     author: Gloutch
     since: '`0.1.0`'

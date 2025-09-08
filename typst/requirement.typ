@@ -25,6 +25,13 @@
 
   #eval(req.long, mode: "markup")
 
+  #if "properties" in req [
+    ==== Properties
+    #for (key, value) in req.properties.pairs().sorted() [
+      - *#key*: #eval(str(value), mode: "markup")
+    ]
+  ]
+
   #if req.id in testers {
     let tests = testers.at(req.id)
     if tests.len() == 1 [
@@ -60,13 +67,6 @@
       ]
     ]
   }
-
-  #if "keyvalues" in req [
-    ==== Properties
-    #for (key, value) in req.keyvalues.pairs() [
-      - *#key*: #value
-    ]
-  ]
 
   #if req.id in comments [
     ==== Comments
