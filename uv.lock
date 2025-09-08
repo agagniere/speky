@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.13"
 
 [[package]]
@@ -290,6 +290,9 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+dev = [
+    { name = "yamale" },
+]
 docs = [
     { name = "furo" },
     { name = "myst-parser" },
@@ -302,6 +305,7 @@ docs = [
 requires-dist = [{ name = "pyyaml", specifier = ">=6.0.2" }]
 
 [package.metadata.requires-dev]
+dev = [{ name = "yamale", specifier = ">=6.0.0" }]
 docs = [
     { name = "furo", specifier = ">=2024.8.6" },
     { name = "myst-parser", specifier = ">=4.0.1" },
@@ -444,4 +448,16 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/8a/78/16493d9c386d8e60e442a35feac5e00f0913c0f4b7c217c11e8ec2ff53e0/urllib3-2.4.0.tar.gz", hash = "sha256:414bc6535b787febd7567804cc015fee39daab8ad86268f1310a9250697de466", size = 390672, upload-time = "2025-04-10T15:23:39.232Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6b/11/cc635220681e93a0183390e26485430ca2c7b5f9d33b15c74c2861cb8091/urllib3-2.4.0-py3-none-any.whl", hash = "sha256:4e16665048960a0900c702d4a66415956a584919c03361cac9f1df5c5dd7e813", size = 128680, upload-time = "2025-04-10T15:23:37.377Z" },
+]
+
+[[package]]
+name = "yamale"
+version = "6.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pyyaml" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/37/27/da3742a358015f3c2a069ccdaf7e5766ac358e8200319f640755db3128ae/yamale-6.0.0.tar.gz", hash = "sha256:60be681f35e4939320b89de0d6f187ee0e5479ae7f7286b7f17f0859ddee4a66", size = 41959, upload-time = "2025-01-02T20:40:43.849Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c2/f3/1410e147127d8b1cdb1a9422eaec54d003b9f0772c0432056333de7fc12e/yamale-6.0.0-py3-none-any.whl", hash = "sha256:828c6cf2023101ec97d2759dfdc507e04ecfc0c6d39d500c00c37ec895ada53b", size = 57867, upload-time = "2025-01-02T20:40:42.545Z" },
 ]

@@ -12,7 +12,7 @@ requirement:
   long: str()
   tags: list(str(min=2, max=20), required=False)
   ref: list(include('id'), required=False)
-  properties: map(str(), str(), required=False)
+  properties: map(str(), any(str(), int()),required=False)
 
 ---
 comments:
