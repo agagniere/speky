@@ -215,9 +215,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
     output.empty_line()
     output.write_line(self.long)
     output.empty_line()
-    if self.keyvalues:
-        with output.dropdown(0, "Associated values", 'primary', False, "note") as dropdown:
-            for key, value in sorted(self.keyvalues.items()):
+    if self.properties:
+        with output.dropdown(0, "Properties", 'primary', False, "note") as dropdown:
+            for key, value in sorted(self.properties.items()):
                 dropdown.write_line(f"**{key}:** {value}")
                 dropdown.empty_line()
     if self.id in specs.testers_of:
