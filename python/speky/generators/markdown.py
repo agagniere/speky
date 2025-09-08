@@ -212,16 +212,14 @@ def requirement_to_myst(self, output: MystWriter, specs):
 
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
-    if self.keyvalues:
-        with output.dropdown(0, "Associated values", None, False, "note") as dropdown:
-            for item in self.keyvalues:
-                key = next(iter(item))
-                output.write_line(f"- {key}: {item[key]}")
-        output.empty_line()
-
     output.empty_line()
     output.write_line(self.long)
     output.empty_line()
+    if self.keyvalues:
+        with output.dropdown(0, "Associated values", 'primary', False, "note") as dropdown:
+            for key, value in sorted(self.keyvalues.items()):
+                dropdown.write_line(f"**{key}:** {value}")
+                dropdown.empty_line()
     if self.id in specs.testers_of:
         with output.dropdown(0, "Tested by", 'success', True, 'check-circle-fill') as dropdown:
             write_list_of_links(dropdown, specs.testers_of[self.id])
@@ -233,7 +231,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
                 write_list_of_links(dropdown, list(map(specs.by_id.__getitem__, self.ref)))
                 dropdown.empty_line()
             if self.id in specs.references:
-                output.write_line(Markdown.bold('Referenced by:'))
+                dropdown.write_line(Markdown.bold('Referenced by:'))
                 write_list_of_links(dropdown, specs.references[self.id])
         output.empty_line()
     if self.id in specs.comments:
