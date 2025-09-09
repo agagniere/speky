@@ -1,5 +1,7 @@
 # Speky: Specifications in YAML
 
+![logo](sphinx/assets/Speky.png)
+
 Write your requirements and functional tests in a textual format to easily version it with Git,
 then generate a PDF and a static website.
 

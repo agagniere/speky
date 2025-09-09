@@ -34,6 +34,7 @@ source_suffix = {'.rst': 'restructuredtext', '.md': 'markdown'}
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme       = 'furo'
+html_logo        = 'assets/Speky.png'
 
 html_theme_options = {
     'navigation_with_keys': True,

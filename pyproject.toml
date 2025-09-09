@@ -71,3 +71,4 @@ select = [
     "PIE",
     "I",
 ]
+ignore = ["COM812"]
