@@ -1,5 +1,6 @@
-from typing import TextIO
 import os
+from typing import TextIO
+
 
 class Markdown:
 

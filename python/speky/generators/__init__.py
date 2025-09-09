@@ -1,1 +1,1 @@
-from .markdown import specification_to_myst
+from .markdown import specification_to_myst as specification_to_myst

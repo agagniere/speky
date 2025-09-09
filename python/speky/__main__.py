@@ -2,7 +2,6 @@ import argparse
 import csv
 import datetime
 import logging
-import sys
 from collections import defaultdict
 from types import SimpleNamespace
 
@@ -13,7 +12,7 @@ from .generators import specification_to_myst
 
 def main():
     cli_parser = argparse.ArgumentParser(
-        prog = f'Speky',
+        prog = 'Speky',
         description = "Write your project's specification in YAML, display it as a static website",
         epilog = 'Copyright (c) 2025 Antoine  GAGNIERE')
     cli_parser.add_argument('paths',
@@ -67,7 +66,7 @@ def ensure_fields(location: str, obj: dict[str], fields: list[str]):
     Raise an exception if one of the expected fields is missing
     """
     for field in fields:
-        if not field in obj:
+        if field not in obj:
             raise Exception(f'Missing the field "{field}" from {location}')
 
 class SpecItem(SimpleNamespace):
