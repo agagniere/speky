@@ -31,3 +31,4 @@ requirements:
   ref: [SF006]
   short: Apply fields to lists of comments
   long: It should be possible to set a default value to comment fields in the same comment file
+  tags: [input]

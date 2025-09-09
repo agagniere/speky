@@ -261,7 +261,8 @@ tests:
   steps:
     - action: Add properties to the second requirement
       run: cat specs.yaml
-      expected: |
+      sample_lang: yaml
+      sample: |
         kind: requirements
         category: functional
         requirements:

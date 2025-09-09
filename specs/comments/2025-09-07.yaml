@@ -1,5 +1,6 @@
 kind: comments
 default:
+  from: Antoine
   about: SF011
 comments:
 - from: Gloutch
@@ -11,11 +12,18 @@ comments:
     keyvalues:
       - key: value
     ```
-- from: Antoine
-  date: 07/09/2025
+- date: 07/09/2025
   text: |
     What about:
     ```
     properties:
       key: value
     ```
+- date: 09/09/2025
+  about: SF012
+  text: |
+    While Yamale is great for its simplicity,
+    it doesn't allow documenting fields and generating documentation.
+
+    Also, using the top-level any ruins error message,
+    as Yamale isn't sure which variant is supposed to match.

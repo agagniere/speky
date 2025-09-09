@@ -30,13 +30,13 @@ requirements:
 - id: SF004
   short: Version controlled
   long: The user shall be able to rollback changes, view previous versions, review changes
-  tags: [versions]
+  tags: [versioning]
 - id: SF005
   short: Differential PDF
   long: The user shall be able to obtain a differential PDF highlighting the differences between a version and the previous
   tags:
     - outputs
-    - versions
+    - versioning
 - id: SF006
   short: Support comments
   long: The user shall be able to add comments to a specification and to tests
@@ -44,6 +44,7 @@ requirements:
 - id: SF007
   short: Index requirements by tags
   long: The user shall be able add tags to requirements, and the outputs will contain the list of requirements for each tag
+  tags: [outputs]
 - id: SF008
   short: Quote client requirement
   client_statement: We need to be able to read the original statement a requirement is based on
@@ -82,7 +83,7 @@ requirements:
     The user shall be able to associate arbitrary "key:value" items to a requirement. It shall appear below the requirement.
 
     This allows having project-specific fields.
-  tags: [input, outputs]
+  tags: [input]
   properties:
     version: 1
     author: Gloutch
@@ -90,3 +91,4 @@ requirements:
 - id: SF012
   short: YAML validation
   long: The user shall be able to validate that a YAML is valid, without having to generate an output.
+  tags: [tooling]
