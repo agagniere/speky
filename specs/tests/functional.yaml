@@ -231,10 +231,10 @@ tests:
         - `S01` is listed as a tested requirement: "Is a test for"
         - The procedure is displayed, with each step in the expected order
 - id: TF009
-  ref: [SF011]
+  ref: [SF012]
   short: Validating YAMLs
   long: Without generating any output, we validate that the YAMLs conform to the expected schema
-  initial: The [uv](https://docs.astral.sh/uv/getting-started/installation/) tool is required.
+  initial: The [uv](https://docs.astral.sh/uv/getting-started/installation/) tool and curl are required.
   prereq: [TF004]
   steps:
     - action: Install Yamale
@@ -243,8 +243,9 @@ tests:
         [...]
         Installed 1 executable: yamale
     - action: Obtain the schema
-      run: curl --pogress-bar -O https://raw.githubusercontent.com/agagniere/speky/refs/heads/master/schema.yaml
-      expected: '################################################################################################# 100.0%'
+      run: |
+        curl --pogress-bar -O https://raw.githubusercontent.com/agagniere/speky/refs/heads/master/schema.yaml
+      expected: '#[...]# 100.0%'
     - action: Run Yamale on the YAMLs
       run: yamale -s schema.yaml specs.yaml tests.yaml comments.yaml
       expected: |
@@ -252,3 +253,25 @@ tests:
         Validating tests.yaml...
         Validating comments.yaml...
         Validation success! 👍
+- id: TF010
+  ref: [SF011]
+  short: Writing properties
+  long: We can associate any key-value to a requirement
+  prereq: [TF002]
+  steps:
+    - action: Add properties to the second requirement
+      run: cat specs.yaml
+      expected: |
+        kind: requirements
+        category: functional
+        requirements:
+        - id: S01
+          short: Lorem ipsum
+          long: The first requirement
+        - id: S02
+          long: The second requirement
+          properties:
+            foo: bar
+            baz: 17
+    - action: Regenerate the PDF and verify that the properties correctly appear in `S02`
+      run: typst compile specification.typ --open
