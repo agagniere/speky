@@ -9,6 +9,8 @@ import yaml
 
 from .generators import specification_to_myst
 
+logger = logging.getLogger(__name__)
+
 
 def main():
     cli_parser = argparse.ArgumentParser(
@@ -73,7 +75,7 @@ def import_fields(destination, source: dict[str], fields: list[str]):
         setattr(destination, field, source.get(field, None))
     extras = source.keys() - set(fields)
     if extras:
-        logging.warning(f'Ignored extra fields: {extras}')
+        logger.warning('Ignored extra fields: %s', extras)
 
 
 def ensure_fields(location: str, obj: dict[str], fields: list[str]):
@@ -82,7 +84,8 @@ def ensure_fields(location: str, obj: dict[str], fields: list[str]):
     """
     for field in fields:
         if field not in obj:
-            raise Exception(f'Missing the field "{field}" from {location}')
+            message = f'Missing the field "{field}" from {location}'
+            raise Exception(message)
 
 
 class SpecItem(SimpleNamespace):
@@ -130,7 +133,7 @@ class Comment(SimpleNamespace):
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, cls.fields)
         import_fields(result, data, cls.fields)
         result.external = result.external in ['True', 'true', True, 1, '1']
-        result.time = datetime.datetime.strptime(result.date, '%d/%m/%Y')
+        result.time = datetime.datetime.strptime(result.date, '%d/%m/%Y').astimezone(datetime.UTC)
         return cls(**result.__dict__)
 
     def __lt__(self, other):
@@ -144,7 +147,7 @@ class Specification:
         self.references = defaultdict(list)
         self.testers_of = defaultdict(list)
         self.comments = defaultdict(list)
-        self.by_id = dict()
+        self.by_id = {}
         self.tags = defaultdict(list)
 
     def load_requirement(self, requirement: Requirement, category: str):

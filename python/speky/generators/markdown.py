@@ -4,11 +4,11 @@ from typing import TextIO
 
 class Markdown:
     @staticmethod
-    def bold(string: str):
+    def bold(string: str) -> str:
         return f'__{string}__'
 
     @staticmethod
-    def link(text: str, link: str):
+    def link(text: str, link: str) -> str:
         return f'[{text}]({link})'
 
 
@@ -192,7 +192,11 @@ def specification_to_myst(self, project_name: str, folder_name: str):
                     toc.write_line(requirement.id)
 
         for requirement in requirements:
-            with open(os.path.join(folder_name, 'requirements', f'{requirement.id}.md'), encoding='utf8', mode='w') as f:
+            with open(
+                os.path.join(folder_name, 'requirements', f'{requirement.id}.md'),
+                encoding='utf8',
+                mode='w',
+            ) as f:
                 requirement_to_myst(requirement, MystWriter(f), self)
 
     for category, tests in self.tests.items():
@@ -214,11 +218,11 @@ def specification_to_myst(self, project_name: str, folder_name: str):
                 output.write_line(f'- {link_to(requirement)}')
 
 
-def link_to(item):
+def link_to(item) -> str:
     return Markdown.link(item.title, f'/{item.folder}/{item.id}')
 
 
-def write_list_of_links(output: MarkdownWriter, items):
+def write_list_of_links(output: MarkdownWriter, items: list):
     if len(items) == 1:
         output.write_line(link_to(items[0]))
     else:

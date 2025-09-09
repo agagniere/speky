@@ -3,7 +3,6 @@
 # For the full list of built-in configuration values, see the documentation:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
-import sys
 import os
 
 # -- Project information -----------------------------------------------------
@@ -35,8 +34,6 @@ source_suffix = {'.rst': 'restructuredtext', '.md': 'markdown'}
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
 html_theme       = 'furo'
-#html_static_path = ['_static']
-#html_logo        = 'assets/logo.png'
 
 html_theme_options = {
     'navigation_with_keys': True,
