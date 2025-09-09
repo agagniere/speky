@@ -280,6 +280,7 @@ def test_to_myst(self, output: MystWriter, specs):
     output.heading('Initial state', 1)
     if self.initial:
         output.write_line(self.initial)
+        output.empty_line()
     if self.prereq:
         output.write_line('The expected state is the final state of')
         write_list_of_links(output, [specs.by_id[p] for p in self.prereq])

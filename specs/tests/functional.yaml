@@ -180,7 +180,6 @@ tests:
           client_statement: I want this and that
     - action: Regenerate the PDF and verify the client statement appears above the regular statement
       run: typst compile specification.typ && open specification.pdf
-# TF007 is
 - id: TF008
   short: HTML output
   long: Generate Myst Markdown from the specification in YAML, then have sphinx generate a static website
@@ -230,4 +229,26 @@ tests:
     - action: |
         Click on the link to `T01`, and verify that:
         - `S01` is listed as a tested requirement: "Is a test for"
-        - The procedure is displaye, with each step in the expected order
+        - The procedure is displayed, with each step in the expected order
+- id: TF009
+  ref: [SF011]
+  short: Validating YAMLs
+  long: Without generating any output, we validate that the YAMLs conform to the expected schema
+  initial: The [uv](https://docs.astral.sh/uv/getting-started/installation/) tool is required.
+  prereq: [TF004]
+  steps:
+    - action: Install Yamale
+      run: uv tool install yamale
+      expected: |
+        [...]
+        Installed 1 executable: yamale
+    - action: Obtain the schema
+      run: curl --pogress-bar -O https://raw.githubusercontent.com/agagniere/speky/refs/heads/master/schema.yaml
+      expected: '################################################################################################# 100.0%'
+    - action: Run Yamale on the YAMLs
+      run: yamale -s schema.yaml specs.yaml tests.yaml comments.yaml
+      expected: |
+        Validating specs.yaml...
+        Validating tests.yaml...
+        Validating comments.yaml...
+        Validation success! 👍

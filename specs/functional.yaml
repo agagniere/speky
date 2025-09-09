@@ -87,3 +87,6 @@ requirements:
     version: 1
     author: Gloutch
     since: '`0.1.0`'
+- id: SF012
+  short: YAML validation
+  long: The user shall be able to validate that a YAML is valid, without having to generate an output.

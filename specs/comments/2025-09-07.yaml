@@ -1,9 +1,9 @@
 kind: comments
 default:
-  date: 07/09/2025
   about: SF011
 comments:
 - from: Gloutch
+  date: 06/09/2025
   external: true
   text: |
     This could take the form:
@@ -12,6 +12,7 @@ comments:
       - key: value
     ```
 - from: Antoine
+  date: 07/09/2025
   text: |
     What about:
     ```

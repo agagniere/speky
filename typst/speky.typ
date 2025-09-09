@@ -85,7 +85,8 @@
         ]
         ==== Initial state
         #if "initial" in test [
-          #test.initial
+          #eval(test.initial, mode: "markup")
+
         ]
         #if "prereq" in test [
           The expected state is the final state of
