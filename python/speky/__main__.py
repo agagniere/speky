@@ -12,29 +12,41 @@ from .generators import specification_to_myst
 
 def main():
     cli_parser = argparse.ArgumentParser(
-        prog = 'Speky',
-        description = "Write your project's specification in YAML, display it as a static website",
-        epilog = 'Copyright (c) 2025 Antoine  GAGNIERE')
-    cli_parser.add_argument('paths',
-                            type = str,
-                            metavar = 'FILE',
-                            nargs = '+',
-                            help = 'The path to a YAML file containing requirements, tests or comments')
-    cli_parser.add_argument('-o', '--output-folder',
-                            type = str,
-                            metavar = 'PATH',
-                            default = 'markdown',
-                            help = 'The folder where to place all generated files')
-    cli_parser.add_argument('-C', '--comment-csv',
-                            dest = 'comment_csvs',
-                            metavar = 'FILE',
-                            type = str,
-                            action = 'append',
-                            help = 'The path to a CSV file containing comments')
-    cli_parser.add_argument('-p', '--project-name',
-                            type = str,
-                            required = True,
-                            help = 'Name of the project used for the title')
+        prog='Speky',
+        description="Write your project's specification in YAML, display it as a static website",
+        epilog='Copyright (c) 2025 Antoine  GAGNIERE',
+    )
+    cli_parser.add_argument(
+        'paths',
+        type=str,
+        metavar='FILE',
+        nargs='+',
+        help='The path to a YAML file containing requirements, tests or comments',
+    )
+    cli_parser.add_argument(
+        '-o',
+        '--output-folder',
+        type=str,
+        metavar='PATH',
+        default='markdown',
+        help='The folder where to place all generated files',
+    )
+    cli_parser.add_argument(
+        '-C',
+        '--comment-csv',
+        dest='comment_csvs',
+        metavar='FILE',
+        type=str,
+        action='append',
+        help='The path to a CSV file containing comments',
+    )
+    cli_parser.add_argument(
+        '-p',
+        '--project-name',
+        type=str,
+        required=True,
+        help='Name of the project used for the title',
+    )
     cli_args = cli_parser.parse_args()
 
     specs = Specification()
@@ -47,8 +59,10 @@ def main():
             specs.read_comment_csv(filename)
     specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
 
-if __name__ == "__main__":
+
+if __name__ == '__main__':
     main()
+
 
 def import_fields(destination, source: dict[str], fields: list[str]):
     """
@@ -61,6 +75,7 @@ def import_fields(destination, source: dict[str], fields: list[str]):
     if extras:
         logging.warning(f'Ignored extra fields: {extras}')
 
+
 def ensure_fields(location: str, obj: dict[str], fields: list[str]):
     """
     Raise an exception if one of the expected fields is missing
@@ -68,6 +83,7 @@ def ensure_fields(location: str, obj: dict[str], fields: list[str]):
     for field in fields:
         if field not in obj:
             raise Exception(f'Missing the field "{field}" from {location}')
+
 
 class SpecItem(SimpleNamespace):
     folder = 'misc'
@@ -79,8 +95,11 @@ class SpecItem(SimpleNamespace):
     def from_yaml(cls, data: dict, location: str):
         result = SimpleNamespace()
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, [cls.id_field])
-        ensure_fields(f"Definition of {cls.__name__} {data[cls.id_field]} in '{location}'",
-                      data, cls.mandatory_fields)
+        ensure_fields(
+            f"Definition of {cls.__name__} {data[cls.id_field]} in '{location}'",
+            data,
+            cls.mandatory_fields,
+        )
         import_fields(result, data, cls.fields)
         return cls(**result.__dict__)
 
@@ -96,9 +115,11 @@ class Requirement(SpecItem):
     folder = 'requirements'
     fields = SpecItem.fields + ['tags', 'client_statement', 'properties']
 
+
 class Test(SpecItem):
     folder = 'tests'
     fields = SpecItem.fields + ['initial', 'prereq', 'steps']
+
 
 class Comment(SimpleNamespace):
     fields = ['about', 'from', 'date', 'text', 'external']
@@ -108,8 +129,8 @@ class Comment(SimpleNamespace):
         result = SimpleNamespace()
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, cls.fields)
         import_fields(result, data, cls.fields)
-        result.external = (result.external in ['True', 'true', True, 1, '1'])
-        result.time = datetime.datetime.strptime(result.date, "%d/%m/%Y")
+        result.external = result.external in ['True', 'true', True, 1, '1']
+        result.time = datetime.datetime.strptime(result.date, '%d/%m/%Y')
         return cls(**result.__dict__)
 
     def __lt__(self, other):
@@ -117,7 +138,6 @@ class Comment(SimpleNamespace):
 
 
 class Specification:
-
     def __init__(self):
         self.requirements = defaultdict(list)
         self.tests = defaultdict(list)
@@ -152,13 +172,15 @@ class Specification:
             ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
             match data['kind']:
                 case 'requirements':
-                    ensure_fields(f'Top-level of requirements file "{file_name}"',
-                                  data, ['requirements', 'category'])
+                    ensure_fields(
+                        f'Top-level of requirements file "{file_name}"',
+                        data,
+                        ['requirements', 'category'],
+                    )
                     for req in data['requirements']:
                         self.load_requirement(Requirement.from_yaml(req, file_name), data['category'])
                 case 'tests':
-                    ensure_fields(f'Top-level of tests file "{file_name}"',
-                                  data, ['tests', 'category'])
+                    ensure_fields(f'Top-level of tests file "{file_name}"', data, ['tests', 'category'])
                     for test in data['tests']:
                         self.load_test(Test.from_yaml(test, file_name), data['category'])
                 case 'comments':
@@ -170,7 +192,7 @@ class Specification:
                         self.load_comment(Comment.from_yaml(default | comment, file_name))
 
     def read_comment_csv(self, file_name: str):
-        with open(file_name, encoding = 'utf8', newline = '') as f:
+        with open(file_name, encoding='utf8', newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
                 self.load_comment(Comment.from_yaml(row, file_name))

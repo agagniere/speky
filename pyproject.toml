@@ -43,3 +43,9 @@ pattern = "(?P<base>\\d+[.]\\d+[.]\\d+)"
 [tool.uv]
 required-version = ">= 0.7.0"
 package = true
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.format]
+quote-style = "single"
