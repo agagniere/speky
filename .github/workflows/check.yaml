@@ -1,4 +1,4 @@
-name: Check YAMLs
+name: Checks
 
 on:
   push:
@@ -10,4 +10,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - uses: astral-sh/setup-uv@v6
-    - run: make -C specs check
+    - name: Validate YAMLs
+      run: make -C specs check
+    - name: Check python format
+      run: uv run --dev ruff format --check python
+    - name: Check python lint
+      run: uv run --dev ruff check python
