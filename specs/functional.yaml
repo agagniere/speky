@@ -22,11 +22,11 @@ requirements:
 
     Each requirement shall appear as a section containing the various informations listed in `SF001`,
     but also which tests validate this requirement and which other requirements refer to it.
-  tags: [outputs]
+  tags: ['output:pdf']
 - id: SF003
   short: HTML output
   long: The user shall be able to read the specifications as a static website
-  tags: [outputs]
+  tags: ['output:html']
 - id: SF004
   short: Version controlled
   long: The user shall be able to rollback changes, view previous versions, review changes
@@ -35,8 +35,9 @@ requirements:
   short: Differential PDF
   long: The user shall be able to obtain a differential PDF highlighting the differences between a version and the previous
   tags:
-    - outputs
+    - output:pdf
     - versioning
+    - todo
 - id: SF006
   short: Support comments
   long: The user shall be able to add comments to a specification and to tests
@@ -44,7 +45,7 @@ requirements:
 - id: SF007
   short: Index requirements by tags
   long: The user shall be able add tags to requirements, and the outputs will contain the list of requirements for each tag
-  tags: [outputs]
+  tags: [output:both]
 - id: SF008
   short: Quote client requirement
   client_statement: We need to be able to read the original statement a requirement is based on
@@ -61,7 +62,7 @@ requirements:
     - `client_statement`
     - `short`
     - `long`
-  tags: [input]
+  tags: [input:formats]
 - id: SF010
   short: CSV for comments
   long: |
@@ -75,7 +76,7 @@ requirements:
     - `text`
 
     The `external` column must contain booleans, either `true`, `false`, `1` or `0`.
-  tags: [input]
+  tags: [input:formats]
 - id: SF011
   short: "Support free key:value"
   client_statement: We may want to associate a version to a requirement, as well as an author
@@ -92,3 +93,14 @@ requirements:
   short: YAML validation
   long: The user shall be able to validate that a YAML is valid, without having to generate an output.
   tags: [tooling]
+  properties:
+    since: '`0.1.0`'
+- id: SF013
+  short: Parameterized tags
+  ref: [SF007]
+  long: |
+    The user shall be able to group and nest tags one level:
+    a tag can have a subtag with the syntax `group:subtag`.
+  tags: [output:both]
+  properties:
+    since: '`0.1.0`'

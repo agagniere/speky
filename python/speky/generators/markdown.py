@@ -212,8 +212,18 @@ def specification_to_myst(self, project_name: str, folder_name: str):
     with open(os.path.join(folder_name, 'by_tag.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('Tags', 0)
+        last = None
         for tag, requirements in sorted(self.tags.items()):
-            output.heading(tag.title(), 1)
+            output.write_line(f'({tag})=')
+            if ':' in tag:
+                group, subtag = tag.split(':', 1)
+                if last != group:
+                    output.heading(group.title(), 1)
+                output.heading(subtag.title(), 2)
+                last = group
+            else:
+                output.heading(tag.title(), 1)
+                last = tag
             for requirement in requirements:
                 output.write_line(f'- {link_to(requirement)}')
 
@@ -235,7 +245,11 @@ def requirement_to_myst(self, output: MystWriter, specs):
 
     if self.tags:
         for tag in self.tags:
-            output.write_line('{bdg-ref-primary}`' + f'{tag} </by_tag>`')
+            if ':' in tag:
+                group, subtag = tag.split(':', 1)
+                output.write_line('{bdg-ref-info}`' + f'{group} | {subtag} <{tag}>`')
+            else:
+                output.write_line('{bdg-ref-primary}`' + f'{tag} <{tag}>`')
 
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
