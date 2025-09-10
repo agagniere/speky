@@ -156,8 +156,21 @@
     #if tags.len() > 0 [
       #pagebreak()
       = Requirements by tag
+      #let prev = none
       #for (tag, specs) in tags.pairs().sorted() [
-        #heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
+        #if tag.contains(":") {
+          let index = tag.position(":")
+          let group = tag.slice(0, index)
+          let subtag = tag.slice(index + 1)
+          if group != prev {
+            heading(level: 2)[#upper(group.at(0))#lower(group.slice(1))]
+          }
+          heading(level: 3)[#upper(subtag.at(0))#lower(subtag.slice(1))]
+          prev = group
+        } else {
+          heading(level: 2)[#upper(tag.at(0))#lower(tag.slice(1))]
+          prev = tag
+        }
         #label(tag)
         #for spec in specs {
           list.item(link_to(spec))
