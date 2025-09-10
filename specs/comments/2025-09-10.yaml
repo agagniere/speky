@@ -1,0 +1,6 @@
+kind: comments
+comments:
+- about: SF013
+  from: Antoine
+  date: 10/09/2025
+  text: For now, only 1 nesting level is considered, so only the first `:` has a special meaning.

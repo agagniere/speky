@@ -14,7 +14,7 @@ requirements:
       - TOML
 - id: SN002
   ref: [SF001]
-  short: Do not contraint file names
+  short: Do not constraint file names
   long: |
     Requirements can be split in any number of files.
 

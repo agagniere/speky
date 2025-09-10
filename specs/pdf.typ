@@ -22,6 +22,7 @@
     "comments/2025-05-26.yaml",
     "comments/2025-05-30.yaml",
     "comments/2025-09-07.yaml",
+    "comments/2025-09-10.yaml",
   ).map(yaml)
     + (
       "comments/2025-05-27.csv",
