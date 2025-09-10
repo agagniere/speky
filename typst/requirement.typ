@@ -6,7 +6,29 @@
 
   #if "tags" in req {
     for tag in req.tags {
-      link(label(tag), box(tag, fill: rgb("#7d9"), inset: 3pt, radius: 10pt))
+      if tag.contains(":") {
+        let index = tag.position(":")
+        let group = tag.slice(0, index)
+        let subtag = tag.slice(index + 1)
+        link(label(tag), {
+          box(inset: 3pt, radius: 10pt, stroke: rgb("#7d9"))[
+            #box(
+              fill: rgb("#7d9"),
+              outset: (left: 3pt, top: 3pt, bottom: 3pt, right: 1.5pt),
+              radius: (left: 10pt),
+              group,
+            )
+            #subtag
+          ]
+        })
+      } else {
+        link(label(tag), box(
+          fill: rgb("#7d9"),
+          inset: 3pt,
+          radius: 10pt,
+          outset: 0.5pt,
+        )[#tag])
+      }
       text(" ")
     }
     linebreak()
