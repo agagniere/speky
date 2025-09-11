@@ -24,7 +24,7 @@ tests:
         - id: S02
           long: The second requirement
     - action: |
-        Verify the requirements are human-readable, in YAML foramt, and contain:
+        Verify the requirements are human-readable, in YAML format, and contain:
         - A unique identider in `id`
         - A summary in `short`
         - The requirement statement in `long`
@@ -62,7 +62,7 @@ tests:
         #import "@local/speky:0.0.7": speky
         #speky(("spec.yaml",  "tests.yaml").map(yaml))
     - action: Run Typst and open PDF
-      run: typst compile specification.typ && open specification.pdf
+      run: typst compile specification.typ --open
     - action: |
         Verify the requirements are found inside:
         - The unique ID and short summary as section title
@@ -98,12 +98,12 @@ tests:
           short: Lorem ipsum
           long: The first requirement
     - action: Confirm the requirement is gone
-      run: typst compile specification.typ && open specification.pdf
+      run: typst compile specification.typ --open
     - action: Revert the deletion
       run: |
         git checkout -- .
     - action: Confirm the requirement is back
-      run: typst compile specification.typ && open specification.pdf
+      run: typst compile specification.typ --open
 - id: TF004
   ref: [SF006]
   short: Add comments
@@ -127,7 +127,7 @@ tests:
         #import "@local/speky:0.0.7": speky
         #speky(("spec.yaml", "tests.yaml", "comments.yaml").map(yaml))
     - action: Regenerate the PDF and open it
-      run: typst compile specification.typ && open specification.typ
+      run: typst compile specification.typ --open
     - action: |
         Verify the comment appears in requirement `S01`, in the "Comments" subsection.
 - id: TF005
@@ -154,7 +154,7 @@ tests:
           long: The second requirement
           tags: [bar, baz]
     - action: Regenerate the PDF and verify the tags index is present and listing the right requirements
-      run: typst compile specification.typ && open specification.pdf
+      run: typst compile specification.typ --open
     - action: |
         In the `S01` section, click on the `bar` label to jump to the list of Bar
     - action: |
@@ -179,7 +179,7 @@ tests:
           long: The second requirement
           client_statement: I want this and that
     - action: Regenerate the PDF and verify the client statement appears above the regular statement
-      run: typst compile specification.typ && open specification.pdf
+      run: typst compile specification.typ --open
 - id: TF008
   short: HTML output
   long: Generate Myst Markdown from the specification in YAML, then have sphinx generate a static website
@@ -276,3 +276,40 @@ tests:
             baz: 17
     - action: Regenerate the PDF and verify that the properties correctly appear in `S02`
       run: typst compile specification.typ --open
+- id: TF011
+  ref: [SF013]
+  short: Parameterizing tags
+  long: We can group tags
+  prereq: [TF002]
+  steps:
+    - action: Add paramterized tags to requirements
+      run: cat specs.yaml
+      sample_lang: yaml
+      sample: |
+        kind: requirements
+        category: functional
+        requirements:
+        - id: S01
+          long: The first requirement
+          short: Lorem ipsum
+          tags:
+            - foo:bar
+            - lorem:ipsum
+        - id: S02
+          long: The second requirement
+          tags:
+            - foo:baz
+            - lorem
+    - action: Regenerate the PDF
+      run: typst compile specification.typ --open
+    - action: |
+        Verify that:
+        1. each requirement has 2 tags
+        2. The tag index has two sections:
+          - Foo
+          - Lorem
+        3. The Foo section has two subsections:
+          - Bar, where `S01` is listed
+          - Baz, where `S02` is listed
+        4. `S02` is listed directly inside the Lorem section
+        5. `S01` is listed inside the Ipsum subsection of Lorem

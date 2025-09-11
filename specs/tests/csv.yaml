@@ -29,5 +29,5 @@ tests:
       #speky((table_to_requirements(csv("spec.csv"), "functional"),
               table_to_comments(csv("comments.csv"))))
   - action: Generate the PDF
-    run: typst compile dummy.typ && open dummy.pdf
+    run: typst compile dummy.typ --open
   - action: Verify the requirement and comment appear properly
