@@ -16,3 +16,5 @@ jobs:
       run: uv run --dev ruff format --check python tests
     - name: Check python lint
       run: uv run --dev ruff check python tests
+    - name: Run tests
+      run: uv run --dev pytest --quiet
