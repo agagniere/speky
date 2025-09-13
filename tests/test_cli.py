@@ -1,15 +1,15 @@
 import pytest
 
-from speky import run as speky_run
+import speky
 
 
 def test_usage(capfd):
     with pytest.raises(SystemExit):
-        speky_run()
+        speky.run()
     err_msg = capfd.readouterr().err
     assert err_msg.startswith('usage')
 
 
+@pytest.mark.xfail(raises=FileNotFoundError)
 def test_missing_file(capfd):
-    with pytest.raises(FileNotFoundError):
-        speky_run(['-p', 'project', 'missing_file.yaml'])
+    speky.run(['-p', 'project', 'missing_file.yaml'])

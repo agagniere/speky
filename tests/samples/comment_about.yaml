@@ -1,0 +1,7 @@
+kind: comments
+default:
+  date: 18/09/2025
+  from: test
+comments:
+  - about: UNKNOWN
+    text: Alone, this comment doesn't reference a known requirement/test, which raises an error
