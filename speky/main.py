@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 def main(argv: list[str] | None = None):
-
     cli_parser = argparse.ArgumentParser(
         prog='Speky',
         description="Write your project's specification in YAML, display it as a static website",
@@ -50,7 +49,7 @@ def main(argv: list[str] | None = None):
         required=True,
         help='Name of the project used for the title',
     )
-    cli_args = cli_parser.parse_args(argv) # Uses sys.argv[1:] if None
+    cli_args = cli_parser.parse_args(argv)  # Uses sys.argv[1:] if None
 
     specs = Specification()
     for filename in cli_args.paths:
