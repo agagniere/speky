@@ -16,3 +16,5 @@ jobs:
       run: uv run --dev ruff format --check speky tests
     - name: Check python lint
       run: uv run --dev ruff check speky tests
+    - name: Run tests
+      run: uv run --dev pytest --quiet
