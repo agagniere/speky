@@ -1,0 +1,18 @@
+version: 1
+formatters:
+  colored:
+    class: speky.ColoredFormatter
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: colored
+    stream: ext://sys.stderr
+loggers:
+  speky:
+    level: DEBUG
+    handlers: [console]
+    propagate: no
+root:
+  level: DEBUG
+  handlers: [console]

@@ -1,15 +1,20 @@
 import argparse
 import csv
 import datetime
+import importlib.resources
 import logging
+import logging.config
 from collections import defaultdict
 from importlib.metadata import version
+from pathlib import Path
 from types import SimpleNamespace
 
 import yaml
 
 from .generators import specification_to_myst
 
+assets = importlib.resources.files(__package__).joinpath('assets')
+default_logging_file = assets.joinpath('logging.yaml')
 logger = logging.getLogger(__name__)
 
 
@@ -51,15 +56,26 @@ def main():
         required=True,
         help='Name of the project used for the title',
     )
+    cli_parser.add_argument(
+        '-l',
+        '--logging-config',
+        type=str,
+        default=default_logging_file,
+        help='Specify a custom config file of the logging library',
+    )
     cli_args = cli_parser.parse_args()
+
+    logging_config_file = Path(cli_args.logging_config)
+    with logging_config_file.open() as f:
+        logging.config.dictConfig(yaml.safe_load(f))
 
     specs = Specification()
     for filename in cli_args.paths:
-        print(f'Loading {filename}')
+        logger.info('Loading %s', filename)
         specs.read_yaml(filename)
     if cli_args.comment_csvs:
         for filename in cli_args.comment_csvs:
-            print(f'Loading {filename} as comments')
+            logger.info('Loading %s as comments', filename)
             specs.read_comment_csv(filename)
     specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
 
