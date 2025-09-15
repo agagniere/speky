@@ -4,6 +4,7 @@ import datetime
 import importlib.resources
 import logging
 import logging.config
+import sys
 from collections import defaultdict
 from importlib.metadata import version
 from pathlib import Path
@@ -72,16 +73,16 @@ def main():
     specs = Specification()
     for filename in cli_args.paths:
         logger.info('Loading %s', filename)
-        specs.read_yaml(filename)
+        try:
+            specs.read_yaml(filename)
+        except KeyError as e:
+            logger.critical(e)
+            sys.exit(1)
     if cli_args.comment_csvs:
         for filename in cli_args.comment_csvs:
             logger.info('Loading %s as comments', filename)
             specs.read_comment_csv(filename)
     specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
-
-
-if __name__ == '__main__':
-    main()
 
 
 def import_fields(destination, source: dict[str], fields: list[str]):
@@ -103,7 +104,7 @@ def ensure_fields(location: str, obj: dict[str], fields: list[str]):
     for field in fields:
         if field not in obj:
             message = f'Missing the field "{field}" from {location}'
-            raise Exception(message)
+            raise KeyError(message)
 
 
 class SpecItem(SimpleNamespace):
@@ -117,7 +118,7 @@ class SpecItem(SimpleNamespace):
         result = SimpleNamespace()
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, [cls.id_field])
         ensure_fields(
-            f"Definition of {cls.__name__} {data[cls.id_field]} in '{location}'",
+            f'Definition of {cls.__name__} {data[cls.id_field]} in "{location}"',
             data,
             cls.mandatory_fields,
         )
