@@ -43,6 +43,7 @@ pattern = "(?P<base>\\d+[.]\\d+[.]\\d+)"
 [tool.uv]
 required-version = ">= 0.7.0"
 package = true
+cache-keys = [{ file = "pyproject.toml" }, { git = { commit = true, tags = true }}]
 
 [tool.ruff]
 line-length = 120

@@ -3,6 +3,7 @@ import csv
 import datetime
 import logging
 from collections import defaultdict
+from importlib.metadata import version
 from types import SimpleNamespace
 
 import yaml
@@ -18,6 +19,7 @@ def main():
         description="Write your project's specification in YAML, display it as a static website",
         epilog='Copyright (c) 2025 Antoine  GAGNIERE',
     )
+    cli_parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version(__package__))
     cli_parser.add_argument(
         'paths',
         type=str,
