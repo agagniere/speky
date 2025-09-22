@@ -1,0 +1,8 @@
+kind: requirements
+category: functional
+requirements:
+- id: RF01
+  short: Lorem ipsum
+  long: The first requirement
+- id: RF01
+  long: Reusing an ID

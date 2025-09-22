@@ -175,6 +175,9 @@ class Specification:
         self.tags = defaultdict(list)
 
     def load_requirement(self, requirement: Requirement, category: str):
+        if requirement.id in self.by_id:
+            message = f'Multiple definitions of requirement "{requirement.id}". ID must be unique'
+            raise KeyError(message)
         self.by_id[requirement.id] = requirement
         self.requirements[category].append(requirement)
         if requirement.ref:
