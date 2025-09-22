@@ -1,0 +1,6 @@
+kind: requirements
+category: functional
+requirements:
+- short: Lorem Ipsum
+  long: This requirement is missing an id field
+  tags: [foo]

@@ -1,0 +1,6 @@
+kind: requirements
+requirements:
+- id: RF01
+  short: Lorem Ipsum
+  long: The top level field category is missing
+  tags: [foo]
