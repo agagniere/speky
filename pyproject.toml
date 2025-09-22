@@ -28,7 +28,7 @@ requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-speky = "speky.__main__:main"
+speky = "speky:run"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"

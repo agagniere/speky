@@ -1,0 +1,5 @@
+kind: comments
+comments:
+- about: RF01
+  date: 03/04/2050
+  text: Some comment missing the from field

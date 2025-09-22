@@ -1,0 +1,5 @@
+kind: comments
+comments:
+- about: RF01
+  from: Toto
+  text: Some comment missing the date field

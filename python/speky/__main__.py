@@ -85,7 +85,7 @@ def main():
     specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
 
 
-def import_fields(destination, source: dict[str], fields: list[str]):
+def import_fields(destination, source: dict, fields: list[str]):
     """
     Creates members to the destination objects, that have the name and values of the desired fields from the source dictionnary.
     Also prints a warning about remaining fields that were not imported
@@ -97,7 +97,7 @@ def import_fields(destination, source: dict[str], fields: list[str]):
         logger.warning('Ignored extra fields: %s', extras)
 
 
-def ensure_fields(location: str, obj: dict[str], fields: list[str]):
+def ensure_fields(location: str, obj: dict, fields: list[str]):
     """
     Raise an exception if one of the expected fields is missing
     """
