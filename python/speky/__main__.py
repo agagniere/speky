@@ -17,7 +17,7 @@ def main():
     cli_parser = argparse.ArgumentParser(
         prog='Speky',
         description="Write your project's specification in YAML, display it as a static website",
-        epilog='Copyright (c) 2025 Antoine  GAGNIERE',
+        epilog='Copyright (c) 2025 Antoine GAGNIERE',
     )
     cli_parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version(__package__))
     cli_parser.add_argument(

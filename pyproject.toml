@@ -39,6 +39,7 @@ packages = [ 'python/speky' ]
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"
 pattern = "(?P<base>\\d+[.]\\d+[.]\\d+)"
+bump = true
 
 [tool.uv]
 required-version = ">= 0.7.0"
