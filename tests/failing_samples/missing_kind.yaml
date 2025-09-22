@@ -1,0 +1,6 @@
+category: functional
+requirements:
+- id: RF01
+  short: Lorem Ipsum
+  long: The top level field kind is missing
+  tags: [foo]

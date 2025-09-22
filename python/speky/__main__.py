@@ -111,7 +111,11 @@ class SpecItem(SimpleNamespace):
     folder = 'misc'
     id_field = 'id'
     mandatory_fields = ['long']
-    fields = [id_field] + mandatory_fields + ['short', 'ref']
+    optional_fields = ['short']
+
+    @classmethod
+    def fields(cls):
+        return [cls.id_field] + cls.mandatory_fields + cls.optional_fields
 
     @classmethod
     def from_yaml(cls, data: dict, location: str):
@@ -122,7 +126,7 @@ class SpecItem(SimpleNamespace):
             data,
             cls.mandatory_fields,
         )
-        import_fields(result, data, cls.fields)
+        import_fields(result, data, cls.fields())
         return cls(**result.__dict__)
 
     @property
@@ -130,17 +134,18 @@ class SpecItem(SimpleNamespace):
         return f'`{self.id}` {self.short}' if self.short else f'`{self.id}`'
 
     def __lt__(self, other):
-        return self.id < other.id
+        return getattr(self, self.id_field) < getattr(other, other.id_field)
 
 
 class Requirement(SpecItem):
     folder = 'requirements'
-    fields = SpecItem.fields + ['tags', 'client_statement', 'properties']
+    optional_fields = SpecItem.optional_fields + ['tags', 'client_statement', 'properties', 'ref']
 
 
 class Test(SpecItem):
     folder = 'tests'
-    fields = SpecItem.fields + ['initial', 'prereq', 'steps']
+    mandatory_fields = SpecItem.mandatory_fields + ['ref', 'steps']
+    optional_fields = SpecItem.optional_fields + ['initial', 'prereq']
 
 
 class Comment(SimpleNamespace):
