@@ -1,0 +1,6 @@
+kind: requirements
+category: test
+requirements:
+- id: SF001
+  long: long
+  ref: [UNKNOWN_ID] # <- id doesn't exist

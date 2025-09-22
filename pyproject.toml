@@ -12,6 +12,7 @@ license-files = ['LICENSE']
 
 [dependency-groups]
 dev = [
+    "pytest>=8.4.2",
     "ruff>=0.12.12",
     "yamale>=6.0.0",
 ]
@@ -28,13 +29,13 @@ requires = ["hatchling", "uv-dynamic-versioning"]
 build-backend = "hatchling.build"
 
 [project.scripts]
-speky = "speky.__main__:main"
+speky = "speky:run"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
 [tool.hatch.build.targets.wheel]
-packages = [ 'python/speky' ]
+packages = [ 'speky' ]
 
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"

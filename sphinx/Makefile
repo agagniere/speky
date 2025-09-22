@@ -2,7 +2,7 @@
 PROJECT_VERSION ?= $(shell git tag --sort '-version:refname' --merged | head -1)
 # ============================================
 
-PythonSources  := $(shell find ../python -type f -name '*.py')
+PythonSources  := $(shell find ../speky -type f -name '*.py')
 YamlSources    := $(shell find ../specs -type f -name '*.yaml')
 CSVComments    := $(shell find ../specs/comments -type f -name '*.csv')
 

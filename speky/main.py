@@ -13,7 +13,7 @@ from .generators import specification_to_myst
 logger = logging.getLogger(__name__)
 
 
-def main():
+def main(argv: list[str] | None = None):
     cli_parser = argparse.ArgumentParser(
         prog='Speky',
         description="Write your project's specification in YAML, display it as a static website",
@@ -51,7 +51,7 @@ def main():
         required=True,
         help='Name of the project used for the title',
     )
-    cli_args = cli_parser.parse_args()
+    cli_args = cli_parser.parse_args(argv)  # Uses sys.argv[1:] if None
 
     specs = Specification()
     for filename in cli_args.paths:
@@ -62,10 +62,6 @@ def main():
             print(f'Loading {filename} as comments')
             specs.read_comment_csv(filename)
     specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
-
-
-if __name__ == '__main__':
-    main()
 
 
 def import_fields(destination, source: dict[str], fields: list[str]):
