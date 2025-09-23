@@ -1,0 +1,11 @@
+kind: tests
+category: functional
+tests:
+- id: TF01
+  short: Foo
+  ref: [RF00]
+  long: This test is referencing a requirement that does not exist
+  initial: Blank project
+  steps:
+    - action: Do this
+    - action: Do that
