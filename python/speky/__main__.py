@@ -70,18 +70,19 @@ def main():
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
 
-    specs = Specification()
-    for filename in cli_args.paths:
-        logger.info('Loading %s', filename)
-        try:
+    try:
+        specs = Specification()
+        for filename in cli_args.paths:
+            logger.info('Loading %s', filename)
             specs.read_yaml(filename)
-        except KeyError as e:
-            logger.critical(e)
-            sys.exit(1)
-    if cli_args.comment_csvs:
-        for filename in cli_args.comment_csvs:
-            logger.info('Loading %s as comments', filename)
-            specs.read_comment_csv(filename)
+        if cli_args.comment_csvs:
+            for filename in cli_args.comment_csvs:
+                logger.info('Loading %s as comments', filename)
+                specs.read_comment_csv(filename)
+        specs.check_references()
+    except KeyError as err:
+        logger.critical(err)
+        sys.exit(1)
     specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
 
 
@@ -226,3 +227,16 @@ class Specification:
             reader = csv.DictReader(f)
             for row in reader:
                 self.load_comment(Comment.from_yaml(row, file_name))
+
+    def check_references(self):
+        for req in self.by_id.values():
+            if req.ref is None:
+                continue
+            for referred in req.ref:
+                if referred not in self.by_id:
+                    message = f'Requirement {referred}, referred from {req.id}, does not exist'
+                    raise KeyError(message)
+        for referred in self.comments.keys():
+            if referred not in self.by_id:
+                message = f'Requirement {referred}, referred from a comment, does not exist'
+                raise KeyError(message)
