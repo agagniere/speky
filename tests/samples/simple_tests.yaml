@@ -1,0 +1,16 @@
+kind: tests
+category: functional
+tests:
+- id: T01
+  ref: [RF01]
+  long: The first test, that validates the first requirement
+  steps:
+  - action: The only step
+- id: T02
+  ref: [RF02]
+  short: Second test
+  long: The second test, that validates the second requirement
+  steps:
+  - action: Do this
+  - action: Do that shell command
+    run: echo Hello

@@ -1,0 +1,10 @@
+kind: comments
+comments:
+- about: RF01
+  from: Some Person
+  date: 01/01/2025
+  text: The first comment
+- about: RF02
+  from: Some "other" Person
+  date: 02/01/2025
+  text: A second comment
