@@ -16,7 +16,7 @@ from .generators import specification_to_myst
 
 assets = importlib.resources.files(__package__).joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__package__)
 
 
 def main():
@@ -64,6 +64,7 @@ def main():
         default=default_logging_file,
         help='Specify a custom config file of the logging library',
     )
+    cli_parser.add_argument('-c', '--check-only', action='store_true')
     cli_args = cli_parser.parse_args()
 
     logging_config_file = Path(cli_args.logging_config)
@@ -83,7 +84,8 @@ def main():
     except KeyError as err:
         logger.critical(err)
         sys.exit(1)
-    specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
+    if not cli_args.check_only:
+        specification_to_myst(specs, cli_args.project_name, cli_args.output_folder)
 
 
 def import_fields(destination, source: dict, fields: list[str]):
