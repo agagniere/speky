@@ -160,7 +160,7 @@ class MystWriter(MarkdownWriter):
         return Card(height, self, title, align, **kwargs)
 
 
-def specification_to_myst(self, project_name: str, folder_name: str):
+def specification_to_myst(self, project_name: str, folder_name: str, sort: bool):
     os.makedirs(os.path.join(folder_name, 'requirements'), exist_ok=True)
     os.makedirs(os.path.join(folder_name, 'tests'), exist_ok=True)
     with open(os.path.join(folder_name, 'index.md'), encoding='utf8', mode='w') as f:
@@ -188,7 +188,7 @@ def specification_to_myst(self, project_name: str, folder_name: str):
             output = MystWriter(f)
             output.heading(category.title(), 0)
             with output.table_of_content(max_depth=1) as toc:
-                for requirement in sorted(requirements):
+                for requirement in sorted(requirements) if sort else requirements:
                     toc.write_line(requirement.id)
 
         for requirement in requirements:
