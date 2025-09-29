@@ -13,6 +13,6 @@ jobs:
     - name: Validate YAMLs
       run: make -C specs check
     - name: Check python format
-      run: uv run --dev ruff format --check python
+      run: uv run --dev ruff format --check python tests
     - name: Check python lint
-      run: uv run --dev ruff check python
+      run: uv run --dev ruff check python tests

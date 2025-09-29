@@ -19,7 +19,7 @@ default_logging_file = assets.joinpath('logging.yaml')
 logger = logging.getLogger(__package__)
 
 
-def main():
+def main(argv: list[str] | None = None):
     cli_parser = argparse.ArgumentParser(
         prog='Speky',
         description="Write your project's specification in YAML, display it as a static website",
@@ -73,7 +73,7 @@ def main():
         default=True,
         help='Sort requirements by ID. If false, the order of files passed as positionals is significant',
     )
-    cli_args = cli_parser.parse_args()
+    cli_args = cli_parser.parse_args(argv)  # Uses sys.argv[1:] if None
 
     logging_config_file = Path(cli_args.logging_config)
     with logging_config_file.open() as f:
