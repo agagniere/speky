@@ -10,4 +10,4 @@ def test_usage(capfd):
 
 
 def test_simple_sample(sample):
-    speky.run(['-p', 'project', sample('simple_requirements'), sample('simple_comments'), sample('simple_tests')])
+    speky.run(['--check-only', '-p', 'project', sample('simple_requirements'), sample('simple_comments'), sample('simple_tests')])

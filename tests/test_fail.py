@@ -2,31 +2,29 @@ import pytest
 import speky
 
 
-@pytest.mark.xfail(raises=FileNotFoundError)
 def test_missing_file():
-    speky.run(['-p', 'project', 'doesntexiste'])
+    with pytest.raises(FileNotFoundError):
+        speky.run(['-p', 'project', 'doesntexist'])
 
 
 def test_error_msg(capfd, sample):
     error_list = [
-        ('com_missing_about', 'about'),
-        ('com_missing_date', 'date'),
-        ('com_missing_from', 'from'),
-        ('com_missing_text', 'text'),
-        ('com_unknown_ref', 'ref'),
-        ('missing_kind', 'kind'),
-        ('req_missing_category', 'category'),
-        ('req_missing_id', 'id'),
-        ('req_missing_long', 'long'),
-        ('req_redefinition', 'RF01'),
-        ('req_unknown_ref', 'RF00'),
-        ('test_missing_ref', 'ref'),
-        ('test_missing_steps', 'steps'),
-        ('test_unknwon_ref', 'ref'),
+        ('com_missing_about', 'Missing the field "about" from Definition of a Comment'),
+        ('com_missing_date', 'Missing the field "date" from Definition of a Comment'),
+        ('com_missing_from', 'Missing the field "from" from Definition of a Comment'),
+        ('com_missing_text', 'Missing the field "text" from Definition of a Comment'),
+        ('com_unknown_ref', 'Requirement RF00, referred from a comment, does not exist'),
+        ('missing_kind', 'Missing the field "kind" from Top-level of "[^.]+.yaml"'),
+        ('req_missing_category', 'Missing the field "category" from Top-level of requirements file "[^.]+.yaml"'),
+        ('req_missing_id', 'Missing the field "id" from Definition of a Requirement'),
+        ('req_missing_long', r'Missing the field "long" from Definition of Requirement \w+'),
+        ('req_redefinition', 'Multiple definitions of requirement "RF01"'),
+        ('req_unknown_ref', 'Requirement RF00, referred from RF01, does not exist'),
+        ('test_missing_ref', r'Missing the field "ref" from Definition of Test \w+'),
+        ('test_missing_steps', r'Missing the field "steps" from Definition of Test \w+'),
+        ('test_unknwon_ref', r'Requirement RF00, referred from \w+, does not exist'),
     ]
 
     for name, reason in error_list:
-        with pytest.raises(SystemExit):
+        with pytest.raises(KeyError, match=reason):
             speky.run(['-p', 'project', sample(name)])
-        err_msg = capfd.readouterr().err
-        assert reason in err_msg
