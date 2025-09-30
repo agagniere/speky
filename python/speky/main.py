@@ -18,8 +18,14 @@ assets = importlib.resources.files(__package__).joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
 logger = logging.getLogger(__package__)
 
+def main():
+    try:
+        run(None)
+    except (KeyError, FileNotFoundError) as err:
+        logger.critical(err)
+        sys.exit(1)
 
-def main(argv: list[str] | None = None):
+def run(argv: list[str] | None = None):
     cli_parser = argparse.ArgumentParser(
         prog='Speky',
         description="Write your project's specification in YAML, display it as a static website",
@@ -79,19 +85,15 @@ def main(argv: list[str] | None = None):
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
 
-    try:
-        specs = Specification()
-        for filename in cli_args.paths:
-            logger.info('Loading %s', filename)
-            specs.read_yaml(filename)
-        if cli_args.comment_csvs:
-            for filename in cli_args.comment_csvs:
-                logger.info('Loading %s as comments', filename)
-                specs.read_comment_csv(filename)
-        specs.check_references()
-    except KeyError as err:
-        logger.critical(err)
-        sys.exit(1)
+    specs = Specification()
+    for filename in cli_args.paths:
+        logger.info('Loading %s', filename)
+        specs.read_yaml(filename)
+    if cli_args.comment_csvs:
+        for filename in cli_args.comment_csvs:
+            logger.info('Loading %s as comments', filename)
+            specs.read_comment_csv(filename)
+    specs.check_references()
     if not cli_args.check_only:
         specification_to_myst(specs, cli_args.project_name, cli_args.output_folder, cli_args.sort)
 
