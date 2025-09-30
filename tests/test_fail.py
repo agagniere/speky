@@ -1,10 +1,19 @@
 import pytest
 import speky
+import yaml
 
 
-def test_missing_file():
+def test_invalid_file():
     with pytest.raises(FileNotFoundError):
         speky.run(['-p', 'project', 'doesntexist'])
+    with pytest.raises(OSError, match='File name too long'):
+        speky.run(['-p', 'project', 'ToooOOOoooOOOLLllLllooOOoOOoOooOOnnnNnnNGGGgGgggG' * 32])
+    with pytest.raises(NotADirectoryError):
+        speky.run(['-p', 'project', 'LICENSE/foo.yaml'])
+    with pytest.raises(yaml.reader.ReaderError):
+        speky.run(['-p', 'project', '/dev/zero'])
+    with pytest.raises(RuntimeError, match='Empty file'):
+        speky.run(['-p', 'project', '/dev/null'])
 
 
 def test_error_msg(capfd, sample):
