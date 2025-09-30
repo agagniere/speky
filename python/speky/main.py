@@ -18,12 +18,22 @@ assets = importlib.resources.files(__package__).joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
 logger = logging.getLogger(__package__)
 
+
 def main():
     try:
         run(None)
-    except (KeyError, FileNotFoundError) as err:
+    except (
+        KeyError,
+        FileNotFoundError,
+        PermissionError,
+        NotADirectoryError,
+        OSError,
+        yaml.reader.ReaderError,
+        RuntimeError,
+    ) as err:
         logger.critical(err)
         sys.exit(1)
+
 
 def run(argv: list[str] | None = None):
     cli_parser = argparse.ArgumentParser(
@@ -212,6 +222,9 @@ class Specification:
     def read_yaml(self, file_name: str):
         with open(file_name, encoding='utf8') as f:
             data = yaml.safe_load(f)
+            if data is None:
+                message = f'Empty file "{file_name}"'
+                raise RuntimeError(message)
             ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
             match data['kind']:
                 case 'requirements':
