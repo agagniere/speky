@@ -1,6 +1,10 @@
+import importlib.resources
+
 import pytest
 import speky
 import yaml
+
+tests_folder = importlib.resources.files(__package__)
 
 
 def test_invalid_file():
@@ -9,7 +13,7 @@ def test_invalid_file():
     with pytest.raises(OSError, match='File name too long'):
         speky.run(['-p', 'project', 'ToooOOOoooOOOLLllLllooOOoOOoOooOOnnnNnnNGGGgGgggG' * 32])
     with pytest.raises(NotADirectoryError):
-        speky.run(['-p', 'project', 'LICENSE/foo.yaml'])
+        speky.run(['-p', 'project', str(tests_folder / 'conftest.py' / 'foo.yaml')])
     with pytest.raises(yaml.reader.ReaderError):
         speky.run(['-p', 'project', '/dev/zero'])
     with pytest.raises(RuntimeError, match='Empty file'):

@@ -17,4 +17,4 @@ jobs:
     - name: Check python lint
       run: uv run --dev ruff check python tests
     - name: Run tests
-      run: uv run --dev pytest --quiet
+      run: uv run --dev pytest --import-mode importlib --quiet
