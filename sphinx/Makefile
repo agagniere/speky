@@ -1,5 +1,5 @@
 # ===== Configurable via the environment =====
-PROJECT_VERSION ?= $(shell git tag --sort '-version:refname' --merged | head -1)
+PROJECT_VERSION ?= $(shell $(Speky) --version | cut -d' ' -f2)
 # ============================================
 
 PythonSources  := $(shell find ../python -type f -name '*.py')

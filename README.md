@@ -12,6 +12,8 @@ then generate a PDF and a static website.
 
 ## Generate a PDF
 
+Requires [Typst](https://github.com/typst/typst) >= 0.13.0
+
 The speky typst package will generate content from language-agnostic data, like YAML.
 
 ### Install locally
@@ -23,7 +25,7 @@ make -C typst
 ### Use from typst
 
 ```typst
-#import "@local/speky:0.0.7": speky
+#import "@local/speky:1.2.0": speky
 
 #speky((
   "requirements.yaml",
@@ -33,6 +35,8 @@ make -C typst
 ```
 
 ## Generate a static website
+
+Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 
 1. Install speky
    ```shell
@@ -53,3 +57,7 @@ make -C typst
    ```shell
    open sphinx/html/index.html
    ```
+
+## Used by
+
+![safran](https://upload.wikimedia.org/wikipedia/fr/thumb/5/5f/Safran_-_logo_2016.png/330px-Safran_-_logo_2016.png)
