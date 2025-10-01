@@ -1,13 +1,9 @@
-import importlib.resources
-
 import pytest
 import speky
 import yaml
 
-tests_folder = importlib.resources.files(__package__)
 
-
-def test_invalid_file():
+def test_invalid_file(tests_folder):
     with pytest.raises(FileNotFoundError):
         speky.run(['-p', 'project', 'doesntexist'])
     with pytest.raises(OSError, match='File name too long'):
@@ -20,7 +16,7 @@ def test_invalid_file():
         speky.run(['-p', 'project', '/dev/null'])
 
 
-def test_error_msg(capfd, sample):
+def test_error_msg(sample):
     error_list = [
         ('com_missing_about', 'Missing the field "about" from Definition of a Comment'),
         ('com_missing_date', 'Missing the field "date" from Definition of a Comment'),
