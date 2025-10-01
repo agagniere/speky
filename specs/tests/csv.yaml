@@ -10,23 +10,23 @@ tests:
   initial: Blank project
   steps:
   - action: Write a CSV file for requirements
-    run: cat spec.csv
+    run: cat requirements.csv
     sample_lang: csv
     sample: |
       id,short,long
-      S01,"Lorem ipsum","A requirement from CSV"
+      RF01,"Lorem ipsum","A requirement from CSV"
   - action: Write a CSV file for comments
     run: cat comments.csv
     sample_lang: csv
     sample: |
       from,about,date,text
-      "Some Person",S01,"01/01/2025","A comment from CSV"
+      "Some Person",RF01,"01/01/2025","A comment from CSV"
   - action: Write a typst file importing the CSVs
     run: cat dummy.typ
     sample_lang: typst
     sample: |
       #import "@local/speky:0.1.0": speky, table_to_comments, table_to_requirements
-      #speky((table_to_requirements(csv("spec.csv"), "functional"),
+      #speky((table_to_requirements(csv("requirements.csv"), "functional"),
               table_to_comments(csv("comments.csv"))))
   - action: Generate the PDF
     run: typst compile dummy.typ --open

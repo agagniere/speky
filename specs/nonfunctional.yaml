@@ -12,6 +12,8 @@ requirements:
       - JSON
       - XML
       - TOML
+  properties:
+    version: 2
 - id: SN002
   ref: [SF001]
   short: Do not constraint file names
@@ -22,6 +24,8 @@ requirements:
     the filename of which can be anything.
 
     The type of a file is determined by the `kind` top-level field, not the filename.
+  properties:
+    version: 2
 - id: SN003
   long: It should be possible to edit specifications without deep knowledge of git.
 - id: SN004
