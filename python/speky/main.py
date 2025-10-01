@@ -263,5 +263,5 @@ class Specification:
                     raise KeyError(message)
         for referred in self.comments.keys():
             if referred not in self.by_id:
-                message = f'Requirement {referred}, referred from a comment, does not exist'
+                message = f'Requirement or Test {referred}, referred from a comment, does not exist'
                 raise KeyError(message)

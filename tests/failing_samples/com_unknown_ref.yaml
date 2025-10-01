@@ -1,6 +1,6 @@
 kind: comments
 comments:
 - from: Toto
-  about: RF00
+  about: foobar
   date: 03/04/2050
-  text: Some comment about a requirement that does not exist
+  text: Some comment about a requirement or test that does not exist
