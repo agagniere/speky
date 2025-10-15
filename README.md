@@ -48,7 +48,17 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 	   --output-folder markdown \
 	   --project-name Toto
    ```
-1. Generate HTML with sphinx:
+1. Configure Sphinx:
+   ```shell
+   cat <<-EOF > conf.py
+      project    = 'Toto'
+      language   = 'en'
+      extensions = [ 'myst_parser', 'sphinx_design' ]
+      html_theme = 'furo'
+      myst_enable_extensions = [ 'colon_fence' ]
+   EOF
+   ```
+1. Generate HTML with Sphinx:
    ```shell
    uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
    sphinx-build -M html markdown sphinx --conf-dir .
