@@ -1,0 +1,78 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP004
+  ref: [MCP003]
+  short: Get simple requirement
+  long: Query a requirement with minimal fields and verify the response
+  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
+  steps:
+  - action: Call get_requirement tool with ID "RF01"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "RF01"}
+        },
+        "id": 1
+      }
+  - action: Verify response contains requirement details
+    expected: |
+      Response includes:
+      - id: "RF01"
+      - long: "The first requirement"
+      - No short field (was not present in source)
+      - Empty or absent tags, properties, ref fields
+
+- id: TMCP005
+  ref: [MCP003]
+  short: Get requirement with all fields
+  long: Query a requirement that has all optional fields populated
+  initial: MCP server is running with specs/functional.yaml loaded
+  steps:
+  - action: Call get_requirement tool with ID "SF001"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "SF001"}
+        },
+        "id": 1
+      }
+  - action: Verify response contains all fields
+    expected: |
+      Response includes:
+      - id: "SF001"
+      - short: "Write requirements"
+      - long: (multiline description)
+      - tags: ["input"]
+      - properties: {"version": 2}
+      - tested_by: (list of test IDs that reference SF001)
+
+- id: TMCP006
+  ref: [MCP003]
+  short: Get non-existent requirement
+  long: Query a requirement ID that does not exist and verify error handling
+  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
+  steps:
+  - action: Call get_requirement tool with ID "INVALID"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "INVALID"}
+        },
+        "id": 1
+      }
+  - action: Verify error response
+    expected: |
+      JSON-RPC error response with message indicating that requirement "INVALID" does not exist
