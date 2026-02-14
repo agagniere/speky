@@ -55,7 +55,7 @@ requirements:
       - expected: Expected output (if present)
       - sample: Sample data (if present)
       - sample_lang: Language of sample data (if present)
-    - comments: List of comments about this test (with about_type field)
+    - comments: List of comments about this test (if any)
 
     If the test ID does not exist, the tool shall return an error message.
   tags: [mcp:tools, mcp:query]

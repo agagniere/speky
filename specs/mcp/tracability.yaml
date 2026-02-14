@@ -1,0 +1,55 @@
+kind: requirements
+category: functional
+requirements:
+- id: MCP006
+  short: List tests validating a requirement
+  client_statement: |
+    I would like to see which tests validate a specific requirement to understand test coverage.
+    When reviewing or modifying a requirement, I need to know what tests will be affected and
+    what test procedures exist to validate it.
+  long: |
+    The user shall be able to query which tests validate a given requirement.
+
+    The MCP server shall expose a tool named `list_testers_of` that accepts
+    a requirement ID and returns all tests that reference it in their `ref` field.
+
+    The response shall be a list of test summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The test category
+
+    The list shall be sorted alphabetically by ID.
+
+    If the requirement has no associated tests, an empty list shall be returned.
+    If the requirement ID does not exist, an error shall be returned.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP003]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
+- id: MCP007
+  short: List requirements referencing another
+  client_statement: |
+    I would like to see which requirements reference or depend on a specific requirement
+    to understand dependency chains and impact analysis. When a requirement changes, I need
+    to know what other requirements might be affected.
+  long: |
+    The user shall be able to query which requirements reference a given requirement.
+
+    The MCP server shall expose a tool named `list_references_to` that accepts
+    a requirement ID and returns all requirements that reference it in their `ref` field.
+
+    The response shall be a list of requirement summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The requirement category
+
+    The list shall be sorted alphabetically by ID.
+
+    If no requirements reference the given ID, an empty list shall be returned.
+    If the requirement ID does not exist, an error shall be returned.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP003]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
