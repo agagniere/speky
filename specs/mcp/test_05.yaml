@@ -1,0 +1,118 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP011
+  ref: [MCP005]
+  short: Search all requirements
+  long: Call search_requirements with no filters to get all requirements
+  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
+  steps:
+  - action: Call search_requirements tool with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {}
+        },
+        "id": 1
+      }
+  - action: Verify all requirements are returned sorted by ID
+    expected: |
+      Response includes both requirements:
+      - {"id": "RF01", "category": "functional"}
+      - {"id": "RF02", "short": "Second", "category": "functional"}
+
+- id: TMCP012
+  ref: [MCP005]
+  short: Search requirements by tag
+  long: Search for requirements with a specific tag
+  initial: MCP server is running with specs/functional.yaml loaded
+  steps:
+  - action: Call search_requirements tool with tag "input"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"tag": "input"}
+        },
+        "id": 1
+      }
+  - action: Verify only requirements tagged with "input" are returned
+    expected: |
+      Response includes SF001, SF006, SF008, SF011 (all tagged "input")
+      Each entry has: id, category, tags array containing "input"
+      Does not include requirements without "input" tag
+
+- id: TMCP013
+  ref: [MCP005]
+  short: Search requirements by parameterized tag
+  long: Search for requirements with a subtag (e.g., "output:pdf")
+  initial: MCP server is running with specs/functional.yaml loaded
+  steps:
+  - action: Call search_requirements tool with tag "output:pdf"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"tag": "output:pdf"}
+        },
+        "id": 1
+      }
+  - action: Verify only requirements with that specific subtag are returned
+    expected: |
+      Response includes SF002, SF005 (both tagged "output:pdf")
+      Does not include SF003 which has "output:html"
+
+- id: TMCP014
+  ref: [MCP005]
+  short: Search requirements by category
+  long: Search for requirements in a specific category
+  initial: MCP server is running with specs/functional.yaml and specs/nonfunctional.yaml loaded
+  steps:
+  - action: Call search_requirements tool with category "functional"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"category": "functional"}
+        },
+        "id": 1
+      }
+  - action: Verify only functional requirements are returned
+    expected: |
+      Response includes all requirements from functional.yaml
+      Does not include requirements from nonfunctional.yaml
+      Each entry has category: "functional"
+
+- id: TMCP015
+  ref: [MCP005]
+  short: Search with no matches
+  long: Search with filters that match no requirements
+  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
+  steps:
+  - action: Call search_requirements tool with a non-existent tag
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"tag": "nonexistent"}
+        },
+        "id": 1
+      }
+  - action: Verify empty list is returned
+    expected: Response is an empty array []
