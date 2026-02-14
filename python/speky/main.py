@@ -39,7 +39,7 @@ def run(argv: list[str] | None = None):
     cli_parser = argparse.ArgumentParser(
         prog='Speky',
         description="Write your project's specification in YAML, display it as a static website",
-        epilog='Copyright (c) 2025 Antoine GAGNIERE',
+        epilog='Copyright (c) 2025,2026 Antoine GAGNIERE',
     )
     cli_parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version(__package__))
     cli_parser.add_argument(
@@ -111,24 +111,27 @@ def run(argv: list[str] | None = None):
 def import_fields(destination, source: dict, fields: list[str]):
     """
     Creates members to the destination objects, that have the name and values of the desired fields from the source dictionnary.
-    Also prints a warning about remaining fields that were not imported
     """
     for field in fields:
         setattr(destination, field, source.get(field, None))
-    extras = source.keys() - set(fields)
-    if extras:
-        logger.warning('Ignored extra fields: %s', extras)
 
+def warn_extra_fields(location: str, obj: dict, expected_fields: list[str]):
+    extras = obj.keys() - set(expected_fields)
+    if extras:
+        s = 's' if len(extras) > 1 else ''
+        logger.warning('Found extra field%s in %s: %s', s, location, extras)
 
 def ensure_fields(location: str, obj: dict, fields: list[str]):
     """
     Raise an exception if one of the expected fields is missing
     """
-    for field in fields:
-        if field not in obj:
-            message = f'Missing the field "{field}" from {location}'
-            raise KeyError(message)
-
+    missing = set(fields) - obj.keys()
+    if missing:
+        if len(missing) > 1:
+            message = f'Missing fields from {location}: {list(sorted(missing))}'
+        else:
+            message = f'Missing field from {location}: {next(iter(missing))}'
+        raise KeyError(message)
 
 class SpecItem(SimpleNamespace):
     folder = 'misc'
@@ -144,11 +147,9 @@ class SpecItem(SimpleNamespace):
     def from_yaml(cls, data: dict, location: str):
         result = SimpleNamespace()
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, [cls.id_field])
-        ensure_fields(
-            f'Definition of {cls.__name__} {data[cls.id_field]} in "{location}"',
-            data,
-            cls.mandatory_fields,
-        )
+        location = f'Definition of {cls.__name__} {data[cls.id_field]} in "{location}"'
+        ensure_fields(location, data, cls.mandatory_fields)
+        warn_extra_fields(location, data, cls.fields())
         import_fields(result, data, cls.fields())
         return cls(**result.__dict__)
 
@@ -177,7 +178,9 @@ class Comment(SimpleNamespace):
     @classmethod
     def from_yaml(cls, data: dict, location: str):
         result = SimpleNamespace()
-        ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, cls.fields)
+        location = f'Definition of a {cls.__name__} in "{location}"'
+        ensure_fields(location, data, cls.fields)
+        warn_extra_fields(location, data, cls.fields)
         import_fields(result, data, cls.fields)
         result.external = result.external in ['True', 'true', True, 1, '1']
         result.time = datetime.datetime.strptime(result.date, '%d/%m/%Y').astimezone(datetime.UTC)
