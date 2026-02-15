@@ -130,7 +130,7 @@ def ensure_fields(location: str, obj: dict, fields: list[str]):
     missing = set(fields) - obj.keys()
     if missing:
         if len(missing) > 1:
-            message = f'Missing fields from {location}: {sorted(missing)}'
+            message = f'Missing fields from {location}: {", ".join(sorted(missing))}'
         else:
             message = f'Missing field from {location}: {next(iter(missing))}'
         raise KeyError(message)

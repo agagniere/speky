@@ -31,6 +31,7 @@ def test_error_msg(sample):
         ('req_unknown_ref', r'Requirement \w+, referred from \w+, does not exist'),
         ('test_missing_ref', r'Missing field from Definition of Test \w+ in "[^"]+": ref'),
         ('test_missing_steps', r'Missing field from Definition of Test \w+ in "[^"]+": steps'),
+        ('test_missing_ref_and_steps', r'Missing fields from Definition of Test \w+ in [^:]+: ref, steps'),
         ('test_unknwon_ref', r'Requirement \w+, referred from \w+, does not exist'),
         ('test_step_missing_action', r'Missing field from Step \d+ of Test \w+ in "[^"]+": action'),
     ]

@@ -1,0 +1,7 @@
+kind: tests
+category: functional
+tests:
+- id: TF01
+  short: Foo
+  long: This test is missing the ref and steps fields
+  initial: Blank project
