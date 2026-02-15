@@ -5,28 +5,47 @@ tests:
   ref: [MCP003]
   short: Get simple requirement
   long: Query a requirement with minimal fields and verify the response
-  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
+  initial: MCP server is running with specification from `tests/samples` loaded
   steps:
   - action: Call get_requirement tool with ID "RF01"
     sample_lang: json
     sample: |
       {
+        "id": 1,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "get_requirement",
           "arguments": {"id": "RF01"}
-        },
-        "id": 1
+        }
       }
-  - action: Verify response contains requirement details
-    expected: |
-      Response includes:
-      - id: "RF01"
+  - action: |
+      Verify response contains requirement details:
+      - id: `RF01`
+      - category: functional
       - long: "The first requirement"
-      - No short field (was not present in source)
-      - Empty or absent tags, properties, ref fields
-
+      - tested_by: T01
+      - comments: a single comment
+      - Empty or absent short, tags, properties, client_statement, ref and referenced_by fields
+    sample_lang: json
+    sample: |
+      {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "category": "functional",
+          "comments": [
+            {
+              "date": "01/01/2025",
+              "from": "Some Person",
+              "text": "The first comment",
+            }
+          ],
+          "id": "RF01",
+          "long": "The first requirement",
+          "tested_by": [ {"id": "T01"} ],
+        }
+      }
 - id: TMCP005
   ref: [MCP003]
   short: Get requirement with all fields
