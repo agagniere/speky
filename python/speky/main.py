@@ -115,11 +115,13 @@ def import_fields(destination, source: dict, fields: list[str]):
     for field in fields:
         setattr(destination, field, source.get(field, None))
 
+
 def warn_extra_fields(location: str, obj: dict, expected_fields: list[str]):
     extras = obj.keys() - set(expected_fields)
     if extras:
         s = 's' if len(extras) > 1 else ''
         logger.warning('Found extra field%s in %s: %s', s, location, extras)
+
 
 def ensure_fields(location: str, obj: dict, fields: list[str]):
     """
@@ -128,10 +130,11 @@ def ensure_fields(location: str, obj: dict, fields: list[str]):
     missing = set(fields) - obj.keys()
     if missing:
         if len(missing) > 1:
-            message = f'Missing fields from {location}: {list(sorted(missing))}'
+            message = f'Missing fields from {location}: {sorted(missing)}'
         else:
             message = f'Missing field from {location}: {next(iter(missing))}'
         raise KeyError(message)
+
 
 class SpecItem(SimpleNamespace):
     folder = 'misc'
@@ -177,10 +180,11 @@ class Test(SpecItem):
     def from_yaml(cls, data: dict, location: str):
         result = super().from_yaml(data, location)
         for i, step in enumerate(result.steps, 1):
-            name  = f'Step {i} of {cls.__name__} {data[cls.id_field]} in "{location}"'
+            name = f'Step {i} of {cls.__name__} {data[cls.id_field]} in "{location}"'
             ensure_fields(name, step, ['action'])
             warn_extra_fields(name, step, cls.step_fields)
         return result
+
 
 class Comment(SimpleNamespace):
     fields = ['about', 'from', 'date', 'text', 'external']

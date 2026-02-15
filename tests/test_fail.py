@@ -18,20 +18,21 @@ def test_invalid_file(tests_folder):
 
 def test_error_msg(sample):
     error_list = [
-        ('com_missing_about', 'Missing the field "about" from Definition of a Comment'),
-        ('com_missing_date', 'Missing the field "date" from Definition of a Comment'),
-        ('com_missing_from', 'Missing the field "from" from Definition of a Comment'),
-        ('com_missing_text', 'Missing the field "text" from Definition of a Comment'),
+        ('com_missing_about', 'Missing field from Definition of a Comment in "[^"]+": about'),
+        ('com_missing_date', 'Missing field from Definition of a Comment in "[^"]+": date'),
+        ('com_missing_from', 'Missing field from Definition of a Comment in "[^"]+": from'),
+        ('com_missing_text', 'Missing field from Definition of a Comment in "[^"]+": text'),
         ('com_unknown_ref', r'Requirement or Test \w+, referred from a comment, does not exist'),
-        ('missing_kind', 'Missing the field "kind" from Top-level of "[^.]+.yaml"'),
-        ('req_missing_category', 'Missing the field "category" from Top-level of requirements file "[^.]+.yaml"'),
-        ('req_missing_id', 'Missing the field "id" from Definition of a Requirement'),
-        ('req_missing_long', r'Missing the field "long" from Definition of Requirement \w+'),
+        ('missing_kind', 'Missing field from Top-level of "[^"]+": kind'),
+        ('req_missing_category', 'Missing field from Top-level of requirements file "[^"]+": category'),
+        ('req_missing_id', 'Missing field from Definition of a Requirement in "[^"]+": id'),
+        ('req_missing_long', r'Missing field from Definition of Requirement \w+ in "[^"]+": long'),
         ('req_redefinition', r'Multiple definitions of requirement "\w+"'),
         ('req_unknown_ref', r'Requirement \w+, referred from \w+, does not exist'),
-        ('test_missing_ref', r'Missing the field "ref" from Definition of Test \w+'),
-        ('test_missing_steps', r'Missing the field "steps" from Definition of Test \w+'),
+        ('test_missing_ref', r'Missing field from Definition of Test \w+ in "[^"]+": ref'),
+        ('test_missing_steps', r'Missing field from Definition of Test \w+ in "[^"]+": steps'),
         ('test_unknwon_ref', r'Requirement \w+, referred from \w+, does not exist'),
+        ('test_step_missing_action', r'Missing field from Step \d+ of Test \w+ in "[^"]+": action'),
     ]
 
     for name, reason in error_list:
