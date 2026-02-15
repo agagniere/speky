@@ -20,3 +20,19 @@ def test_simple_sample(sample):
             sample('simple_tests'),
         ]
     )
+
+
+def test_more_samples(sample):
+    speky.run(
+        [
+            '--check-only',
+            '--project-name',
+            'Project',
+            sample('simple_requirements'),
+            sample('simple_comments'),
+            sample('simple_tests'),
+            sample('more_requirements'),
+            sample('more_comments'),
+            sample('more_tests'),
+        ]
+    )

@@ -1,0 +1,28 @@
+kind: tests
+category: non-functional
+tests:
+- id: T03
+  long: First step before T04
+  ref: [RF03]
+  initial: Nothing
+  steps:
+  - action: Store secret
+    run: echo secret > topsecret.txt
+  - action: Store some values
+    run: |
+      echo '{"foo": "bar", "baz": 21}' > foo.json
+- id: T04
+  ref: [RF03]
+  prereq: [T03]
+  initial: Requires ls and cat
+  short: Yet another test
+  long: The third test, that validates the third requirement
+  steps:
+  - action: Do that shell command
+    run: 'ls *secret*'
+    expected: topsecret.txt
+  - action: Show file content
+    run: cat foo.json
+    sample_lang: json
+    sample: |
+      {"foo": "bar", "baz": 21}

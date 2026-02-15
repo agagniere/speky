@@ -1,0 +1,12 @@
+kind: comments
+default:
+  date: 03/01/2025
+  about: RF03
+  from: "Mr. Author"
+  external: false
+comments:
+- text: "I wrote that"
+- from: Observer
+  external: true
+  text: "I can see that"
+- text: "Good"
