@@ -1,0 +1,3 @@
+kind: comments
+comments:
+- text: Some comment missing the about, date and from fields
