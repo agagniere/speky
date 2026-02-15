@@ -1,17 +1,70 @@
 kind: tests
 category: functional
 tests:
-- id: TMCP004
-  ref: [MCP003]
-  short: Get simple requirement
-  long: Query a requirement with minimal fields and verify the response
-  initial: MCP server is running with specification from `tests/samples` loaded
+- id: TMCP001
+  short: Start the MCP server
+  long: Install and run Speky's MCP server
+  initial: |
+    - The uv tool is required
+    - The current directory contains the yaml files from `test/samples`
   steps:
-  - action: Call get_requirement tool with ID "RF01"
+  - action: Install Speky
+    run: uv tool install git+https://github.com/agagniere/speky#master
+    expected: |
+      [...]
+      Installed 2 executables: speky, speky_mcp
+  - action: Run the MCP server
+    run: speky_mcp *.yaml
+- id: TMCP002
+  short: Initialize the MCP server
+  long: |
+    Once the server is running, the client needs to initialize it,
+    specifying a protocol version and negotiating capabilities.
+  prereq: [TMCP001]
+  steps:
+  - action: The client sends an `initialize` request
     sample_lang: json
     sample: |
       {
         "id": 1,
+        "jsonrpc": "2.0",
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {...},
+          "clientInfo": {...}
+        }
+      }
+  - action: The server answers with an appropriate response
+    sample_lang: json
+    sample: |
+      {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {...},
+          "serverInfo": {...}
+        }
+      }
+  - action: The client notifies the initialization is complete
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "notifications/initialized"
+      }
+- id: TMCP004
+  ref: [MCP003]
+  short: Get simple requirement
+  long: Query a requirement with minimal fields and verify the response
+  prereq: [TMCP002]
+  steps:
+  - action: Call `get_requirement` tool with ID `RF01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
@@ -24,55 +77,105 @@ tests:
       - id: `RF01`
       - category: functional
       - long: "The first requirement"
-      - tested_by: T01
+      - tested_by: `T01`
       - comments: a single comment
       - Empty or absent short, tags, properties, client_statement, ref and referenced_by fields
     sample_lang: json
     sample: |
       {
-        "id": 1,
+        "id": 2,
         "jsonrpc": "2.0",
         "result": {
-          "category": "functional",
-          "comments": [
-            {
-              "date": "01/01/2025",
-              "from": "Some Person",
-              "text": "The first comment",
-            }
-          ],
-          "id": "RF01",
-          "long": "The first requirement",
-          "tested_by": [ {"id": "T01"} ],
+          "structuredContent": {
+            "category": "functional",
+            "comments": [
+              {
+                "date": "01/01/2025",
+                "external": false,
+                "from": "Some Person",
+                "text": "The first comment"
+              }
+            ],
+            "id": "RF01",
+            "long": "The first requirement",
+            "tested_by": [{"id": "T01"}]
+          }
         }
       }
 - id: TMCP005
   ref: [MCP003]
-  short: Get requirement with all fields
+  short: Get requirement with more fields
   long: Query a requirement that has all optional fields populated
-  initial: MCP server is running with specs/functional.yaml loaded
+  prereq: [TMCP002]
   steps:
-  - action: Call get_requirement tool with ID "SF001"
+  - action: Call `get_requirement` tool with ID `RF03`
     sample_lang: json
     sample: |
       {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "get_requirement",
-          "arguments": {"id": "SF001"}
-        },
-        "id": 1
+          "arguments": {"id": "RF03"}
+        }
       }
-  - action: Verify response contains all fields
-    expected: |
-      Response includes:
-      - id: "SF001"
-      - short: "Write requirements"
-      - long: (multiline description)
-      - tags: ["input"]
-      - properties: {"version": 2}
-      - tested_by: (list of test IDs that reference SF001)
+  - action: |
+      Verify response contains all expected fields:
+      - id: `RF03`
+      - category: non-functional
+      - short: "Number 3"
+      - long: "The third requirement !"
+      - client_statement: "I want a requirement will all fields"
+      - properties: author, since, version
+      - tags: `foo`, `bar:baz`
+      - ref and referenced_by: `RF04`
+      - tested_by: `T03` and `T04`
+      - comments: 3 comments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "non-functional",
+            "client_statement": "I want a requirement will all fields",
+            "comments": [
+              {
+                "date": "03/01/2025",
+                "external": false,
+                "from": "Mr. Author",
+                "text": "I wrote that"
+              },
+              {
+                "date": "03/01/2025",
+                "external": true,
+                "from": "Observer",
+                "text": "I can see that"
+              },
+              {
+                "date": "03/01/2025",
+                "external": false,
+                "from": "Mr. Author",
+                "text": "Good"
+              }
+            ],
+            "id": "RF03",
+            "long": "The third requirement !",
+            "properties": {
+              "author": "Mr. Author",
+              "since": "`1.0.0`",
+              "version": 2
+            },
+            "ref": [{"id": "RF04"}],
+            "referenced_by": [{"id": "RF04"}],
+            "short": "Number 3",
+            "tags": ["foo", "bar:baz"],
+            "tested_by": [{"id": "T03"}, {"id": "T04", "short": "Yet another test"}]
+          }
+        }
+      }
 
 - id: TMCP006
   ref: [MCP003]
@@ -80,18 +183,33 @@ tests:
   long: Query a requirement ID that does not exist and verify error handling
   initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
   steps:
-  - action: Call get_requirement tool with ID "INVALID"
+  - action: Call `get_requirement` tool with ID `INVALID`
     sample_lang: json
     sample: |
       {
+        "id": 1,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "get_requirement",
           "arguments": {"id": "INVALID"}
-        },
-        "id": 1
+        }
       }
-  - action: Verify error response
-    expected: |
-      JSON-RPC error response with message indicating that requirement "INVALID" does not exist
+  - action: |
+      Verify that the response is a tool execution error indicating that
+      requirement `INVALID` does not exist
+    sample_lang: json
+    sample: |
+      {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "content": [
+            {
+              "type": "text",
+              "text": "Requirement 'INVALID' does not exist"
+            }
+          ],
+          "isError": true
+        }
+      }
