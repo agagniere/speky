@@ -171,6 +171,16 @@ class Test(SpecItem):
     mandatory_fields = SpecItem.mandatory_fields + ['ref', 'steps']
     optional_fields = SpecItem.optional_fields + ['initial', 'prereq']
 
+    step_fields = {'action', 'run', 'expected', 'sample', 'sample_lang'}
+
+    @classmethod
+    def from_yaml(cls, data: dict, location: str):
+        result = super().from_yaml(data, location)
+        for i, step in enumerate(result.steps, 1):
+            name  = f'Step {i} of {cls.__name__} {data[cls.id_field]} in "{location}"'
+            ensure_fields(name, step, ['action'])
+            warn_extra_fields(name, step, cls.step_fields)
+        return result
 
 class Comment(SimpleNamespace):
     fields = ['about', 'from', 'date', 'text', 'external']
