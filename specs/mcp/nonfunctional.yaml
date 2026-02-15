@@ -1,0 +1,22 @@
+kind: requirements
+category: non-functional
+requirements:
+- id: MCP002
+  short: Multiple queries per session
+  client_statement: |
+    I would like to send multiple queries in one conversation without the overhead of
+    reloading YAML files each time. When exploring a specification interactively, I might
+    search for tags, then get specific requirements, then check their tests - all in quick
+    succession. Fast responses are crucial for a smooth user experience.
+  long: |
+    The system shall be able to handle multiple tool calls in a single session
+    without restarting.
+
+    The server shall keep the specifications loaded in memory and respond to each query
+    without reloading the YAML files.
+
+    This allows efficient querying during interactive sessions with an LLM agent.
+  tags: [mcp:core, mcp:performance]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
