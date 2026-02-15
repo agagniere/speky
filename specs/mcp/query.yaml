@@ -15,6 +15,7 @@ requirements:
 
     The response shall include all available fields:
     - id: The unique identifier
+    - category: The category this requirement is from
     - short: The short description (if present)
     - long: The full description
     - tags: List of tags (if present)
