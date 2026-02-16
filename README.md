@@ -71,3 +71,13 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 ## Used by
 
 ![safran](https://upload.wikimedia.org/wikipedia/fr/thumb/5/5f/Safran_-_logo_2016.png/330px-Safran_-_logo_2016.png)
+
+## AI usage disclosure
+
+Written 100% by hand (without even a language server):
+- Speky's specification
+- The PDF generation in typst
+- Python CLI and its tests
+
+Written with LLM assistance (Claude Sonnet 4.5):
+- MCP server specification, implementation and related tests

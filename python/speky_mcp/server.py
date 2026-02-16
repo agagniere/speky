@@ -72,7 +72,6 @@ def main():
 
     args = parser.parse_args()
 
-    # Setup logging
     logging_config_file = Path(args.logging_config)
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
