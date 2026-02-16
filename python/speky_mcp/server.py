@@ -145,14 +145,14 @@ def run_server(specs: Specification):
                 continue  # Notifications don't get responses
 
             # Send response
-            json.dump(response, sys.stdout)
+            json.dump(response, sys.stdout, sort_keys=True)
             sys.stdout.write('\n')
             sys.stdout.flush()
 
         except json.JSONDecodeError as e:
             logger.error('Invalid JSON: %s', e)
             error_response = protocol_error(None, JsonRpcError.PARSE_ERROR, 'Parse error')
-            json.dump(error_response, sys.stdout)
+            json.dump(error_response, sys.stdout, sort_keys=True)
             sys.stdout.write('\n')
             sys.stdout.flush()
 
@@ -185,16 +185,6 @@ def protocol_error(request_id: int | None, code: int, message: str, data: dict |
 
 
 def tool_error(request_id: int, message: str) -> dict:
-    """
-    Return a tool execution error response.
-
-    Args:
-        request_id: JSON-RPC request ID
-        message: Error message
-
-    Returns:
-        JSON-RPC error response
-    """
     return {
         'jsonrpc': '2.0',
         'id': request_id,
@@ -208,16 +198,6 @@ def tool_error(request_id: int, message: str) -> dict:
 
 
 def tool_result(request_id: int, content: dict) -> dict:
-    """
-    Return a successful tool result.
-
-    Args:
-        request_id: JSON-RPC request ID
-        content: Response content
-
-    Returns:
-        JSON-RPC success response
-    """
     return {
         'jsonrpc': '2.0',
         'id': request_id,
@@ -242,7 +222,7 @@ def handle_get_requirement(request_id: int, arguments: dict, specs: Specificatio
     Returns:
         JSON-RPC response
     """
-    requirement_id = arguments.get('id')
+    requirement_id = arguments['id']
 
     # Check if ID exists
     # speky:speky_mcp#TMCP006
@@ -256,8 +236,6 @@ def handle_get_requirement(request_id: int, arguments: dict, specs: Specificatio
     if requirement.kind != 'requirement':
         return tool_error(request_id, f'{requirement_id} is a {requirement.kind}, not a requirement')
 
-    # Build response with all fields
-    # speky:speky_mcp#TMCP004
     content = {
         'category': requirement.category,
         'id': requirement.id,
@@ -275,22 +253,24 @@ def handle_get_requirement(request_id: int, arguments: dict, specs: Specificatio
     if requirement.properties:
         content['properties'] = requirement.properties
     if requirement.ref:
-        content['ref'] = [{'id': ref_id} for ref_id in requirement.ref]
-
-    # Add tested_by
+        content['ref'] = [
+            referred.json_oneliner(False)
+            for referred in map(specs.by_id.__getitem__, requirement.ref)
+        ]
+    if requirement_id in specs.references:
+        content['referenced_by'] = [
+            ref.json_oneliner(False)
+            for ref in specs.references[requirement_id]
+        ]
     if requirement_id in specs.testers_of:
-        content['tested_by'] = [{'id': test.id} for test in specs.testers_of[requirement_id]]
-
-    # Add comments
+        content['tested_by'] = [
+            test.json_oneliner(False)
+            for test in specs.testers_of[requirement_id]
+        ]
     if requirement_id in specs.comments:
         content['comments'] = [
-            {
-                'date': c.date,
-                'external': c.external,
-                'from': getattr(c, 'from'),
-                'text': c.text,
-            }
-            for c in specs.comments[requirement_id]
+            {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
+            for comment in specs.comments[requirement_id]
         ]
 
     return tool_result(request_id, content)
