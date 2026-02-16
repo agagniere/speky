@@ -43,6 +43,8 @@ class Specification:
         if requirement.id in self.by_id:
             message = f'Multiple definitions of requirement "{requirement.id}". ID must be unique'
             raise KeyError(message)
+        requirement.category = category
+        requirement.kind = 'requirement'
         self.by_id[requirement.id] = requirement
         self.requirements[category].append(requirement)
         if requirement.ref:
@@ -60,6 +62,8 @@ class Specification:
             test: Test instance
             category: Category name
         """
+        test.category = category
+        test.kind = 'test'
         self.by_id[test.id] = test
         self.tests[category].append(test)
         for req in test.ref:
