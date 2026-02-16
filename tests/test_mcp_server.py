@@ -26,6 +26,7 @@ def complex_specs():
     specs = Specification()
     specs.read_yaml(str(SAMPLES_DIR / 'more_requirements.yaml'))
     specs.read_yaml(str(SAMPLES_DIR / 'more_tests.yaml'))
+    specs.read_yaml(str(SAMPLES_DIR / 'more_comments.yaml'))
     specs.check_references()
     return specs
 
@@ -177,6 +178,10 @@ class TestGetRequirement:
         # Tested by
         assert 'tested_by' in content
         assert len(content['tested_by']) == 2
+
+        # Comments
+        assert 'comments' in content
+        assert len(content['comments']) == 3
 
     def test_get_requirement_not_found(self, simple_specs):
         """Test error when requirement ID doesn't exist (TMCP006)."""
