@@ -2,6 +2,7 @@ kind: tests
 category: functional
 tests:
 - id: TMCP001
+  ref: [MCP001]
   short: Start the MCP server
   long: Install and run Speky's MCP server
   initial: |
@@ -16,6 +17,7 @@ tests:
   - action: Run the MCP server
     run: speky_mcp *.yaml
 - id: TMCP002
+  ref: [MCP002]
   short: Initialize the MCP server
   long: |
     Once the server is running, the client needs to initialize it,

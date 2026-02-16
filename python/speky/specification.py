@@ -78,7 +78,7 @@ class Specification:
         """
         Load a YAML file containing requirements, tests, or comments.
 
-        # speky:speky#SF001
+        speky:speky#SF001
 
         Args:
             file_name: Path to YAML file
