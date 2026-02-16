@@ -29,6 +29,7 @@ class JsonRpcError(IntEnum):
     INTERNAL_ERROR = -32603
     SERVER_NOT_INITIALIZED = -32002
 
+
 assets = importlib.resources.files('speky').joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
 logger = logging.getLogger(__name__)
@@ -252,20 +253,11 @@ def handle_get_requirement(request_id: int, arguments: dict, specs: Specificatio
     if requirement.properties:
         content['properties'] = requirement.properties
     if requirement.ref:
-        content['ref'] = [
-            referred.json_oneliner(False)
-            for referred in map(specs.by_id.__getitem__, requirement.ref)
-        ]
+        content['ref'] = [referred.json_oneliner(False) for referred in map(specs.by_id.__getitem__, requirement.ref)]
     if requirement_id in specs.references:
-        content['referenced_by'] = [
-            ref.json_oneliner(False)
-            for ref in specs.references[requirement_id]
-        ]
+        content['referenced_by'] = [ref.json_oneliner(False) for ref in specs.references[requirement_id]]
     if requirement_id in specs.testers_of:
-        content['tested_by'] = [
-            test.json_oneliner(False)
-            for test in specs.testers_of[requirement_id]
-        ]
+        content['tested_by'] = [test.json_oneliner(False) for test in specs.testers_of[requirement_id]]
     if requirement_id in specs.comments:
         content['comments'] = [
             {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
