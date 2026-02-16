@@ -36,10 +36,30 @@ logger = logging.getLogger(__name__)
 
 
 def main():
+    """Main entry point with error handling."""
+    try:
+        run(None)
+    except (
+        KeyError,
+        FileNotFoundError,
+        PermissionError,
+        NotADirectoryError,
+        OSError,
+        yaml.reader.ReaderError,
+        RuntimeError,
+    ) as err:
+        logger.critical(err)
+        sys.exit(1)
+
+
+def run(argv: list[str] | None = None):
     """
-    Main entry point for the MCP server.
+    Run the MCP server.
 
     speky:speky_mcp#TMCP001
+
+    Args:
+        argv: Command-line arguments (uses sys.argv if None)
     """
     parser = argparse.ArgumentParser(
         prog='speky-mcp',
@@ -71,45 +91,33 @@ def main():
         help='Specify a custom config file of the logging library',
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
+    # Setup logging
     logging_config_file = Path(args.logging_config)
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
 
-    try:
-        # Load specifications
-        # speky:speky_mcp#MCP001
-        specs = Specification()
-        for filename in args.paths:
-            logger.info('Loading %s', filename)
-            specs.read_yaml(filename)
-        if args.comment_csvs:
-            for filename in args.comment_csvs:
-                logger.info('Loading %s as comments', filename)
-                specs.read_comment_csv(filename)
+    # Load specifications
+    # speky:speky_mcp#MCP001
+    specs = Specification()
+    for filename in args.paths:
+        logger.info('Loading %s', filename)
+        specs.read_yaml(filename)
+    if args.comment_csvs:
+        for filename in args.comment_csvs:
+            logger.info('Loading %s as comments', filename)
+            specs.read_comment_csv(filename)
 
-        # Validate cross-references
-        # speky:speky_mcp#TMCP002
-        specs.check_references()
+    # Validate cross-references
+    # speky:speky_mcp#TMCP002
+    specs.check_references()
 
-        logger.info('Specifications loaded successfully')
+    logger.info('Specifications loaded successfully')
 
-        # Run JSON-RPC server
-        # speky:speky_mcp#MCP002
-        run_server(specs)
-
-    except (
-        KeyError,
-        FileNotFoundError,
-        PermissionError,
-        NotADirectoryError,
-        OSError,
-        yaml.reader.ReaderError,
-        RuntimeError,
-    ) as err:
-        logger.critical(err)
-        sys.exit(1)
+    # Run JSON-RPC server
+    # speky:speky_mcp#MCP002
+    run_server(specs)
 
 
 def run_server(specs: Specification):
