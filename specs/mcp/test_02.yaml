@@ -1,0 +1,43 @@
+kind: tests
+category: non-functional
+tests:
+- id: TMCP003
+  ref: [MCP002]
+  short: Initialize the MCP server
+  long: |
+    Once the server is running, the client needs to initialize it,
+    specifying a protocol version and negotiating capabilities.
+  prereq: [TMCP001]
+  steps:
+  - action: The client sends an `initialize` request
+    sample_lang: json
+    sample: |
+      {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "method": "initialize",
+        "params": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {...},
+          "clientInfo": {...}
+        }
+      }
+  - action: The server answers with an appropriate response
+    sample_lang: json
+    sample: |
+      {
+        "id": 1,
+        "jsonrpc": "2.0",
+        "result": {
+          "protocolVersion": "2025-11-25",
+          "capabilities": {...},
+          "serverInfo": {...}
+        }
+      }
+  - action: The client notifies the initialization is complete
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "notifications/initialized"
+      }
