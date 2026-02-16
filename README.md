@@ -14,7 +14,7 @@ then generate a PDF and a static website.
 
 Requires [Typst](https://github.com/typst/typst) >= 0.13.0
 
-The speky typst package will generate content from language-agnostic data, like YAML.
+The speky typst package will generate content from language-agnostic data, like YAML or TOML.
 
 ### Install locally
 
@@ -51,11 +51,11 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 1. Configure Sphinx:
    ```shell
    cat <<-EOF > conf.py
-      project    = 'Toto'
-      language   = 'en'
-      extensions = [ 'myst_parser', 'sphinx_design' ]
-      html_theme = 'furo'
-      myst_enable_extensions = [ 'colon_fence' ]
+   project    = 'Toto'
+   language   = 'en'
+   extensions = [ 'myst_parser', 'sphinx_design' ]
+   html_theme = 'furo'
+   myst_enable_extensions = [ 'colon_fence' ]
    EOF
    ```
 1. Generate HTML with Sphinx:
@@ -77,7 +77,11 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 Written 100% by hand (without even a language server):
 - Speky's specification
 - The PDF generation in typst
-- Python CLI and its tests
+- Python CLI (spec checker, markdown generation, common code reused by the MCP server, ...)
+- Tests and spec samples
+- This README.md
+- Makefiles, the Yamale schema, pyproject.toml, ...
 
 Written with LLM assistance (Claude Sonnet 4.5):
 - MCP server specification, implementation and related tests
+- [DEVELOPMENT.md](DEVELOPMENT.md)
