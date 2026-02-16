@@ -25,7 +25,7 @@ make -C typst
 ### Use from typst
 
 ```typst
-#import "@local/speky:1.2.0": speky
+#import "@local/speky:1.3.0": speky
 
 #speky((
   "requirements.yaml",

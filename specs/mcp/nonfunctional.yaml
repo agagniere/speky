@@ -1,6 +1,19 @@
 kind: requirements
 category: non-functional
 requirements:
+- id: MCP001
+  short: Start server with specifications
+  long: |
+    The system shall be started with one or more specification YAML files
+    provided as command-line arguments.
+
+    If the specification files contain validation errors
+    (such as missing fields or unknown references),
+    the server shall fail to start and display an error message.
+  tags: [mcp:core]
+  properties:
+    author: Claude
+    since: '`0.2.0`'
 - id: MCP002
   short: Multiple queries per session
   client_statement: |
@@ -16,6 +29,9 @@ requirements:
     without reloading the YAML files.
 
     This allows efficient querying during interactive sessions with an LLM agent.
+
+    Queries are received by the server in its standard input,
+    and responses are written to its standard output.
   tags: [mcp:core, mcp:performance]
   properties:
     since: '`0.2.0`'
