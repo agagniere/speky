@@ -1,0 +1,94 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP007
+  ref: [MCP004]
+  short: Get simple test
+  long: Query a test with minimal fields and verify the response
+  initial: MCP server is running with tests/samples/simple_tests.yaml loaded
+  steps:
+  - action: Call get_test tool with ID "T01"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T01"}
+        },
+        "id": 1
+      }
+  - action: Verify response contains test details
+    expected: |
+      Response includes:
+      - id: "T01"
+      - ref: ["RF01"]
+      - long: "The first test, that validates the first requirement"
+      - steps: [{"action": "The only step"}]
+      - No initial, prereq, or short fields (were not present)
+
+- id: TMCP008
+  ref: [MCP004]
+  short: Get test with multiple steps
+  long: Query a test with multiple steps including run commands
+  initial: MCP server is running with tests/samples/simple_tests.yaml loaded
+  steps:
+  - action: Call get_test tool with ID "T02"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T02"}
+        },
+        "id": 1
+      }
+  - action: Verify response contains all steps with details
+    expected: |
+      Response includes:
+      - id: "T02"
+      - ref: ["RF02"]
+      - short: "Second test"
+      - steps array with:
+        - Step 1: {"action": "Do this"}
+        - Step 2: {"action": "Do that shell command", "run": "echo Hello"}
+
+- id: TMCP009
+  ref: [MCP004]
+  short: Get test with prerequisites
+  long: Query a test that has initial state and prerequisites
+  initial: MCP server is running with specs/tests/functional.yaml loaded
+  steps:
+  - action: Call get_test tool with ID "TF003"
+  - action: Verify response includes initial state and prerequisites
+    expected: |
+      Response includes:
+      - id: "TF003"
+      - initial: "The [uv](https://docs.astral.sh/uv/getting-started/installation/) tool is required."
+      - prereq: ["TF002"]
+      - steps: (list of procedure steps)
+
+- id: TMCP010
+  ref: [MCP004]
+  short: Get non-existent test
+  long: Query a test ID that does not exist and verify error handling
+  initial: MCP server is running with tests/samples/simple_tests.yaml loaded
+  steps:
+  - action: Call get_test tool with ID "INVALID"
+    sample_lang: json
+    sample: |
+      {
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "INVALID"}
+        },
+        "id": 1
+      }
+  - action: Verify error response
+    expected: |
+      JSON-RPC error response with message indicating that test "INVALID" does not exist

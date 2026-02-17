@@ -1,4 +1,4 @@
-#import "@local/speky:0.1.2": speky, table_to_comments
+#import "@local/speky:0.1.3": speky, table_to_comments
 
 #set document(title: [Speky --- Specification], author: "Antoine GAGNIERE")
 

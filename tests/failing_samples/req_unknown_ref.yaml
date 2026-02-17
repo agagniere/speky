@@ -3,6 +3,6 @@ category: functional
 requirements:
 - id: RF01
   short: Lorem Ipsum
-  long: The top level field category is missing
+  long: The `RF00` requirement doesn't exist
   tags: [foo]
   ref: [RF00]
