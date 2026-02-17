@@ -32,7 +32,7 @@ class JsonRpcError(IntEnum):
 
 assets = importlib.resources.files('speky').joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(__package__)
 
 
 def main():
