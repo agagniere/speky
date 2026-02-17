@@ -157,7 +157,8 @@
       #pagebreak()
       = Requirements by tag
       #let prev = none
-      #for (tag, specs) in tags.pairs().sorted() [
+      #for tag in tags.keys().sorted() [
+        #let specs = tags.at(tag)
         #if tag.contains(":") {
           let index = tag.position(":")
           let group = tag.slice(0, index)
