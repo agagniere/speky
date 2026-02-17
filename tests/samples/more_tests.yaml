@@ -2,6 +2,7 @@ kind: tests
 category: non-functional
 tests:
 - id: T03
+  short: Create files
   long: First step before T04
   ref: [RF03]
   initial: Nothing

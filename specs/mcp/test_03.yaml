@@ -119,11 +119,13 @@ tests:
             "referenced_by": [{"id": "RF04"}],
             "short": "Number 3",
             "tags": ["foo", "bar:baz"],
-            "tested_by": [{"id": "T03"}, {"id": "T04", "short": "Yet another test"}]
+            "tested_by": [
+              {"id": "T03", "short": "Create files"},
+              {"id": "T04", "short": "Yet another test"}
+            ]
           }
         }
       }
-
 - id: TMCP006
   ref: [MCP003]
   short: Get non-existent requirement
