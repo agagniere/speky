@@ -16,6 +16,11 @@ tests:
       Installed 2 executables: speky, speky_mcp
   - action: Run the MCP server
     run: speky_mcp *.yaml
+    expected: |
+      speky_mcp     INFO  Loading tests/samples/simple_requirements.yaml
+      [...]
+      speky_mcp     INFO  Specifications loaded successfully
+      speky_mcp     INFO  MCP server ready, waiting for requests
 - id: TMCP002
   ref: [MCP001]
   short: Reject invalid specifications
@@ -37,7 +42,8 @@ tests:
   - action: Attempt to start MCP server with it
     run: speky_mcp req_unknown_ref.yaml
     expected: |
-      ERROR: Requirement [...], referred from [...], does not exist
+      speky_mcp     INFO  Loading req_unknown_ref.yaml
+      speky_mcp CRITICAL  'Requirement RF00, referred from RF01, does not exist'
   - action: Verify the server exited with an error code
     run: 'echo $?'
     expected: "1"
