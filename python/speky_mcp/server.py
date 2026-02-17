@@ -275,6 +275,61 @@ def handle_get_requirement(request_id: int, arguments: dict, specs: Specificatio
     return tool_result(request_id, content)
 
 
+def handle_get_test(request_id: int, arguments: dict, specs: Specification) -> dict:
+    """
+    Handle get_test tool call.
+
+    speky:speky_mcp#MCP004
+    speky:speky_mcp#TMCP007
+
+    Args:
+        request_id: JSON-RPC request ID
+        arguments: Tool arguments containing 'id'
+        specs: Loaded specification
+
+    Returns:
+        JSON-RPC response
+    """
+    test_id = arguments['id']
+
+    # Check if ID exists
+    # speky:speky_mcp#TMCP009
+    if test_id not in specs.by_id:
+        return tool_error(request_id, f'Test {test_id} not found')
+
+    test = specs.by_id[test_id]
+
+    # Check if it's a test (not a requirement)
+    # speky:speky_mcp#TMCP010
+    if test.kind != 'test':
+        return tool_error(request_id, f'{test_id} is a {test.kind}, not a test')
+
+    content = {
+        'category': test.category,
+        'id': test.id,
+        'long': test.long,
+        'ref': [
+            referred.json_oneliner(False)
+            for referred in map(specs.by_id.__getitem__, test.ref)
+        ],
+        'steps': test.steps,
+    }
+
+    # Add optional fields if present
+    # speky:speky_mcp#TMCP008
+    if test.short:
+        content['short'] = test.short
+    if test.initial:
+        content['initial'] = test.initial
+    if test.prereq:
+        content['prereq'] = [
+            prereq_test.json_oneliner(False)
+            for prereq_test in map(specs.by_id.__getitem__, test.prereq)
+        ]
+
+    return tool_result(request_id, content)
+
+
 def handle_request(request: dict, specs: Specification, initialized: bool) -> dict:
     """
     Handle a single JSON-RPC request.
@@ -314,6 +369,7 @@ def handle_request(request: dict, specs: Specification, initialized: bool) -> di
 
     # Handle tool calls
     # speky:speky_mcp#MCP003
+    # speky:speky_mcp#MCP004
     if method == 'tools/call':
         tool_name = request.get('params', {}).get('name')
         arguments = request.get('params', {}).get('arguments', {})
@@ -321,6 +377,10 @@ def handle_request(request: dict, specs: Specification, initialized: bool) -> di
         if tool_name == 'get_requirement':
             # speky:speky_mcp#TMCP004
             return handle_get_requirement(request_id, arguments, specs)
+
+        if tool_name == 'get_test':
+            # speky:speky_mcp#TMCP007
+            return handle_get_test(request_id, arguments, specs)
 
         return protocol_error(request_id, JsonRpcError.METHOD_NOT_FOUND, f'Tool not found: {tool_name}')
 
