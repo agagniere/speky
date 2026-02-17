@@ -226,3 +226,128 @@ class TestGetRequirement:
         error_msg = response['result']['structuredContent']['error']
         assert 'T01' in error_msg
         assert 'test' in error_msg
+
+
+class TestGetTest:
+    """Tests for get_test tool."""
+
+    def test_get_simple_test(self, simple_specs):
+        """Test getting a simple test with minimal fields (TMCP007)."""
+        # speky:speky_mcp#TMCP007
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {
+                'name': 'get_test',
+                'arguments': {'id': 'T01'},
+            },
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert response['jsonrpc'] == '2.0'
+        assert response['id'] == 2
+        assert 'result' in response
+        assert 'structuredContent' in response['result']
+
+        content = response['result']['structuredContent']
+
+        # Verify required fields
+        assert content['id'] == 'T01'
+        assert content['category'] == 'functional'
+        assert content['long'] == 'The first test, that validates the first requirement'
+
+        # Verify ref
+        assert 'ref' in content
+        assert len(content['ref']) == 1
+        assert content['ref'][0]['id'] == 'RF01'
+
+        # Verify steps
+        assert 'steps' in content
+        assert len(content['steps']) == 1
+        assert content['steps'][0]['action'] == 'The only step'
+
+    def test_get_test_all_fields(self, complex_specs):
+        """Test getting a test with all optional fields (TMCP008)."""
+        # speky:speky_mcp#TMCP008
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {
+                'name': 'get_test',
+                'arguments': {'id': 'T04'},
+            },
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+
+        content = response['result']['structuredContent']
+
+        # Required fields
+        assert content['id'] == 'T04'
+        assert content['category'] == 'non-functional'
+        assert content['long'] == 'The third test, that validates the third requirement'
+
+        # Optional fields
+        assert content['short'] == 'Yet another test'
+        assert content['initial'] == 'Requires ls and cat'
+
+        # Prerequisites
+        assert 'prereq' in content
+        assert len(content['prereq']) == 1
+        assert content['prereq'][0]['id'] == 'T03'
+
+        # References
+        assert 'ref' in content
+        assert len(content['ref']) == 1
+        assert content['ref'][0]['id'] == 'RF03'
+
+        # Steps with various fields
+        assert 'steps' in content
+        assert len(content['steps']) > 0
+
+    def test_get_test_not_found(self, simple_specs):
+        """Test error when test ID doesn't exist (TMCP009)."""
+        # speky:speky_mcp#TMCP009
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {
+                'name': 'get_test',
+                'arguments': {'id': 'NOTFOUND'},
+            },
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert 'result' in response
+        assert response['result']['isError'] is True
+        assert 'error' in response['result']['structuredContent']
+        error_msg = response['result']['structuredContent']['error']
+        assert 'NOTFOUND' in error_msg
+        assert 'not found' in error_msg
+
+    def test_get_test_wrong_type(self, simple_specs):
+        """Test error when ID is a requirement, not a test (TMCP010)."""
+        # speky:speky_mcp#TMCP010
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {
+                'name': 'get_test',
+                'arguments': {'id': 'RF01'},
+            },
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert 'result' in response
+        assert response['result']['isError'] is True
+        assert 'error' in response['result']['structuredContent']
+        error_msg = response['result']['structuredContent']['error']
+        assert 'RF01' in error_msg
+        assert 'requirement' in error_msg

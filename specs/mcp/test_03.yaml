@@ -128,37 +128,71 @@ tests:
       }
 - id: TMCP006
   ref: [MCP003]
-  short: Get non-existent requirement
-  long: Query a requirement ID that does not exist and verify error handling
+  short: Error when requirement not found
+  long: |
+    The user shall receive a tool execution error when requesting
+    a requirement ID that does not exist in the loaded specifications.
   prereq: [TMCP003]
   steps:
-  - action: Call `get_requirement` tool with ID `INVALID`
+  - action: The client sends a `get_requirement` request for non-existent requirement `NOTFOUND`
     sample_lang: json
     sample: |
       {
-        "id": 1,
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "get_requirement",
-          "arguments": {"id": "INVALID"}
+          "arguments": {"id": "NOTFOUND"}
         }
       }
   - action: |
-      Verify that the response is a tool execution error indicating that
-      requirement `INVALID` does not exist
+      Verify response contains a tool execution error (not a protocol error).
+      The error message indicates the requirement was not found.
     sample_lang: json
     sample: |
       {
-        "id": 1,
+        "id": 2,
         "jsonrpc": "2.0",
         "result": {
-          "content": [
-            {
-              "type": "text",
-              "text": "Requirement 'INVALID' does not exist"
-            }
-          ],
-          "isError": true
+          "isError": true,
+          "structuredContent": {
+            "error": "Requirement NOTFOUND not found"
+          }
+        }
+      }
+- id: TMCP006b
+  ref: [MCP003]
+  short: Error when ID is not a requirement
+  long: |
+    The user shall receive a tool execution error when requesting
+    an ID that exists but is a test, not a requirement.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_requirement` request for test `T01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "T01"}
+        }
+      }
+  - action: |
+      Verify response contains a tool execution error indicating
+      that T01 is a test, not a requirement.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "T01 is a test, not a requirement"
+          }
         }
       }
