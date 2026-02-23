@@ -308,10 +308,7 @@ def handle_get_test(request_id: int, arguments: dict, specs: Specification) -> d
         'category': test.category,
         'id': test.id,
         'long': test.long,
-        'ref': [
-            referred.json_oneliner(False)
-            for referred in map(specs.by_id.__getitem__, test.ref)
-        ],
+        'ref': [referred.json_oneliner(False) for referred in map(specs.by_id.__getitem__, test.ref)],
         'steps': test.steps,
     }
 
@@ -323,8 +320,7 @@ def handle_get_test(request_id: int, arguments: dict, specs: Specification) -> d
         content['initial'] = test.initial
     if test.prereq:
         content['prereq'] = [
-            prereq_test.json_oneliner(False)
-            for prereq_test in map(specs.by_id.__getitem__, test.prereq)
+            prereq_test.json_oneliner(False) for prereq_test in map(specs.by_id.__getitem__, test.prereq)
         ]
 
     return tool_result(request_id, content)
