@@ -47,13 +47,15 @@ class SpecItem(SimpleNamespace):
         """Return formatted title with ID and optional short description."""
         return f'`{self.id}` {self.short}' if self.short else f'`{self.id}`'
 
-    def json_oneliner(self, include_tags: bool):
+    def json_oneliner(self, full_summary: bool):
         """Equivalent of the title but in JSON format"""
         result = {'id': self.id}
         if self.short:
             result['short'] = self.short
-        if include_tags and hasattr(self, 'tags') and self.tags:
-            result['tags'] = self.tags
+        if full_summary:
+            result['category'] = self.category
+            if hasattr(self, 'tags') and self.tags:
+                result['tags'] = self.tags
         return result
 
     def __lt__(self, other):
