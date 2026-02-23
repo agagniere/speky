@@ -373,11 +373,7 @@ class TestSearchRequirements:
         requirements = response['result']['structuredContent']['requirements']
 
         ids = [r['id'] for r in requirements]
-        assert ids == sorted(ids)
-        assert 'RF01' in ids
-        assert 'RF02' in ids
-        assert 'RF03' in ids
-        assert 'RF04' in ids
+        assert ids == ['RF01', 'RF02', 'RF03', 'RF04']
         assert all('category' in r for r in requirements)
 
     def test_search_by_tag(self, complex_specs):
