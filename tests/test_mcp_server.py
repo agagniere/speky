@@ -22,8 +22,11 @@ def simple_specs():
 
 @pytest.fixture
 def complex_specs():
-    """Load complex test specifications."""
+    """Load all test sample specifications."""
     specs = Specification()
+    specs.read_yaml(str(SAMPLES_DIR / 'simple_requirements.yaml'))
+    specs.read_yaml(str(SAMPLES_DIR / 'simple_tests.yaml'))
+    specs.read_yaml(str(SAMPLES_DIR / 'simple_comments.yaml'))
     specs.read_yaml(str(SAMPLES_DIR / 'more_requirements.yaml'))
     specs.read_yaml(str(SAMPLES_DIR / 'more_tests.yaml'))
     specs.read_yaml(str(SAMPLES_DIR / 'more_comments.yaml'))
@@ -351,3 +354,98 @@ class TestGetTest:
         error_msg = response['result']['structuredContent']['error']
         assert 'RF01' in error_msg
         assert 'requirement' in error_msg
+
+
+class TestSearchRequirements:
+    """Tests for search_requirements tool."""
+
+    def test_search_all(self, complex_specs):
+        """Test searching with no filters returns all requirements (TMCP011)."""
+        # speky:speky_mcp#TMCP011
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'search_requirements', 'arguments': {}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        ids = [r['id'] for r in requirements]
+        assert ids == sorted(ids)
+        assert 'RF01' in ids
+        assert 'RF02' in ids
+        assert 'RF03' in ids
+        assert 'RF04' in ids
+        assert all('category' in r for r in requirements)
+
+    def test_search_by_tag(self, complex_specs):
+        """Test filtering by tag (TMCP012)."""
+        # speky:speky_mcp#TMCP012
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'search_requirements', 'arguments': {'tag': 'foo'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert len(requirements) == 1
+        assert requirements[0]['id'] == 'RF03'
+        assert requirements[0]['category'] == 'non-functional'
+        assert requirements[0]['short'] == 'Number 3'
+        assert 'foo' in requirements[0]['tags']
+        assert 'RF04' not in [r['id'] for r in requirements]
+
+    def test_search_by_namespaced_tag(self, complex_specs):
+        """Test filtering by namespaced tag (TMCP013)."""
+        # speky:speky_mcp#TMCP013
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'search_requirements', 'arguments': {'tag': 'bar:baz'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert len(requirements) == 1
+        assert requirements[0]['id'] == 'RF03'
+
+    def test_search_by_category(self, simple_specs):
+        """Test filtering by category (TMCP014)."""
+        # speky:speky_mcp#TMCP014
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'search_requirements', 'arguments': {'category': 'functional'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert len(requirements) == 2
+        assert all(r['category'] == 'functional' for r in requirements)
+        ids = [r['id'] for r in requirements]
+        assert 'RF01' in ids
+        assert 'RF02' in ids
+
+    def test_search_no_matches(self, simple_specs):
+        """Test searching with a tag that matches nothing (TMCP015)."""
+        # speky:speky_mcp#TMCP015
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'search_requirements', 'arguments': {'tag': 'nonexistent'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert requirements == []

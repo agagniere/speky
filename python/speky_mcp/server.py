@@ -326,6 +326,45 @@ def handle_get_test(request_id: int, arguments: dict, specs: Specification) -> d
     return tool_result(request_id, content)
 
 
+def handle_search_requirements(request_id: int, arguments: dict, specs: Specification) -> dict:
+    """
+    Handle search_requirements tool call.
+
+    speky:speky_mcp#MCP005
+    speky:speky_mcp#TMCP011
+
+    Args:
+        request_id: JSON-RPC request ID
+        arguments: Tool arguments with optional 'tag' and 'category' filters
+        specs: Loaded specification
+
+    Returns:
+        JSON-RPC response with matching requirement summaries
+    """
+    tag = arguments.get('tag')
+    category = arguments.get('category')
+
+    # Build candidate set based on filters
+    # speky:speky_mcp#TMCP012
+    # speky:speky_mcp#TMCP014
+    if tag and category:
+        by_tag = {r.id for r in specs.tags[tag]}
+        candidates = [r for r in specs.requirements[category] if r.id in by_tag]
+    elif tag:
+        candidates = specs.tags[tag]
+    elif category:
+        candidates = specs.requirements[category]
+    else:
+        candidates = [r for reqs in specs.requirements.values() for r in reqs]
+
+    # speky:speky_mcp#TMCP015
+    requirements = sorted(
+        (r.json_oneliner(True) for r in candidates),
+        key=lambda r: r['id'],
+    )
+    return tool_result(request_id, {'requirements': requirements})
+
+
 def handle_request(request: dict, specs: Specification, initialized: bool) -> dict:
     """
     Handle a single JSON-RPC request.
@@ -377,6 +416,10 @@ def handle_request(request: dict, specs: Specification, initialized: bool) -> di
         if tool_name == 'get_test':
             # speky:speky_mcp#TMCP007
             return handle_get_test(request_id, arguments, specs)
+
+        if tool_name == 'search_requirements':
+            # speky:speky_mcp#TMCP011
+            return handle_search_requirements(request_id, arguments, specs)
 
         return protocol_error(request_id, JsonRpcError.METHOD_NOT_FOUND, f'Tool not found: {tool_name}')
 
