@@ -80,7 +80,7 @@ tests:
             "short": "Yet another test",
             "steps": [
               {
-                "action": "Do that shell command,
+                "action": "Do that shell command",
                 "expected": "topsecret.txt",
                 "run": "ls *secret*"
               },
@@ -88,7 +88,7 @@ tests:
                 "action": "Show file content",
                 "run": "cat foo.json",
                 "sample_lang": "json",
-                "sample": "{"foo": "bar", "baz": 21}"
+                "sample": '{"foo": "bar", "baz": 21}'
               }
             ]
           }

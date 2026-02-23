@@ -76,3 +76,6 @@ select = [
     "I",
 ]
 ignore = ["COM812", "ERA001"]
+
+[tool.ruff.lint.per-file-ignores]
+"python/speky_mcp/tools.py" = ["EM102"]
