@@ -33,10 +33,6 @@ class Specification:
         """
         Add a requirement to the specification.
 
-        Args:
-            requirement: Requirement instance
-            category: Category name (e.g., "functional", "non-functional")
-
         Raises:
             KeyError: If requirement ID is already defined
         """
@@ -57,10 +53,6 @@ class Specification:
     def load_test(self, test: Test, category: str):
         """
         Add a test to the specification.
-
-        Args:
-            test: Test instance
-            category: Category name
         """
         test.category = category
         test.kind = 'test'
