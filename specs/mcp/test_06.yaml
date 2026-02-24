@@ -3,77 +3,132 @@ category: functional
 tests:
 - id: TMCP016
   ref: [MCP006]
-  short: List tests for requirement
-  long: Get all tests that validate a specific requirement
-  initial: MCP server is running with tests/samples/simple_requirements.yaml and tests/samples/simple_tests.yaml loaded
+  short: List tests for requirement with one test
+  long: Query which tests validate a requirement that has exactly one test
+  prereq: [TMCP003]
   steps:
-  - action: Call list_testers_of tool with ID "RF01"
+  - action: The client calls `list_testers_of` with ID `RF01`
     sample_lang: json
     sample: |
       {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "list_testers_of",
           "arguments": {"id": "RF01"}
-        },
-        "id": 1
+        }
       }
-  - action: Verify T01 is returned
-    expected: |
-      Response contains:
-      - {"id": "T01", "category": "functional"}
-
-- id: TMCP017
-  ref: [MCP006]
-  short: List multiple tests for requirement
-  long: Get all tests when a requirement has multiple tests validating it
-  initial: MCP server is running with specs/functional.yaml and specs/tests/functional.yaml loaded
-  steps:
-  - action: Call list_testers_of tool with ID "SF001"
-  - action: Verify all tests referencing SF001 are returned sorted by ID
-    expected: |
-      Response includes TF001 and any other tests with SF001 in their ref field
-      Each entry has: id, category
-      Optional short field if present
-
-- id: TMCP018
-  ref: [MCP006]
-  short: List tests for untested requirement
-  long: Query tests for a requirement that has no tests
-  initial: MCP server is running with a spec containing an untested requirement
-  steps:
-  - action: Add a requirement without tests
-    run: cat requirements.yaml
-    sample_lang: yaml
-    sample: |
-      kind: requirements
-      category: functional
-      requirements:
-      - id: RF99
-        long: An untested requirement
-  - action: Start MCP server and call list_testers_of with ID "RF99"
-  - action: Verify empty list is returned
-    expected: Response is an empty array []
-
-- id: TMCP019
-  ref: [MCP006]
-  short: List tests for non-existent requirement
-  long: Query tests for a requirement ID that does not exist
-  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
-  steps:
-  - action: Call list_testers_of tool with ID "INVALID"
+  - action: Verify the response contains T01
     sample_lang: json
     sample: |
       {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "functional", "id": "T01"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP017
+  ref: [MCP006]
+  short: List tests for requirement with multiple tests
+  long: Query which tests validate a requirement that has more than one test, verify they are sorted by ID
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_testers_of` with ID `RF03`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "list_testers_of",
-          "arguments": {"id": "INVALID"}
-        },
-        "id": 1
+          "arguments": {"id": "RF03"}
+        }
       }
-  - action: Verify error response
-    expected: |
-      JSON-RPC error response with message indicating that requirement "INVALID" does not exist
+  - action: Verify the response contains T03 and T04 sorted by ID
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "non-functional", "id": "T03", "short": "Create files"},
+              {"category": "non-functional", "id": "T04", "short": "Yet another test"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP018
+  ref: [MCP006]
+  short: List tests for untested requirement
+  long: Query which tests validate a requirement that has no associated tests, verify an empty list is returned
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_testers_of` with ID `RF04`, a requirement with no tests
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_testers_of",
+          "arguments": {"id": "RF04"}
+        }
+      }
+  - action: Verify an empty list is returned
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": []
+          }
+        }
+      }
+
+- id: TMCP019
+  ref: [MCP006]
+  short: Error when requirement ID does not exist
+  long: |
+    The user shall receive a tool execution error when calling list_testers_of
+    with an ID that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_testers_of` with a non-existent ID
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_testers_of",
+          "arguments": {"id": "NOTFOUND"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the ID was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Requirement NOTFOUND not found"
+          }
+        }
+      }
