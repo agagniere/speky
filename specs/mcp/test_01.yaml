@@ -1,0 +1,49 @@
+kind: tests
+category: non-functional
+tests:
+- id: TMCP001
+  ref: [MCP001]
+  short: Start the MCP server
+  long: Install and run Speky's MCP server
+  initial: |
+    - The uv tool is required
+    - The current directory contains the yaml files from `test/samples`
+  steps:
+  - action: Install Speky
+    run: uv tool install git+https://github.com/agagniere/speky#master
+    expected: |
+      [...]
+      Installed 2 executables: speky, speky_mcp
+  - action: Run the MCP server
+    run: speky_mcp *.yaml
+    expected: |
+      speky_mcp     INFO  Loading tests/samples/simple_requirements.yaml
+      [...]
+      speky_mcp     INFO  Specifications loaded successfully
+      speky_mcp     INFO  MCP server ready, waiting for requests
+- id: TMCP002
+  ref: [MCP001]
+  short: Reject invalid specifications
+  long: Verify the server refuses to start with invalid specification files
+  prereq: [TMCP001]
+  steps:
+  - action: Create an invalid specification
+    run: cat req_unknown_ref.yaml
+    sample_lang: yaml
+    sample: |
+      kind: requirements
+      category: functional
+      requirements:
+      - id: RF01
+        short: Lorem Ipsum
+        long: The `RF00` requirement doesn't exist
+        tags: [foo]
+        ref: [RF00]
+  - action: Attempt to start MCP server with it
+    run: speky_mcp req_unknown_ref.yaml
+    expected: |
+      speky_mcp     INFO  Loading req_unknown_ref.yaml
+      speky_mcp CRITICAL  'Requirement RF00, referred from RF01, does not exist'
+  - action: Verify the server exited with an error code
+    run: 'echo $?'
+    expected: "1"

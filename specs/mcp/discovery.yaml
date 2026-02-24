@@ -1,0 +1,113 @@
+kind: requirements
+category: functional
+requirements:
+- id: MCP005
+  short: Search and filter requirements
+  client_statement: |
+    I would like to discover what requirements exist by searching with filters like tags or categories.
+    For example, "show me all requirements tagged with 'security'" or "what functional requirements exist?"
+    This helps me explore the specification and find related requirements when working on a feature.
+  long: |
+    The user shall be able to search for requirements using optional filter criteria.
+
+    The MCP server shall expose a tool named `search_requirements` that accepts
+    optional filter parameters and returns matching requirements.
+
+    Filter parameters:
+    - tag: Filter by tag (exact match, e.g., "input" or "output:pdf"). If the
+      tag does not exist in the loaded specifications, an error shall be returned.
+    - category: Filter by category (exact match, e.g., "functional"). If the
+      category does not exist in the loaded specifications, an error shall be returned.
+
+    If no filters are provided, all requirements shall be returned.
+
+    The response shall be a list of requirement summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The requirement category
+    - tags: List of tags (if present)
+
+    The list shall be sorted alphabetically by ID.
+  tags: [mcp:tools, mcp:query, mcp:discovery]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
+- id: MCP011
+  short: Search and filter tests
+  client_statement: |
+    I would like to discover what tests exist by searching with filters like category
+    or the requirement they validate. For example, "show me all non-functional tests"
+    or "which functional tests validate RF03" helps me explore the test suite and
+    prepare targeted test campaigns.
+  long: |
+    The user shall be able to search for tests using optional filter criteria.
+
+    The MCP server shall expose a tool named `search_tests` that accepts
+    optional filter parameters and returns matching tests.
+
+    Filter parameters:
+    - category: Filter by category (exact match, e.g., "functional"). If the
+      category does not exist in the loaded specifications, an error shall be returned.
+    - tester_of: Filter by requirement ID — returns only tests that reference
+      that requirement in their `ref` field. If the requirement ID does not
+      exist, an error shall be returned.
+
+    If no filters are provided, all tests shall be returned.
+    Filters can be combined.
+
+    The response shall be a list of test summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The test category
+
+    The list shall be sorted alphabetically by ID.
+  tags: [mcp:tools, mcp:query, mcp:discovery, mcp:traceability]
+  ref: [MCP005]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
+- id: MCP008
+  short: List all tags
+  client_statement: |
+    I would like to discover what tags exist in the specification so I can explore
+    requirements by theme. For example, "what tags are used?" helps me understand
+    how requirements are organized before I search for specific tags.
+  long: |
+    The user shall be able to retrieve a list of all tags used in the specification.
+
+    The MCP server shall expose a tool named `list_all_tags` that returns
+    all unique tags used across all requirements.
+
+    The response shall be a sorted list of unique tag strings.
+
+    Tags with subtags (e.g., "output:pdf") shall be listed as complete tags,
+    not split into parts.
+
+    If no requirements have tags, an empty list shall be returned.
+  tags: [mcp:tools, mcp:discovery]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
+- id: MCP009
+  short: List all IDs
+  client_statement: |
+    I would like to see all requirement and test IDs that exist in the specification.
+    This helps me discover what's available, avoid ID collisions when creating new items,
+    and understand the naming conventions used in the project.
+  long: |
+    The user shall be able to retrieve a list of all requirement and test IDs.
+
+    The MCP server shall expose a tool named `list_all_ids` that returns
+    all requirement and test IDs in the specification.
+
+    The response shall be an object with two fields:
+    - requirements: Sorted list of all requirement IDs
+    - tests: Sorted list of all test IDs
+
+    Each list shall be sorted alphabetically.
+
+    If the specification has no requirements or tests, the corresponding list shall be empty.
+  tags: [mcp:tools, mcp:discovery]
+  properties:
+    since: '`0.2.0`'
+    author: Claude

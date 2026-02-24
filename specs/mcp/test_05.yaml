@@ -1,0 +1,220 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP011
+  ref: [MCP005]
+  short: search_requirements returns all when unfiltered
+  long: |
+    The user shall be able to call search_requirements with no filters
+    and receive all requirements in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {}
+        }
+      }
+  - action: Verify all requirements are returned
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "functional", "id": "RF01"},
+              {"category": "functional", "id": "RF02", "short": "Second"},
+              {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]},
+              {"category": "non-functional", "id": "RF04"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP012
+  ref: [MCP005]
+  short: search_requirements filtered by tag
+  long: |
+    The user shall be able to filter requirements by tag and receive
+    only requirements matching that exact tag.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with tag `foo`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"tag": "foo"}
+        }
+      }
+  - action: |
+      Verify only requirements tagged with `foo` are returned.
+      RF04 must not appear as it has no tags.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]}
+            ]
+          }
+        }
+      }
+
+- id: TMCP013
+  ref: [MCP005]
+  short: search_requirements filtered by namespaced tag
+  long: |
+    The user shall be able to filter requirements by a namespaced tag (e.g., `bar:baz`)
+    and receive only requirements matching that exact tag.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with tag `bar:baz`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"tag": "bar:baz"}
+        }
+      }
+  - action: |
+      Verify only requirements tagged with the exact value `bar:baz` are returned.
+      A tag `bar` alone would not match.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]}
+            ]
+          }
+        }
+      }
+
+- id: TMCP014
+  ref: [MCP005]
+  short: search_requirements filtered by category
+  long: |
+    The user shall be able to filter requirements by category and receive
+    only requirements belonging to that category.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with category `functional`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"category": "functional"}
+        }
+      }
+  - action: |
+      Verify only functional requirements are returned.
+      RF03 and RF04 (non-functional) must not appear.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "functional", "id": "RF01"},
+              {"category": "functional", "id": "RF02", "short": "Second"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP015
+  ref: [MCP005]
+  short: search_requirements errors on unknown tag
+  long: |
+    The user shall receive a tool execution error when filtering by a tag
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with a tag that no requirement has
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"tag": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the tag was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Tag 'nonexistent' not found"
+          }
+        }
+      }
+
+- id: TMCP031
+  ref: [MCP005]
+  short: search_requirements errors on unknown category
+  long: |
+    The user shall receive a tool execution error when filtering by a category
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with a category that does not exist
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"category": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the category was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Category 'nonexistent' not found"
+          }
+        }
+      }

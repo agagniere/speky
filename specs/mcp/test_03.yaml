@@ -1,0 +1,198 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP004
+  ref: [MCP003]
+  short: get_requirement with minimal fields
+  long: Query a requirement with minimal fields and verify the response
+  prereq: [TMCP003]
+  steps:
+  - action: Call `get_requirement` tool with ID `RF01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "RF01"}
+        }
+      }
+  - action: |
+      Verify response contains requirement details:
+      - id: `RF01`
+      - category: functional
+      - long: "The first requirement"
+      - tested_by: `T01`
+      - comments: a single comment
+      - Empty or absent short, tags, properties, client_statement, ref and referenced_by fields
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "functional",
+            "comments": [
+              {
+                "date": "01/01/2025",
+                "external": false,
+                "from": "Some Person",
+                "text": "The first comment"
+              }
+            ],
+            "id": "RF01",
+            "long": "The first requirement",
+            "tested_by": [{"id": "T01"}]
+          }
+        }
+      }
+- id: TMCP005
+  ref: [MCP003]
+  short: get_requirement with all fields
+  long: Query a requirement that has all optional fields populated
+  prereq: [TMCP003]
+  steps:
+  - action: Call `get_requirement` tool with ID `RF03`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "RF03"}
+        }
+      }
+  - action: |
+      Verify response contains all expected fields:
+      - id: `RF03`
+      - category: non-functional
+      - short: "Number 3"
+      - long: "The third requirement !"
+      - client_statement: "I want a requirement will all fields"
+      - properties: author, since, version
+      - tags: `foo`, `bar:baz`
+      - ref and referenced_by: `RF04`
+      - tested_by: `T03` and `T04`
+      - comments: 3 comments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "non-functional",
+            "client_statement": "I want a requirement will all fields",
+            "comments": [
+              {
+                "date": "03/01/2025",
+                "external": false,
+                "from": "Mr. Author",
+                "text": "I wrote that"
+              },
+              {
+                "date": "03/01/2025",
+                "external": true,
+                "from": "Observer",
+                "text": "I can see that"
+              },
+              {
+                "date": "03/01/2025",
+                "external": false,
+                "from": "Mr. Author",
+                "text": "Good"
+              }
+            ],
+            "id": "RF03",
+            "long": "The third requirement !",
+            "properties": {
+              "author": "Mr. Author",
+              "since": "`1.0.0`",
+              "version": 2
+            },
+            "ref": [{"id": "RF04"}],
+            "referenced_by": [{"id": "RF04"}],
+            "short": "Number 3",
+            "tags": ["foo", "bar:baz"],
+            "tested_by": [
+              {"id": "T03", "short": "Create files"},
+              {"id": "T04", "short": "Yet another test"}
+            ]
+          }
+        }
+      }
+- id: TMCP006
+  ref: [MCP003]
+  short: get_requirement errors on unknown ID
+  long: |
+    The user shall receive a tool execution error when requesting
+    a requirement ID that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_requirement` request for non-existent requirement `NOTFOUND`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "NOTFOUND"}
+        }
+      }
+  - action: |
+      Verify response contains a tool execution error (not a protocol error).
+      The error message indicates the requirement was not found.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Requirement NOTFOUND not found"
+          }
+        }
+      }
+- id: TMCP006b
+  ref: [MCP003]
+  short: get_requirement errors on non-requirement ID
+  long: |
+    The user shall receive a tool execution error when requesting
+    an ID that exists but is a test, not a requirement.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_requirement` request for test `T01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "T01"}
+        }
+      }
+  - action: |
+      Verify response contains a tool execution error indicating
+      that T01 is a test, not a requirement.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "T01 is a test, not a requirement"
+          }
+        }
+      }

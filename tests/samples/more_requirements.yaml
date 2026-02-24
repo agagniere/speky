@@ -1,0 +1,16 @@
+kind: requirements
+category: non-functional
+requirements:
+- id: RF03
+  short: Number 3
+  client_statement: I want a requirement will all fields
+  long: The third requirement !
+  tags: [foo, bar:baz]
+  ref: [RF04]
+  properties:
+    author: "Mr. Author"
+    since: '`1.0.0`'
+    version: 2
+- id: RF04
+  long: A requirement created to reference and be referenced by RF03
+  ref: [RF03]

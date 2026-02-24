@@ -1,0 +1,166 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP007
+  ref: [MCP004]
+  short: get_test with minimal fields
+  long: |
+    The user shall be able to query a test by ID using the get_test tool.
+    The response shall include all fields present in the test definition.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_test` request for test `T01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T01"}
+        }
+      }
+  - action: |
+      Verify response contains test details with all fields.
+      T01 is a minimal test with only mandatory fields.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "functional",
+            "id": "T01",
+            "long": "The first test, that validates the first requirement",
+            "ref": [{"id": "RF01"}],
+            "steps": [
+              {"action": "The only step"}
+            ]
+          }
+        }
+      }
+- id: TMCP008
+  ref: [MCP004]
+  short: get_test with all fields
+  long: |
+    The user shall be able to query a test that includes all optional fields:
+    short description, initial state, prerequisites, and multiple steps with various fields.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_test` request for test T04
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T04"}
+        }
+      }
+  - action: |
+      Verify response contains all fields including short, initial, prereq,
+      and steps with action, run, expected, sample, and sample_lang fields.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "non-functional",
+            "id": "T04",
+            "initial": "Requires ls and cat",
+            "long": "The third test, that validates the third requirement",
+            "prereq": [{"id": "T03", "short": "Create files"}],
+            "ref": [{"id": "RF03"}],
+            "short": "Yet another test",
+            "steps": [
+              {
+                "action": "Do that shell command",
+                "expected": "topsecret.txt",
+                "run": "ls *secret*"
+              },
+              {
+                "action": "Show file content",
+                "run": "cat foo.json",
+                "sample_lang": "json",
+                "sample": '{"foo": "bar", "baz": 21}'
+              }
+            ]
+          }
+        }
+      }
+- id: TMCP009
+  ref: [MCP004]
+  short: get_test errors on unknown ID
+  long: |
+    The user shall receive a tool execution error when requesting
+    a test ID that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_test` request for non-existent test `NOTFOUND`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "NOTFOUND"}
+        }
+      }
+  - action: |
+      Verify response contains a tool execution error (not a protocol error).
+      The error message indicates the test was not found.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Test NOTFOUND not found"
+          }
+        }
+      }
+- id: TMCP010
+  ref: [MCP004]
+  short: get_test errors on non-test ID
+  long: |
+    The user shall receive a tool execution error when requesting
+    an ID that exists but is a requirement, not a test.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_test` request for requirement `RF01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "RF01"}
+        }
+      }
+  - action: |
+      Verify response contains a tool execution error indicating
+      that RF01 is a requirement, not a test.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "RF01 is a requirement, not a test"
+          }
+        }
+      }

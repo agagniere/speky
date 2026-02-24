@@ -1,0 +1,69 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP024
+  ref: [MCP008]
+  short: list_all_tags returns unique tags sorted
+  long: |
+    Call `list_all_tags` and verify the response contains all unique tags sorted
+    alphabetically. Namespaced tags (e.g. `bar:baz`) shall appear as a single
+    entry, not split into parts.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_all_tags` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_all_tags",
+          "arguments": {}
+        }
+      }
+  - action: |
+      Verify the response contains all tags sorted alphabetically.
+      `bar:baz` appears as one entry (not split into `bar` and `baz`).
+      `bar:baz` sorts before `foo`.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tags": ["bar:baz", "foo"]
+          }
+        }
+      }
+- id: TMCP025
+  ref: [MCP008]
+  short: list_all_tags returns empty list when no tags
+  long: Call `list_all_tags` when no requirements have tags and verify an empty list is returned
+  initial: An initialized MCP server with only the simple requirements, tests and comments loaded.
+  steps:
+  - action: The client calls `list_all_tags` on a specification where no requirement has tags
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_all_tags",
+          "arguments": {}
+        }
+      }
+  - action: Verify an empty list is returned
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tags": []
+          }
+        }
+      }

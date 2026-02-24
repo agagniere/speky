@@ -30,12 +30,13 @@ build-backend = "hatchling.build"
 
 [project.scripts]
 speky = "speky:main.main"
+speky-mcp = "speky_mcp:server.main"
 
 [tool.hatch.version]
 source = "uv-dynamic-versioning"
 
 [tool.hatch.build.targets.wheel]
-packages = [ 'python/speky' ]
+packages = [ 'python/speky', 'python/speky_mcp' ]
 
 [tool.uv-dynamic-versioning]
 fallback-version = "0.0.0"
@@ -74,4 +75,7 @@ select = [
     "PIE",
     "I",
 ]
-ignore = ["COM812"]
+ignore = ["COM812", "ERA001"]
+
+[tool.ruff.lint.per-file-ignores]
+"python/speky_mcp/tools.py" = ["EM102"]

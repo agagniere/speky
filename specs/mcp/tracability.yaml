@@ -1,0 +1,57 @@
+kind: requirements
+category: functional
+requirements:
+- id: MCP010
+  short: List requirements without test coverage
+  client_statement: |
+    I would like to know which requirements have no tests validating them, so I can
+    identify coverage gaps. When preparing for a release or reviewing a specification,
+    I need to quickly find what still needs test procedures written for it.
+  long: |
+    The user shall be able to retrieve all requirements that have no associated tests.
+
+    The MCP server shall expose a tool named `list_untested_requirements` that returns
+    all requirements for which no test references them in its `ref` field.
+
+    An optional `category` parameter allows filtering by category.
+
+    The response shall be a list of requirement summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The requirement category
+    - tags: List of tags (if present)
+
+    The list shall be sorted alphabetically by ID.
+
+    If all requirements have at least one test, an empty list shall be returned.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP005]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
+- id: MCP007
+  short: List requirements referencing another
+  client_statement: |
+    I would like to see which requirements reference or depend on a specific requirement
+    to understand dependency chains and impact analysis. When a requirement changes, I need
+    to know what other requirements might be affected.
+  long: |
+    The user shall be able to query which requirements reference a given requirement.
+
+    The MCP server shall expose a tool named `list_references_to` that accepts
+    a requirement ID and returns all requirements that reference it in their `ref` field.
+
+    The response shall be a list of requirement summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The requirement category
+
+    The list shall be sorted alphabetically by ID.
+
+    If no requirements reference the given ID, an empty list shall be returned.
+    If the requirement ID does not exist, an error shall be returned.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP003]
+  properties:
+    since: '`0.2.0`'
+    author: Claude

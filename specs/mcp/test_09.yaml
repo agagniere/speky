@@ -1,0 +1,70 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP029
+  ref: [MCP009]
+  short: list_all_ids returns all requirement and test IDs sorted
+  long: Call list_all_ids and verify the response contains all IDs in two sorted lists
+  initial: An initialized MCP server with only the simple requirements, tests and comments loaded
+  steps:
+  - action: The client calls `list_all_ids` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_all_ids",
+          "arguments": {}
+        }
+      }
+  - action: Verify the response contains all requirement and test IDs in separate sorted lists
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": ["RF01", "RF02"],
+            "tests": ["T01", "T02"]
+          }
+        }
+      }
+
+- id: TMCP030
+  ref: [MCP009]
+  short: list_all_ids includes IDs from all categories
+  long: |
+    Call list_all_ids with requirements and tests from multiple categories loaded.
+    Verify that IDs from all categories are merged into a single sorted list each.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_all_ids` with both functional and non-functional specs loaded
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_all_ids",
+          "arguments": {}
+        }
+      }
+  - action: |
+      Verify IDs from both functional (RF01, RF02, T01, T02) and
+      non-functional (RF03, RF04, T03, T04) categories are returned together, sorted
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": ["RF01", "RF02", "RF03", "RF04"],
+            "tests": ["T01", "T02", "T03", "T04"]
+          }
+        }
+      }

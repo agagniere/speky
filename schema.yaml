@@ -7,7 +7,7 @@ requirements:
 
 requirement:
   id: include('id')
-  short: str(max=60, required=False)
+  short: str(max=80, required=False)
   client_statement: str(required=False)
   long: str()
   tags: list(str(min=2, max=20), required=False)
@@ -35,7 +35,7 @@ tests:
 
 test:
   id: include('id')
-  short: str(max=60, required=False)
+  short: str(max=80, required=False)
   ref: list(include('id'))
   long: str()
   initial: str(required=False)
