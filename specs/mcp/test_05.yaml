@@ -3,7 +3,7 @@ category: functional
 tests:
 - id: TMCP011
   ref: [MCP005]
-  short: Search all requirements
+  short: search_requirements returns all when unfiltered
   long: |
     The user shall be able to call search_requirements with no filters
     and receive all requirements in the loaded specifications.
@@ -41,7 +41,7 @@ tests:
 
 - id: TMCP012
   ref: [MCP005]
-  short: Search requirements by tag
+  short: search_requirements filtered by tag
   long: |
     The user shall be able to filter requirements by tag and receive
     only requirements matching that exact tag.
@@ -78,7 +78,7 @@ tests:
 
 - id: TMCP013
   ref: [MCP005]
-  short: Search requirements by parameterized tag
+  short: search_requirements filtered by namespaced tag
   long: |
     The user shall be able to filter requirements by a namespaced tag (e.g., `bar:baz`)
     and receive only requirements matching that exact tag.
@@ -115,7 +115,7 @@ tests:
 
 - id: TMCP014
   ref: [MCP005]
-  short: Search requirements by category
+  short: search_requirements filtered by category
   long: |
     The user shall be able to filter requirements by category and receive
     only requirements belonging to that category.
@@ -153,7 +153,7 @@ tests:
 
 - id: TMCP015
   ref: [MCP005]
-  short: Search with no matches
+  short: search_requirements returns empty list on no match
   long: |
     The user shall receive an empty list when the search filters
     match no requirements in the loaded specifications.

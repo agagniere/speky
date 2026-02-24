@@ -3,7 +3,7 @@ category: functional
 tests:
 - id: TMCP007
   ref: [MCP004]
-  short: Get simple test
+  short: get_test with minimal fields
   long: |
     The user shall be able to query a test by ID using the get_test tool.
     The response shall include all fields present in the test definition.
@@ -43,7 +43,7 @@ tests:
       }
 - id: TMCP008
   ref: [MCP004]
-  short: Get test with all fields
+  short: get_test with all fields
   long: |
     The user shall be able to query a test that includes all optional fields:
     short description, initial state, prerequisites, and multiple steps with various fields.
@@ -96,7 +96,7 @@ tests:
       }
 - id: TMCP009
   ref: [MCP004]
-  short: Error when test not found
+  short: get_test errors on unknown ID
   long: |
     The user shall receive a tool execution error when requesting
     a test ID that does not exist in the loaded specifications.
@@ -131,7 +131,7 @@ tests:
       }
 - id: TMCP010
   ref: [MCP004]
-  short: Error when ID is not a test
+  short: get_test errors on non-test ID
   long: |
     The user shall receive a tool execution error when requesting
     an ID that exists but is a requirement, not a test.
