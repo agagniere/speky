@@ -137,10 +137,16 @@ def handle_list_references_to(arguments: dict, specs: Specification) -> dict:
     return {'requirements': requirements}
 
 
+def handle_list_all_tags(arguments: dict, specs: Specification) -> dict:
+    """speky:speky_mcp#MCP008"""
+    return {'tags': sorted(specs.tags.keys())}
+
+
 TOOLS: dict[str, Callable] = {
     'get_requirement': handle_get_requirement,
     'get_test': handle_get_test,
     'search_requirements': handle_search_requirements,
     'list_testers_of': handle_list_testers_of,
     'list_references_to': handle_list_references_to,
+    'list_all_tags': handle_list_all_tags,
 }
