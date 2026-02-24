@@ -14,8 +14,10 @@ requirements:
     optional filter parameters and returns matching requirements.
 
     Filter parameters:
-    - tag: Filter by tag (exact match, e.g., "input" or "output:pdf")
-    - category: Filter by category (exact match, e.g., "functional")
+    - tag: Filter by tag (exact match, e.g., "input" or "output:pdf"). If the
+      tag does not exist in the loaded specifications, an error shall be returned.
+    - category: Filter by category (exact match, e.g., "functional"). If the
+      category does not exist in the loaded specifications, an error shall be returned.
 
     If no filters are provided, all requirements shall be returned.
 

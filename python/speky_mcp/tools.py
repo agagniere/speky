@@ -93,6 +93,11 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
     tag = arguments.get('tag')
     category = arguments.get('category')
 
+    if tag and tag not in specs.tags:
+        raise ToolError(f'Tag {tag!r} not found')
+    if category and category not in specs.requirements:
+        raise ToolError(f'Category {category!r} not found')
+
     # speky:speky_mcp#TMCP012
     # speky:speky_mcp#TMCP014
     if tag and category:
