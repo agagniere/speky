@@ -137,6 +137,14 @@ def handle_list_references_to(arguments: dict, specs: Specification) -> dict:
     return {'requirements': requirements}
 
 
+def handle_list_all_ids(arguments: dict, specs: Specification) -> dict:
+    """speky:speky_mcp#MCP009"""
+    return {
+        'requirements': sorted(item.id for item in specs.by_id.values() if item.kind == 'requirement'),
+        'tests': sorted(item.id for item in specs.by_id.values() if item.kind == 'test'),
+    }
+
+
 def handle_list_all_tags(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP008"""
     return {'tags': sorted(specs.tags.keys())}
@@ -149,4 +157,5 @@ TOOLS: dict[str, Callable] = {
     'list_testers_of': handle_list_testers_of,
     'list_references_to': handle_list_references_to,
     'list_all_tags': handle_list_all_tags,
+    'list_all_ids': handle_list_all_ids,
 }

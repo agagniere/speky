@@ -606,3 +606,39 @@ class TestListAllTags:
         tags = response['result']['structuredContent']['tags']
 
         assert tags == []
+
+
+class TestListAllIds:
+    """Tests for list_all_ids tool."""
+
+    def test_list_all_ids(self, simple_specs):
+        """Test listing all IDs in two sorted lists (TMCP029)."""
+        # speky:speky_mcp#TMCP029
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_all_ids', 'arguments': {}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+        content = response['result']['structuredContent']
+
+        assert content['requirements'] == ['RF01', 'RF02']
+        assert content['tests'] == ['T01', 'T02']
+
+    def test_list_all_ids_multi_category(self, complex_specs):
+        """Test that IDs from all categories are merged and sorted (TMCP030)."""
+        # speky:speky_mcp#TMCP030
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_all_ids', 'arguments': {}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        content = response['result']['structuredContent']
+
+        assert content['requirements'] == ['RF01', 'RF02', 'RF03', 'RF04']
+        assert content['tests'] == ['T01', 'T02', 'T03', 'T04']
