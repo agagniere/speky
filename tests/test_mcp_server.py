@@ -445,3 +445,75 @@ class TestSearchRequirements:
         requirements = response['result']['structuredContent']['requirements']
 
         assert requirements == []
+
+
+class TestListTestersOf:
+    """Tests for list_testers_of tool."""
+
+    def test_list_testers_of_one(self, simple_specs):
+        """Test listing tests for a requirement with one test (TMCP016)."""
+        # speky:speky_mcp#TMCP016
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_testers_of', 'arguments': {'id': 'RF01'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+        tests = response['result']['structuredContent']['tests']
+
+        assert len(tests) == 1
+        assert tests[0]['id'] == 'T01'
+        assert tests[0]['category'] == 'functional'
+        assert 'short' not in tests[0]
+
+    def test_list_testers_of_multiple(self, complex_specs):
+        """Test listing tests for a requirement with multiple tests, sorted by ID (TMCP017)."""
+        # speky:speky_mcp#TMCP017
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_testers_of', 'arguments': {'id': 'RF03'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        tests = response['result']['structuredContent']['tests']
+
+        assert len(tests) == 2
+        assert [t['id'] for t in tests] == ['T03', 'T04']
+        assert tests[0]['short'] == 'Create files'
+        assert tests[1]['short'] == 'Yet another test'
+
+    def test_list_testers_of_empty(self, complex_specs):
+        """Test listing tests for a requirement with no tests (TMCP018)."""
+        # speky:speky_mcp#TMCP018
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_testers_of', 'arguments': {'id': 'RF04'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        tests = response['result']['structuredContent']['tests']
+
+        assert tests == []
+
+    def test_list_testers_of_not_found(self, simple_specs):
+        """Test error when requirement ID does not exist (TMCP019)."""
+        # speky:speky_mcp#TMCP019
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_testers_of', 'arguments': {'id': 'NOTFOUND'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert response['result']['isError'] is True
+        error_msg = response['result']['structuredContent']['error']
+        assert 'NOTFOUND' in error_msg
+        assert 'not found' in error_msg
