@@ -3,7 +3,7 @@ category: functional
 tests:
 - id: TMCP016
   ref: [MCP006]
-  short: List tests for requirement with one test
+  short: list_testers_of returns single test
   long: Query which tests validate a requirement that has exactly one test
   prereq: [TMCP003]
   steps:
@@ -36,7 +36,7 @@ tests:
 
 - id: TMCP017
   ref: [MCP006]
-  short: List tests for requirement with multiple tests
+  short: list_testers_of returns multiple tests sorted
   long: Query which tests validate a requirement that has more than one test, verify they are sorted by ID
   prereq: [TMCP003]
   steps:
@@ -70,7 +70,7 @@ tests:
 
 - id: TMCP018
   ref: [MCP006]
-  short: List tests for untested requirement
+  short: list_testers_of returns empty list for untested requirement
   long: Query which tests validate a requirement that has no associated tests, verify an empty list is returned
   prereq: [TMCP003]
   steps:
@@ -101,7 +101,7 @@ tests:
 
 - id: TMCP019
   ref: [MCP006]
-  short: Error when requirement ID does not exist
+  short: list_testers_of errors on unknown ID
   long: |
     The user shall receive a tool execution error when calling list_testers_of
     with an ID that does not exist in the loaded specifications.

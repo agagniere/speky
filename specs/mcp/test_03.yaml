@@ -3,7 +3,7 @@ category: functional
 tests:
 - id: TMCP004
   ref: [MCP003]
-  short: Get simple requirement
+  short: get_requirement with minimal fields
   long: Query a requirement with minimal fields and verify the response
   prereq: [TMCP003]
   steps:
@@ -51,7 +51,7 @@ tests:
       }
 - id: TMCP005
   ref: [MCP003]
-  short: Get requirement with more fields
+  short: get_requirement with all fields
   long: Query a requirement that has all optional fields populated
   prereq: [TMCP003]
   steps:
@@ -128,7 +128,7 @@ tests:
       }
 - id: TMCP006
   ref: [MCP003]
-  short: Error when requirement not found
+  short: get_requirement errors on unknown ID
   long: |
     The user shall receive a tool execution error when requesting
     a requirement ID that does not exist in the loaded specifications.
@@ -163,7 +163,7 @@ tests:
       }
 - id: TMCP006b
   ref: [MCP003]
-  short: Error when ID is not a requirement
+  short: get_requirement errors on non-requirement ID
   long: |
     The user shall receive a tool execution error when requesting
     an ID that exists but is a test, not a requirement.
