@@ -431,8 +431,8 @@ class TestSearchRequirements:
         assert 'RF01' in ids
         assert 'RF02' in ids
 
-    def test_search_no_matches(self, simple_specs):
-        """Test searching with a tag that matches nothing (TMCP015)."""
+    def test_search_unknown_tag(self, simple_specs):
+        """Test error when filtering by a tag that does not exist (TMCP015)."""
         # speky:speky_mcp#TMCP015
         request = {
             'jsonrpc': '2.0',
@@ -442,9 +442,24 @@ class TestSearchRequirements:
         }
 
         response = handle_request(request, simple_specs, initialized=True)
-        requirements = response['result']['structuredContent']['requirements']
 
-        assert requirements == []
+        assert response['result']['isError'] is True
+        assert 'nonexistent' in response['result']['structuredContent']['error']
+
+    def test_search_unknown_category(self, simple_specs):
+        """Test error when filtering by a category that does not exist (TMCP031)."""
+        # speky:speky_mcp#TMCP031
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'search_requirements', 'arguments': {'category': 'nonexistent'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert response['result']['isError'] is True
+        assert 'nonexistent' in response['result']['structuredContent']['error']
 
 
 class TestListTestersOf:

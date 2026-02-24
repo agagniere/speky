@@ -153,10 +153,10 @@ tests:
 
 - id: TMCP015
   ref: [MCP005]
-  short: search_requirements returns empty list on no match
+  short: search_requirements errors on unknown tag
   long: |
-    The user shall receive an empty list when the search filters
-    match no requirements in the loaded specifications.
+    The user shall receive a tool execution error when filtering by a tag
+    that does not exist in the loaded specifications.
   prereq: [TMCP003]
   steps:
   - action: The client calls `search_requirements` with a tag that no requirement has
@@ -171,15 +171,50 @@ tests:
           "arguments": {"tag": "nonexistent"}
         }
       }
-  - action: Verify an empty list is returned
+  - action: Verify a tool execution error is returned indicating the tag was not found
     sample_lang: json
     sample: |
       {
         "id": 2,
         "jsonrpc": "2.0",
         "result": {
+          "isError": true,
           "structuredContent": {
-            "requirements": []
+            "error": "Tag 'nonexistent' not found"
+          }
+        }
+      }
+
+- id: TMCP031
+  ref: [MCP005]
+  short: search_requirements errors on unknown category
+  long: |
+    The user shall receive a tool execution error when filtering by a category
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_requirements` with a category that does not exist
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"category": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the category was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Category 'nonexistent' not found"
           }
         }
       }
