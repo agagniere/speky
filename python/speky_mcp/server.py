@@ -53,7 +53,7 @@ def run(argv: list[str] | None = None):
         description='MCP server for querying Speky specifications',
         epilog='Copyright (c) 2025-2026 Antoine GAGNIERE',
     )
-    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version(__package__))
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version('speky'))
     parser.add_argument(
         'paths',
         type=str,

@@ -155,7 +155,7 @@ Search and filter requirements.
 - `tag` (string): Filter by tag, exact match (e.g., `"security"` or `"output:pdf"`)
 - `category` (string): Filter by category (e.g., `"functional"`)
 
-If no arguments are provided, all requirements are returned.
+If no arguments are provided, all requirements are returned. An error is returned if the tag or category does not exist.
 
 **Returns:** `requirements` — a sorted list of matching requirement summaries, each with:
 - `id`, `category`: Always present
@@ -183,6 +183,123 @@ If no arguments are provided, all requirements are returned.
 }
 ```
 
+### `search_tests`
+
+Search and filter tests.
+
+**Arguments** (all optional):
+- `category` (string): Filter by category (e.g., `"functional"`). An error is returned if the category does not exist.
+- `tester_of` (string): Filter by requirement ID — returns only tests that reference that requirement in their `ref` field. An error is returned if the requirement ID does not exist.
+
+If no arguments are provided, all tests are returned. Filters can be combined.
+
+**Returns:** `tests` — a sorted list of matching test summaries, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+
+**Examples:**
+```json
+{"name": "search_tests", "arguments": {}}
+{"name": "search_tests", "arguments": {"category": "functional"}}
+{"name": "search_tests", "arguments": {"tester_of": "RF03"}}
+{"name": "search_tests", "arguments": {"category": "functional", "tester_of": "RF01"}}
+```
+
+**Response:**
+```json
+{
+  "structuredContent": {
+    "tests": [
+      {"category": "non-functional", "id": "T03", "short": "Create files"},
+      {"category": "non-functional", "id": "T04", "short": "Yet another test"}
+    ]
+  }
+}
+```
+
+### `list_references_to`
+
+List all requirements and tests that reference a given item.
+
+**Arguments:**
+- `id` (string): The requirement or test ID to look up
+
+**Returns:** `requirements` — sorted list of items that have this ID in their `ref` field, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `tags`: List of tags (if present)
+
+**Example:**
+```json
+{"name": "list_references_to", "arguments": {"id": "RF04"}}
+```
+
+**Response:**
+```json
+{
+  "structuredContent": {
+    "requirements": [
+      {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]}
+    ]
+  }
+}
+```
+
+### `list_untested_requirements`
+
+List requirements that have no associated tests.
+
+**Arguments** (all optional):
+- `category` (string): Restrict to a specific category. An error is returned if the category does not exist.
+
+**Returns:** `requirements` — sorted list of untested requirements, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `tags`: List of tags (if present)
+
+**Examples:**
+```json
+{"name": "list_untested_requirements", "arguments": {}}
+{"name": "list_untested_requirements", "arguments": {"category": "functional"}}
+```
+
+### `list_all_tags`
+
+List all tags used across all loaded requirements.
+
+**Arguments:** none
+
+**Returns:** `tags` — sorted list of tag strings.
+
+**Example response:**
+```json
+{
+  "structuredContent": {
+    "tags": ["bar:baz", "foo", "mcp:discovery", "mcp:tools"]
+  }
+}
+```
+
+### `list_all_ids`
+
+List all requirement and test IDs in the loaded specifications.
+
+**Arguments:** none
+
+**Returns:**
+- `requirements`: Sorted list of all requirement IDs
+- `tests`: Sorted list of all test IDs
+
+**Example response:**
+```json
+{
+  "structuredContent": {
+    "requirements": ["RF01", "RF02", "RF03", "RF04"],
+    "tests": ["T01", "T02", "T03", "T04"]
+  }
+}
+```
+
 ## Usage Examples
 
 ### Querying Requirements
@@ -197,8 +314,14 @@ Claude will use `get_requirement` to retrieve the full requirement details inclu
 
 Claude can:
 1. Use `search_requirements` with `tag: "authentication"` to find relevant requirements
-2. Use `get_requirement` to find which tests cover each requirement via `tested_by`
+2. Read the `tested_by` field from each `get_requirement` response, or use `search_tests` with `tester_of` to query by requirement ID
 3. Use `get_test` to understand what each test validates
+
+### Finding Coverage Gaps
+
+**User:** "Which requirements have no tests yet?"
+
+Claude can use `list_untested_requirements` to get the full list, optionally filtered by category.
 
 ### Verifying Implementation
 
@@ -255,18 +378,20 @@ The server loads specifications into memory once at startup:
 
 ### Adding a New Tool
 
-1. **Define the specification** in `specs/mcp/` following the pattern of `test_03.yaml` and `test_04.yaml`
-2. **Implement the handler** in `python/speky_mcp/server.py`:
+1. **Define the specification** in `specs/mcp/` following the pattern of existing spec files
+2. **Implement the handler** in `python/speky_mcp/tools.py`:
    ```python
-   def handle_my_tool(request_id: int, arguments: dict, specs: Specification) -> dict:
-       # speky:speky_mcp#MCP00X
-       # Implementation
-       return tool_result(request_id, content)
+   def handle_my_tool(arguments: dict, specs: Specification) -> dict:
+       """speky:speky_mcp#MCP00X"""
+       # Implementation — raise ToolError for domain-level errors
+       return {'key': value}
    ```
-3. **Register the tool** in `handle_request()`:
+3. **Register the tool** in the `TOOLS` dict at the bottom of `tools.py`:
    ```python
-   if tool_name == 'my_tool':
-       return handle_my_tool(request_id, arguments, specs)
+   TOOLS: dict[str, Callable] = {
+       ...
+       'my_tool': handle_my_tool,
+   }
    ```
 4. **Write tests** in `tests/test_mcp_server.py` using `handle_request()` directly
 5. **Update this documentation** with the new tool's arguments and return format
@@ -298,15 +423,3 @@ uv run --dev ruff format python/speky_mcp
 ```bash
 uv run --dev ruff check python/speky_mcp
 ```
-
-## Future Tools
-
-Potential tools to implement:
-
-- `search_tests` - Find tests by various criteria
-- `get_requirement_tree` - Get requirement and all its dependencies
-- `get_test_plan` - Get ordered list of tests for a requirement
-- `list_untested_requirements` - Find requirements without test coverage
-- `get_comments` - Query comments by requirement/test or author
-
-See `specs/mcp/query.yaml` for planned tool specifications.
