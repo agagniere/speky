@@ -589,6 +589,75 @@ class TestListReferencesTo:
         assert 'not found' in error_msg
 
 
+class TestListUntestedRequirements:
+    """Tests for list_untested_requirements tool."""
+
+    def test_list_untested_requirements(self, complex_specs):
+        """Test listing requirements with no associated tests (TMCP032)."""
+        # speky:speky_mcp#TMCP032
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_untested_requirements', 'arguments': {}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert len(requirements) == 1
+        assert requirements[0]['id'] == 'RF04'
+        assert requirements[0]['category'] == 'non-functional'
+
+    def test_list_untested_requirements_by_category(self, complex_specs):
+        """Test filtering untested requirements by category (TMCP033)."""
+        # speky:speky_mcp#TMCP033
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_untested_requirements', 'arguments': {'category': 'non-functional'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert len(requirements) == 1
+        assert requirements[0]['id'] == 'RF04'
+        ids = [r['id'] for r in requirements]
+        assert 'RF03' not in ids
+
+    def test_list_untested_requirements_empty(self, complex_specs):
+        """Test empty list when all requirements in a category are tested (TMCP034)."""
+        # speky:speky_mcp#TMCP034
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_untested_requirements', 'arguments': {'category': 'functional'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert requirements == []
+
+    def test_list_untested_requirements_unknown_category(self, simple_specs):
+        """Test error on unknown category (TMCP035)."""
+        # speky:speky_mcp#TMCP035
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_untested_requirements', 'arguments': {'category': 'nonexistent'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert response['result']['isError'] is True
+        assert 'nonexistent' in response['result']['structuredContent']['error']
+
+
 class TestListAllTags:
     """Tests for list_all_tags tool."""
 

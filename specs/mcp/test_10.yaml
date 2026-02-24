@@ -1,0 +1,135 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP032
+  ref: [MCP010]
+  short: list_untested_requirements returns requirements with no tests
+  long: Call list_untested_requirements with no filter and verify only requirements with no associated tests are returned
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_untested_requirements` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_untested_requirements",
+          "arguments": {}
+        }
+      }
+  - action: Verify only RF04 is returned, as it is the only requirement with no associated tests
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "non-functional", "id": "RF04"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP033
+  ref: [MCP010]
+  short: list_untested_requirements filtered by category
+  long: Call list_untested_requirements with a category filter and verify only untested requirements from that category are returned
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_untested_requirements` with category `non-functional`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_untested_requirements",
+          "arguments": {"category": "non-functional"}
+        }
+      }
+  - action: |
+      Verify only RF04 is returned.
+      RF03 must not appear as it is covered by T03 and T04.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "non-functional", "id": "RF04"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP034
+  ref: [MCP010]
+  short: list_untested_requirements returns empty list when all are tested
+  long: Call list_untested_requirements filtered by a category where all requirements have tests, verify an empty list is returned
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_untested_requirements` with category `functional`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_untested_requirements",
+          "arguments": {"category": "functional"}
+        }
+      }
+  - action: Verify an empty list is returned as RF01 and RF02 are both covered by tests
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": []
+          }
+        }
+      }
+
+- id: TMCP035
+  ref: [MCP010]
+  short: list_untested_requirements errors on unknown category
+  long: |
+    The user shall receive a tool execution error when filtering by a category
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_untested_requirements` with a non-existent category
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_untested_requirements",
+          "arguments": {"category": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the category was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Category 'nonexistent' not found"
+          }
+        }
+      }
