@@ -3,91 +3,67 @@ category: functional
 tests:
 - id: TMCP024
   ref: [MCP008]
-  short: List all tags
-  long: Get the complete list of all tags used in the specification
-  initial: MCP server is running with specs/functional.yaml loaded
+  short: list_all_tags returns unique tags sorted
+  long: |
+    Call `list_all_tags` and verify the response contains all unique tags sorted
+    alphabetically. Namespaced tags (e.g. `bar:baz`) shall appear as a single
+    entry, not split into parts.
+  prereq: [TMCP003]
   steps:
-  - action: Call list_all_tags tool
+  - action: The client calls `list_all_tags` with no arguments
     sample_lang: json
     sample: |
       {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "list_all_tags",
           "arguments": {}
-        },
-        "id": 1
+        }
       }
-  - action: Verify all unique tags are returned sorted alphabetically
-    expected: |
-      Response includes all tags from functional.yaml sorted:
-      ["input", "input:formats", "output:both", "output:html", "output:pdf",
-       "todo", "tooling", "versioning"]
-
+  - action: |
+      Verify the response contains all tags sorted alphabetically.
+      `bar:baz` appears as one entry (not split into `bar` and `baz`).
+      `bar:baz` sorts before `foo`.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tags": ["bar:baz", "foo"]
+          }
+        }
+      }
 - id: TMCP025
   ref: [MCP008]
-  short: List tags with no duplicates
-  long: Verify that when multiple requirements use the same tag, it appears only once
-  initial: MCP server is running with specs/functional.yaml loaded
+  short: list_all_tags returns empty list when no tags
+  long: Call `list_all_tags` when no requirements have tags and verify an empty list is returned
+  initial: An initialized MCP server with only the simple requirements, tests and comments loaded.
   steps:
-  - action: Call list_all_tags tool
-  - action: Verify each tag appears exactly once in the response
-    expected: |
-      Tag "input" appears once even though SF001, SF006, SF008, SF011 all use it
-
-- id: TMCP026
-  ref: [MCP008]
-  short: List tags includes parameterized tags
-  long: Verify parameterized tags (with colons) are listed as complete tags
-  initial: MCP server is running with specs/functional.yaml loaded
-  steps:
-  - action: Call list_all_tags tool
-  - action: Verify parameterized tags are not split
-    expected: |
-      Response includes "output:pdf" as one tag, not "output" and "pdf" separately
-      Response includes "input:formats" as one tag
-
-- id: TMCP027
-  ref: [MCP008]
-  short: List tags when none exist
-  long: Call list_all_tags when no requirements have tags
-  initial: MCP server is running with a spec where no requirements have tags
-  steps:
-  - action: Create requirements without tags
-    run: cat requirements.yaml
-    sample_lang: yaml
+  - action: The client calls `list_all_tags` on a specification where no requirement has tags
+    sample_lang: json
     sample: |
-      kind: requirements
-      category: functional
-      requirements:
-      - id: RF01
-        long: Requirement without tags
-      - id: RF02
-        long: Another without tags
-  - action: Start MCP server and call list_all_tags
-  - action: Verify empty list is returned
-    expected: Response is an empty array []
-
-- id: TMCP028
-  ref: [MCP008]
-  short: List tags sorted alphabetically
-  long: Verify the tag list is sorted regardless of input order
-  initial: MCP server is running with requirements that have tags in random order
-  steps:
-  - action: Create requirements with tags in non-alphabetical order
-    run: cat requirements.yaml
-    sample_lang: yaml
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_all_tags",
+          "arguments": {}
+        }
+      }
+  - action: Verify an empty list is returned
+    sample_lang: json
     sample: |
-      kind: requirements
-      category: functional
-      requirements:
-      - id: RF01
-        long: First
-        tags: [zebra, apple]
-      - id: RF02
-        long: Second
-        tags: [mango, banana]
-  - action: Start MCP server and call list_all_tags
-  - action: Verify tags are returned in alphabetical order
-    expected: Response is ["apple", "banana", "mango", "zebra"]
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tags": []
+          }
+        }
+      }

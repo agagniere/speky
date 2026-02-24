@@ -572,3 +572,37 @@ class TestListReferencesTo:
         error_msg = response['result']['structuredContent']['error']
         assert 'NOTFOUND' in error_msg
         assert 'not found' in error_msg
+
+
+class TestListAllTags:
+    """Tests for list_all_tags tool."""
+
+    def test_list_all_tags(self, complex_specs):
+        """Test listing all unique tags sorted alphabetically (TMCP024)."""
+        # speky:speky_mcp#TMCP024
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_all_tags', 'arguments': {}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        tags = response['result']['structuredContent']['tags']
+
+        assert tags == ['bar:baz', 'foo']
+
+    def test_list_all_tags_empty(self, simple_specs):
+        """Test empty list when no requirements have tags (TMCP025)."""
+        # speky:speky_mcp#TMCP025
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_all_tags', 'arguments': {}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+        tags = response['result']['structuredContent']['tags']
+
+        assert tags == []
