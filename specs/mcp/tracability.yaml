@@ -27,6 +27,34 @@ requirements:
   properties:
     since: '`0.2.0`'
     author: Claude
+- id: MCP010
+  short: List requirements without test coverage
+  client_statement: |
+    I would like to know which requirements have no tests validating them, so I can
+    identify coverage gaps. When preparing for a release or reviewing a specification,
+    I need to quickly find what still needs test procedures written for it.
+  long: |
+    The user shall be able to retrieve all requirements that have no associated tests.
+
+    The MCP server shall expose a tool named `list_untested_requirements` that returns
+    all requirements for which no test references them in its `ref` field.
+
+    An optional `category` parameter allows filtering by category.
+
+    The response shall be a list of requirement summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The requirement category
+    - tags: List of tags (if present)
+
+    The list shall be sorted alphabetically by ID.
+
+    If all requirements have at least one test, an empty list shall be returned.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP005, MCP006]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
 - id: MCP007
   short: List requirements referencing another
   client_statement: |

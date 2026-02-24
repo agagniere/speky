@@ -142,6 +142,18 @@ def handle_list_references_to(arguments: dict, specs: Specification) -> dict:
     return {'requirements': requirements}
 
 
+def handle_list_untested_requirements(arguments: dict, specs: Specification) -> dict:
+    """speky:speky_mcp#MCP010"""
+    category = arguments.get('category')
+
+    if category and category not in specs.requirements:
+        raise ToolError(f'Category {category!r} not found')
+
+    candidates = specs.requirements[category] if category else [r for reqs in specs.requirements.values() for r in reqs]
+    requirements = [r.json_oneliner(True) for r in sorted(r for r in candidates if r.id not in specs.testers_of)]
+    return {'requirements': requirements}
+
+
 def handle_list_all_ids(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP009"""
     return {
@@ -161,6 +173,7 @@ TOOLS: dict[str, Callable] = {
     'search_requirements': handle_search_requirements,
     'list_testers_of': handle_list_testers_of,
     'list_references_to': handle_list_references_to,
+    'list_untested_requirements': handle_list_untested_requirements,
     'list_all_tags': handle_list_all_tags,
     'list_all_ids': handle_list_all_ids,
 }
