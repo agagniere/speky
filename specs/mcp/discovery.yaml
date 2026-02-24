@@ -62,7 +62,7 @@ requirements:
 
     The list shall be sorted alphabetically by ID.
   tags: [mcp:tools, mcp:query, mcp:discovery, mcp:traceability]
-  ref: [MCP005, MCP006]
+  ref: [MCP005]
   properties:
     since: '`0.2.0`'
     author: Claude

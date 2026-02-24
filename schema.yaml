@@ -35,7 +35,7 @@ tests:
 
 test:
   id: include('id')
-  short: str(max=60, required=False)
+  short: str(max=80, required=False)
   ref: list(include('id'))
   long: str()
   initial: str(required=False)
