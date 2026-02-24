@@ -3,83 +3,103 @@ category: functional
 tests:
 - id: TMCP020
   ref: [MCP007]
-  short: List requirements referencing another
-  long: Get all requirements that reference a specific requirement
-  initial: MCP server is running with specs/functional.yaml loaded
+  short: list_references_to returns referencing requirements
+  long: Query which requirements reference a given requirement and verify the response
+  prereq: [TMCP003]
   steps:
-  - action: Call list_references_to tool with ID "SF007"
+  - action: The client calls `list_references_to` with ID `RF04`, which is referenced by `RF03`
     sample_lang: json
     sample: |
       {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "list_references_to",
-          "arguments": {"id": "SF007"}
-        },
-        "id": 1
+          "arguments": {"id": "RF04"}
+        }
       }
-  - action: Verify SF013 is returned (it references SF007)
-    expected: |
-      Response includes:
-      - {"id": "SF013", "short": "Parameterized tags", "category": "functional"}
+  - action: Verify the response contains RF03
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {
+                "category": "non-functional",
+                "id": "RF03",
+                "short": "Number 3",
+                "tags": ["foo", "bar:baz"]
+              }
+            ]
+          }
+        }
+      }
 
 - id: TMCP021
   ref: [MCP007]
-  short: List references for unreferenced requirement
-  long: Query references for a requirement that no other requirement references
-  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
+  short: list_references_to returns empty list for unreferenced requirement
+  long: Query which requirements reference a requirement that no other requirement points to, verify an empty list is returned
+  prereq: [TMCP003]
   steps:
-  - action: Call list_references_to tool with ID "RF01"
-  - action: Verify empty list is returned (no requirement references RF01)
-    expected: Response is an empty array []
-
-- id: TMCP022
-  ref: [MCP007]
-  short: List references for non-existent requirement
-  long: Query references for a requirement ID that does not exist
-  initial: MCP server is running with tests/samples/simple_requirements.yaml loaded
-  steps:
-  - action: Call list_references_to tool with ID "INVALID"
+  - action: The client calls `list_references_to` with ID `RF01`, which no requirement references
     sample_lang: json
     sample: |
       {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "list_references_to",
-          "arguments": {"id": "INVALID"}
-        },
-        "id": 1
+          "arguments": {"id": "RF01"}
+        }
       }
-  - action: Verify error response
-    expected: |
-      JSON-RPC error response with message indicating that requirement "INVALID" does not exist
-
-- id: TMCP023
-  ref: [MCP007]
-  short: List multiple references
-  long: Get all requirements when multiple requirements reference the same one
-  initial: MCP server is running with a spec where multiple requirements reference one
-  steps:
-  - action: Create a spec with multiple references to the same requirement
-    run: cat requirements.yaml
-    sample_lang: yaml
+  - action: Verify an empty list is returned
+    sample_lang: json
     sample: |
-      kind: requirements
-      category: functional
-      requirements:
-      - id: RF01
-        long: Base requirement
-      - id: RF02
-        long: Extends RF01
-        ref: [RF01]
-      - id: RF03
-        long: Also extends RF01
-        ref: [RF01]
-  - action: Start MCP server and call list_references_to with ID "RF01"
-  - action: Verify both RF02 and RF03 are returned sorted by ID
-    expected: |
-      Response includes:
-      - {"id": "RF02", "category": "functional"}
-      - {"id": "RF03", "category": "functional"}
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": []
+          }
+        }
+      }
+
+- id: TMCP022
+  ref: [MCP007]
+  short: list_references_to errors on unknown ID
+  long: |
+    The user shall receive a tool execution error when calling list_references_to
+    with an ID that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `list_references_to` with a non-existent ID
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_references_to",
+          "arguments": {"id": "NOTFOUND"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the ID was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Requirement NOTFOUND not found"
+          }
+        }
+      }

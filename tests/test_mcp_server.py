@@ -517,3 +517,58 @@ class TestListTestersOf:
         error_msg = response['result']['structuredContent']['error']
         assert 'NOTFOUND' in error_msg
         assert 'not found' in error_msg
+
+
+class TestListReferencesTo:
+    """Tests for list_references_to tool."""
+
+    def test_list_references_to_one(self, complex_specs):
+        """Test listing requirements that reference a given requirement (TMCP020)."""
+        # speky:speky_mcp#TMCP020
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_references_to', 'arguments': {'id': 'RF04'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert len(requirements) == 1
+        assert requirements[0]['id'] == 'RF03'
+        assert requirements[0]['category'] == 'non-functional'
+        assert requirements[0]['short'] == 'Number 3'
+        assert 'foo' in requirements[0]['tags']
+
+    def test_list_references_to_empty(self, complex_specs):
+        """Test empty list for a requirement no one references (TMCP021)."""
+        # speky:speky_mcp#TMCP021
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_references_to', 'arguments': {'id': 'RF01'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        requirements = response['result']['structuredContent']['requirements']
+
+        assert requirements == []
+
+    def test_list_references_to_not_found(self, simple_specs):
+        """Test error when requirement ID does not exist (TMCP022)."""
+        # speky:speky_mcp#TMCP022
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'list_references_to', 'arguments': {'id': 'NOTFOUND'}},
+        }
+
+        response = handle_request(request, simple_specs, initialized=True)
+
+        assert response['result']['isError'] is True
+        error_msg = response['result']['structuredContent']['error']
+        assert 'NOTFOUND' in error_msg
+        assert 'not found' in error_msg
