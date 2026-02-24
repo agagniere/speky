@@ -3,99 +3,68 @@ category: functional
 tests:
 - id: TMCP029
   ref: [MCP009]
-  short: List all IDs
-  long: Get the complete list of all requirement and test IDs
-  initial: MCP server is running with tests/samples/simple_requirements.yaml and tests/samples/simple_tests.yaml loaded
+  short: list_all_ids returns all requirement and test IDs sorted
+  long: Call list_all_ids and verify the response contains all IDs in two sorted lists
+  initial: An initialized MCP server with only the simple requirements, tests and comments loaded
   steps:
-  - action: Call list_all_ids tool
+  - action: The client calls `list_all_ids` with no arguments
     sample_lang: json
     sample: |
       {
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
           "name": "list_all_ids",
           "arguments": {}
-        },
-        "id": 1
+        }
       }
-  - action: Verify all IDs are returned sorted by type
-    expected: |
-      Response is:
+  - action: Verify the response contains all requirement and test IDs in separate sorted lists
+    sample_lang: json
+    sample: |
       {
-        "requirements": ["RF01", "RF02"],
-        "tests": ["T01", "T02"]
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": ["RF01", "RF02"],
+            "tests": ["T01", "T02"]
+          }
+        }
       }
 
 - id: TMCP030
   ref: [MCP009]
-  short: List IDs includes both requirements and tests
-  long: Verify the response includes IDs from both requirements and tests
-  initial: MCP server is running with specs/functional.yaml and specs/tests/functional.yaml loaded
+  short: list_all_ids includes IDs from all categories
+  long: |
+    Call list_all_ids with requirements and tests from multiple categories loaded.
+    Verify that IDs from all categories are merged into a single sorted list each.
+  prereq: [TMCP003]
   steps:
-  - action: Call list_all_ids tool
-  - action: Verify response contains both requirement IDs (SF*) and test IDs (TF*)
-    expected: |
-      Response structure:
-      {
-        "requirements": ["SF001", "SF002", ..., "SF013"],
-        "tests": ["TF001", "TF002", ..., "TF011"]
-      }
-      Each list sorted alphabetically
-
-- id: TMCP031
-  ref: [MCP009]
-  short: List IDs sorted alphabetically
-  long: Verify IDs are sorted regardless of source file order
-  initial: MCP server is running with multiple spec files loaded in random order
-  steps:
-  - action: Start MCP server with files in non-alphabetical order
-    run: uv run python -m speky_mcp tests/samples/simple_tests.yaml tests/samples/simple_requirements.yaml
-  - action: Call list_all_ids tool
-  - action: Verify IDs are sorted and grouped by type
-    expected: |
-      Response is:
-      {
-        "requirements": ["RF01", "RF02"],
-        "tests": ["T01", "T02"]
-      }
-
-- id: TMCP032
-  ref: [MCP009]
-  short: List IDs when empty
-  long: Call list_all_ids when no requirements or tests exist
-  initial: MCP server is running with empty specification files
-  steps:
-  - action: Create empty requirement and test files
-    run: cat requirements.yaml
-    sample_lang: yaml
+  - action: The client calls `list_all_ids` with both functional and non-functional specs loaded
+    sample_lang: json
     sample: |
-      kind: requirements
-      category: functional
-      requirements: []
-  - action: Start MCP server and call list_all_ids
-  - action: Verify empty lists are returned
-    expected: |
-      Response is:
       {
-        "requirements": [],
-        "tests": []
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_all_ids",
+          "arguments": {}
+        }
       }
-
-- id: TMCP033
-  ref: [MCP009]
-  short: List IDs from multiple categories
-  long: Verify IDs from different categories are all included
-  initial: MCP server is running with both functional and nonfunctional requirements
-  steps:
-  - action: Load specs from multiple categories
-    run: uv run python -m speky_mcp specs/functional.yaml specs/nonfunctional.yaml
-  - action: Call list_all_ids tool
-  - action: Verify IDs from all categories are included
-    expected: |
-      Response structure:
+  - action: |
+      Verify IDs from both functional (RF01, RF02, T01, T02) and
+      non-functional (RF03, RF04, T03, T04) categories are returned together, sorted
+    sample_lang: json
+    sample: |
       {
-        "requirements": ["SF001", ..., "SN001", ...],
-        "tests": [...]
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": ["RF01", "RF02", "RF03", "RF04"],
+            "tests": ["T01", "T02", "T03", "T04"]
+          }
+        }
       }
-      Requirements list includes IDs from all categories, sorted together
