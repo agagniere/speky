@@ -1,0 +1,250 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP036
+  ref: [MCP011]
+  short: search_tests returns all tests when unfiltered
+  long: |
+    The user shall be able to call search_tests with no filters
+    and receive all tests in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {}
+        }
+      }
+  - action: Verify all tests are returned sorted by ID
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "functional", "id": "T01"},
+              {"category": "functional", "id": "T02", "short": "Second test"},
+              {"category": "non-functional", "id": "T03", "short": "Create files"},
+              {"category": "non-functional", "id": "T04", "short": "Yet another test"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP037
+  ref: [MCP011]
+  short: search_tests filtered by category
+  long: |
+    The user shall be able to filter tests by category and receive
+    only tests belonging to that category.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with category `functional`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"category": "functional"}
+        }
+      }
+  - action: Verify only functional tests are returned. T03 and T04 (non-functional) must not appear.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "functional", "id": "T01"},
+              {"category": "functional", "id": "T02", "short": "Second test"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP038
+  ref: [MCP011]
+  short: search_tests filtered by tester_of
+  long: |
+    The user shall be able to filter tests by the requirement they validate
+    and receive only tests that reference that requirement.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with tester_of `RF03`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"tester_of": "RF03"}
+        }
+      }
+  - action: Verify only T03 and T04 are returned as they both reference RF03
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "non-functional", "id": "T03", "short": "Create files"},
+              {"category": "non-functional", "id": "T04", "short": "Yet another test"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP039
+  ref: [MCP011]
+  short: search_tests filtered by category and tester_of
+  long: |
+    The user shall be able to combine category and tester_of filters,
+    receiving only tests that match both criteria.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with category `functional` and tester_of `RF01`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"category": "functional", "tester_of": "RF01"}
+        }
+      }
+  - action: |
+      Verify only T01 is returned.
+      T03 and T04 do not reference RF01. T02 references RF02, not RF01.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "functional", "id": "T01"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP040
+  ref: [MCP011]
+  short: search_tests returns empty list when tester_of has no tests
+  long: |
+    The user shall receive an empty list when filtering by a requirement
+    that exists but has no associated tests.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with tester_of `RF04`, a requirement with no tests
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"tester_of": "RF04"}
+        }
+      }
+  - action: Verify an empty list is returned
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": []
+          }
+        }
+      }
+
+- id: TMCP041
+  ref: [MCP011]
+  short: search_tests errors on unknown category
+  long: |
+    The user shall receive a tool execution error when filtering by a category
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with a non-existent category
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"category": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the category was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Category 'nonexistent' not found"
+          }
+        }
+      }
+
+- id: TMCP042
+  ref: [MCP011]
+  short: search_tests errors on unknown tester_of
+  long: |
+    The user shall receive a tool execution error when filtering by a requirement ID
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `search_tests` with a non-existent tester_of requirement ID
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"tester_of": "NONEXISTENT"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the requirement was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Requirement 'NONEXISTENT' not found"
+          }
+        }
+      }

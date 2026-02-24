@@ -32,6 +32,40 @@ requirements:
   properties:
     since: '`0.2.0`'
     author: Claude
+- id: MCP011
+  short: Search and filter tests
+  client_statement: |
+    I would like to discover what tests exist by searching with filters like category
+    or the requirement they validate. For example, "show me all non-functional tests"
+    or "which functional tests validate RF03" helps me explore the test suite and
+    prepare targeted test campaigns.
+  long: |
+    The user shall be able to search for tests using optional filter criteria.
+
+    The MCP server shall expose a tool named `search_tests` that accepts
+    optional filter parameters and returns matching tests.
+
+    Filter parameters:
+    - category: Filter by category (exact match, e.g., "functional"). If the
+      category does not exist in the loaded specifications, an error shall be returned.
+    - tester_of: Filter by requirement ID — returns only tests that reference
+      that requirement in their `ref` field. If the requirement ID does not
+      exist, an error shall be returned.
+
+    If no filters are provided, all tests shall be returned.
+    Filters can be combined.
+
+    The response shall be a list of test summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The test category
+
+    The list shall be sorted alphabetically by ID.
+  tags: [mcp:tools, mcp:query, mcp:discovery, mcp:traceability]
+  ref: [MCP005, MCP006]
+  properties:
+    since: '`0.2.0`'
+    author: Claude
 - id: MCP008
   short: List all tags
   client_statement: |

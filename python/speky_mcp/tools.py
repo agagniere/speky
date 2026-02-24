@@ -154,6 +154,30 @@ def handle_list_untested_requirements(arguments: dict, specs: Specification) -> 
     return {'requirements': requirements}
 
 
+def handle_search_tests(arguments: dict, specs: Specification) -> dict:
+    """speky:speky_mcp#MCP011"""
+    tester_of = arguments.get('tester_of')
+    category = arguments.get('category')
+
+    if tester_of and tester_of not in specs.by_id:
+        raise ToolError(f'Requirement {tester_of!r} not found')
+    if category and category not in specs.tests:
+        raise ToolError(f'Category {category!r} not found')
+
+    if tester_of and category:
+        by_tester = {t.id for t in specs.testers_of[tester_of]}
+        candidates = [t for t in specs.tests[category] if t.id in by_tester]
+    elif tester_of:
+        candidates = specs.testers_of[tester_of]
+    elif category:
+        candidates = specs.tests[category]
+    else:
+        candidates = [t for tests in specs.tests.values() for t in tests]
+
+    tests = sorted((t.json_oneliner(False) for t in candidates), key=lambda t: t['id'])
+    return {'tests': tests}
+
+
 def handle_list_all_ids(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP009"""
     return {
@@ -172,6 +196,7 @@ TOOLS: dict[str, Callable] = {
     'get_test': handle_get_test,
     'search_requirements': handle_search_requirements,
     'list_testers_of': handle_list_testers_of,
+    'search_tests': handle_search_tests,
     'list_references_to': handle_list_references_to,
     'list_untested_requirements': handle_list_untested_requirements,
     'list_all_tags': handle_list_all_tags,
