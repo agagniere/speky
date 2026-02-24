@@ -263,17 +263,17 @@ def requirement_to_myst(self, output: MystWriter, specs):
                 dropdown.empty_line()
     if self.id in specs.testers_of:
         with output.dropdown(0, 'Tested by', 'success', True, 'check-circle-fill') as dropdown:
-            write_list_of_links(dropdown, specs.testers_of[self.id])
+            write_list_of_links(dropdown, sorted(specs.testers_of[self.id]))
         output.empty_line()
     if self.id in specs.references or self.ref:
         with output.dropdown(0, 'References', 'secondary', False, 'link') as dropdown:
             if self.ref:
                 output.write_line(Markdown.bold('Relates to:'))
-                write_list_of_links(dropdown, list(map(specs.by_id.__getitem__, self.ref)))
+                write_list_of_links(dropdown, sorted(map(specs.by_id.__getitem__, self.ref)))
                 dropdown.empty_line()
             if self.id in specs.references:
                 dropdown.write_line(Markdown.bold('Referenced by:'))
-                write_list_of_links(dropdown, specs.references[self.id])
+                write_list_of_links(dropdown, sorted(specs.references[self.id]))
         output.empty_line()
     if self.id in specs.comments:
         output.write_line('-' * 10)
@@ -289,7 +289,7 @@ def test_to_myst(self, output: MystWriter, specs):
     output.write_line(self.long)
     output.empty_line()
     with output.dropdown(0, 'Is a test for', 'primary', True, 'check-circle-fill') as dropdown:
-        write_list_of_links(dropdown, [specs.by_id[r] for r in self.ref])
+        write_list_of_links(dropdown, sorted(map(specs.by_id.__getitem__, self.ref)))
     output.empty_line()
     output.heading('Initial state', 1)
     if self.initial:
@@ -297,7 +297,7 @@ def test_to_myst(self, output: MystWriter, specs):
         output.empty_line()
     if self.prereq:
         output.write_line('The expected state is the final state of')
-        write_list_of_links(output, [specs.by_id[p] for p in self.prereq])
+        write_list_of_links(output, sorted(map(specs.by_id.__getitem__, self.prereq)))
     output.heading('Procedure', 1)
     for i, step in enumerate(self.steps, 1):
         output.heading(f'Step {i}', 2)

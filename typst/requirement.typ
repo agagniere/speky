@@ -60,7 +60,7 @@
       *Tested by* #link_to(tests.at(0))
     ] else [
       ==== Tested by
-      #for test in tests [
+      #for test in tests.sorted(key: r => r.id) [
         - #link_to(test)
       ]
 
@@ -73,7 +73,7 @@
       *Referenced by* #link_to(refs.at(0))
     ] else [
       ==== Referenced by
-      #for other in refs [
+      #for other in refs.sorted(key: r => r.id) [
         - #link_to(other)
       ]
     ]
@@ -84,7 +84,7 @@
       *Relates to* #link_to(by_id.at(req.ref.at(0)))
     ] else [
       ==== Relates to
-      #for other in req.ref [
+      #for other in req.ref.sorted() [
         - #link_to(by_id.at(other))
       ]
     ]
@@ -105,7 +105,7 @@
               colspan: 2,
             ),
             columns: (1fr, 1fr),
-            gutter: 8pt
+            gutter: 8pt,
           ),
           width: 80%,
           inset: 5pt,

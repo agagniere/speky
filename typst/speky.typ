@@ -79,7 +79,7 @@
           *Is a test for* #link_to(by_id.at(test.ref.at(0)))
         ] else [
           ==== Is a test for
-          #for r in test.ref [
+          #for r in test.ref.sorted() [
             - #link_to(by_id.at(r))
           ]
         ]
@@ -93,7 +93,7 @@
           #if test.prereq.len() == 1 {
             link_to(by_id.at(test.prereq.at(0)))
           } else {
-            for prereq in test.prereq [
+            for prereq in test.prereq.sorted() [
               - #link_to(by_id.at(prereq))
             ]
           }

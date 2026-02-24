@@ -37,11 +37,13 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
     if requirement.properties:
         content['properties'] = requirement.properties
     if requirement.ref:
-        content['ref'] = [referred.json_oneliner(False) for referred in map(specs.by_id.__getitem__, requirement.ref)]
+        content['ref'] = [
+            referred.json_oneliner(False) for referred in sorted(map(specs.by_id.__getitem__, requirement.ref))
+        ]
     if requirement_id in specs.references:
-        content['referenced_by'] = [ref.json_oneliner(False) for ref in specs.references[requirement_id]]
+        content['referenced_by'] = [ref.json_oneliner(False) for ref in sorted(specs.references[requirement_id])]
     if requirement_id in specs.testers_of:
-        content['tested_by'] = [test.json_oneliner(False) for test in specs.testers_of[requirement_id]]
+        content['tested_by'] = [test.json_oneliner(False) for test in sorted(specs.testers_of[requirement_id])]
     if requirement_id in specs.comments:
         content['comments'] = [
             {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
@@ -69,7 +71,7 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         'category': test.category,
         'id': test.id,
         'long': test.long,
-        'ref': [referred.json_oneliner(False) for referred in map(specs.by_id.__getitem__, test.ref)],
+        'ref': [referred.json_oneliner(False) for referred in sorted(map(specs.by_id.__getitem__, test.ref))],
         'steps': test.steps,
     }
 
@@ -80,7 +82,7 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         content['initial'] = test.initial
     if test.prereq:
         content['prereq'] = [
-            prereq_test.json_oneliner(False) for prereq_test in map(specs.by_id.__getitem__, test.prereq)
+            prereq_test.json_oneliner(False) for prereq_test in sorted(map(specs.by_id.__getitem__, test.prereq))
         ]
 
     return content
