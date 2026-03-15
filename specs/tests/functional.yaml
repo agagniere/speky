@@ -223,6 +223,37 @@ tests:
         Loading requirements.yaml
         Loading tests.yaml
         Loading comments.yaml
+- id: TF014
+  ref: [SF014, SF015]
+  short: Repo-tracked manifest loading
+  long: |
+    Create a checked-in `speky.toml` manifest in a repository and load the specification
+    by project name instead of enumerating YAML files.
+  steps:
+    - action: Create a repository manifest that points to the specification files and code roots
+    - action: Run `speky --project Demo --check-only`
+    - action: Verify the manifest-defined specification files are loaded successfully
+- id: TF015
+  ref: [SF016]
+  short: Lifecycle stage validation
+  long: |
+    Add lifecycle stages to requirements and tests through `properties.stage`.
+    Verify valid stages load successfully and invalid stages fail validation.
+  steps:
+    - action: |
+        Add `properties.stage: approved` to a requirement and a test
+    - action: Run `speky --check-only`
+    - action: Change the stage to an unsupported value and verify validation fails
+- id: TF016
+  ref: [SF017, SF018]
+  short: Code references and executable test evidence
+  long: |
+    Link tagged code references back to Speky identifiers and verify generic code mentions
+    stay distinct from the specific executable-test evidence flow.
+  steps:
+    - action: Add tagged code references such as `speky:Demo#RF01` and `speky:Demo#T01` in code
+    - action: Run the MCP server or static output generation using the project manifest
+    - action: Verify generic code mentions appear on the targeted object unless already captured by a specific executable-test flow
     - action: Install sphinx with dependencies
       run: uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
       expected: |

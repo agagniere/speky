@@ -108,3 +108,57 @@ requirements:
   tags: [output:both]
   properties:
     since: '`0.1.0`'
+- id: SF014
+  short: Repo-tracked project manifest
+  long: |
+    A project using Speky shall be able to define a checked-in project manifest.
+
+    The manifest shall describe:
+    - the project name
+    - where requirements, tests and comments are stored
+    - where executable code tests may be discovered
+
+    The manifest shall be versioned in the same repository as the related product specification
+    so that specification changes are tracked directly with the implementation they describe.
+  tags: [input, versioning]
+- id: SF015
+  short: Load a project by name
+  ref: [SF014]
+  long: |
+    The user shall be able to load a specification project by its project name instead of
+    enumerating YAML files manually.
+
+    This shall work when the specification lives:
+    - in the current repository
+    - in another local repository
+    - in an external git repository
+  tags: [input, tooling]
+- id: SF016
+  short: Track lifecycle stage
+  long: |
+    Requirements and tests shall be able to expose a lifecycle stage such as draft, review,
+    approved, implementing, implemented or blocked.
+
+    This lifecycle state shall be stored in the repository-tracked specification data so it can
+    evolve through normal code review and version control flows.
+  tags: [input, output:both]
+- id: SF017
+  short: Link code references
+  ref: [SF015]
+  long: |
+    The user shall be able to link tagged code references back to Speky objects by identifier,
+    regardless of whether the target is a requirement or a test.
+
+    A code reference shall appear under a generic "Mentioned in code by" view unless a more
+    specific Speky flow already captures it.
+  tags: [tooling, traceability]
+- id: SF018
+  short: Distinguish executable test evidence
+  ref: [SF017]
+  long: |
+    When a tagged code reference targets a Speky test item and originates from an executable
+    test symbol, Speky shall expose it as executable test evidence for that Speky test.
+
+    This specific executable-test flow shall not duplicate the same reference under the generic
+    "Mentioned in code by" section of that Speky test.
+  tags: [tooling, traceability]
