@@ -5,6 +5,8 @@ from types import SimpleNamespace
 
 from .utils import ensure_fields, import_fields, warn_extra_fields
 
+ALLOWED_STAGES = {'draft', 'review', 'approved', 'implementing', 'implemented', 'blocked'}
+
 
 class SpecItem(SimpleNamespace):
     """Base class for specification items (requirements and tests)."""
@@ -40,6 +42,11 @@ class SpecItem(SimpleNamespace):
         ensure_fields(location, data, cls.mandatory_fields)
         warn_extra_fields(location, data, cls.fields())
         import_fields(result, data, cls.fields())
+        if getattr(result, 'properties', None):
+            stage = result.properties.get('stage')
+            if stage is not None and stage not in ALLOWED_STAGES:
+                message = f'Invalid lifecycle stage {stage!r} in {location}'
+                raise KeyError(message)
         return cls(**result.__dict__)
 
     @property
@@ -52,11 +59,20 @@ class SpecItem(SimpleNamespace):
         result = {'id': self.id}
         if self.short:
             result['short'] = self.short
+        if self.stage:
+            result['stage'] = self.stage
         if full_summary:
             result['category'] = self.category
             if hasattr(self, 'tags') and self.tags:
                 result['tags'] = self.tags
         return result
+
+    @property
+    def stage(self):
+        """Return the lifecycle stage stored in properties, if any."""
+        if not getattr(self, 'properties', None):
+            return None
+        return self.properties.get('stage')
 
     def __lt__(self, other):
         """Compare by ID field for sorting."""
@@ -75,7 +91,7 @@ class Test(SpecItem):
 
     folder = 'tests'
     mandatory_fields = SpecItem.mandatory_fields + ['ref', 'steps']
-    optional_fields = SpecItem.optional_fields + ['initial', 'prereq']
+    optional_fields = SpecItem.optional_fields + ['initial', 'prereq', 'properties']
 
     step_fields = {'action', 'run', 'expected', 'sample', 'sample_lang'}
 

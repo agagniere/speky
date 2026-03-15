@@ -116,6 +116,7 @@ requirements:
     The manifest shall describe:
     - the project name
     - where requirements, tests and comments are stored
+    - where executable code tests may be discovered
 
     The manifest shall be versioned in the same repository as the related product specification
     so that specification changes are tracked directly with the implementation they describe.
@@ -132,3 +133,12 @@ requirements:
     - in another local repository
     - in an external git repository
   tags: [input, tooling]
+- id: SF016
+  short: Track lifecycle stage
+  long: |
+    Requirements and tests shall be able to expose a lifecycle stage such as draft, review,
+    approved, implementing, implemented or blocked.
+
+    This lifecycle state shall be stored in the repository-tracked specification data so it can
+    evolve through normal code review and version control flows.
+  tags: [input, output:both]

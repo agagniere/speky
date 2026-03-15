@@ -18,6 +18,7 @@ requirements:
       tag does not exist in the loaded specifications, an error shall be returned.
     - category: Filter by category (exact match, e.g., "functional"). If the
       category does not exist in the loaded specifications, an error shall be returned.
+    - stage: Filter by lifecycle stage (exact match, e.g., "draft" or "approved")
 
     If no filters are provided, all requirements shall be returned.
 
@@ -26,6 +27,7 @@ requirements:
     - short: The short description (if present)
     - category: The requirement category
     - tags: List of tags (if present)
+    - stage: The lifecycle stage (if present)
 
     The list shall be sorted alphabetically by ID.
   tags: [mcp:tools, mcp:query, mcp:discovery]
@@ -51,6 +53,7 @@ requirements:
     - tester_of: Filter by requirement ID — returns only tests that reference
       that requirement in their `ref` field. If the requirement ID does not
       exist, an error shall be returned.
+    - stage: Filter by lifecycle stage (exact match, e.g., "approved" or "implemented")
 
     If no filters are provided, all tests shall be returned.
     Filters can be combined.
@@ -59,6 +62,7 @@ requirements:
     - id: The unique identifier
     - short: The short description (if present)
     - category: The test category
+    - stage: The lifecycle stage (if present)
 
     The list shall be sorted alphabetically by ID.
   tags: [mcp:tools, mcp:query, mcp:discovery, mcp:traceability]
@@ -135,6 +139,44 @@ requirements:
     When a project is loaded by name, the server shall load the manifest-defined YAML sources
     and optional comment CSV files without requiring explicit YAML paths on the command line.
   tags: [mcp:discovery, tooling]
+  properties:
+    since: '`0.3.0`'
+    author: Codex
+- id: MCP013
+  short: Filter requirements by lifecycle stage
+  client_statement: |
+    I would like to discover only the requirements that are currently in a given lifecycle
+    stage, for example draft, approved or implemented.
+  long: |
+    The `search_requirements` tool shall support filtering by lifecycle stage.
+
+    The tool shall accept an optional `stage` argument.
+
+    When the filter is provided, only requirements whose `properties.stage` matches the requested
+    lifecycle stage shall be returned.
+
+    Returned requirement summaries shall include the lifecycle stage when present.
+  tags: [mcp:discovery, mcp:query]
+  ref: [MCP005]
+  properties:
+    since: '`0.3.0`'
+    author: Codex
+- id: MCP016
+  short: Filter tests by lifecycle stage
+  client_statement: |
+    I would like to discover only the Speky tests that are currently in a given lifecycle stage,
+    for example approved or implemented.
+  long: |
+    The `search_tests` tool shall support filtering by lifecycle stage.
+
+    The tool shall accept an optional `stage` argument.
+
+    When the filter is provided, only tests whose `properties.stage` matches the requested
+    lifecycle stage shall be returned.
+
+    Returned test summaries shall include the lifecycle stage when present.
+  tags: [mcp:discovery, mcp:query]
+  ref: [MCP011]
   properties:
     since: '`0.3.0`'
     author: Codex
