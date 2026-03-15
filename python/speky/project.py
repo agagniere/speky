@@ -10,6 +10,7 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .code_tests import discover_code_references
 from .specification import Specification
 
 logger = logging.getLogger(__name__)
@@ -17,7 +18,7 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ProjectSource:
-    """Manifest-defined source of YAML specs and optional comment files."""
+    """Manifest-defined source of YAML specs and code evidence."""
 
     kind: str
     root: str | None = None
@@ -29,6 +30,7 @@ class ProjectSource:
     tests: list[str] = field(default_factory=list)
     comments: list[str] = field(default_factory=list)
     comment_csv: list[str] = field(default_factory=list)
+    code_roots: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -63,6 +65,12 @@ def load_specification(
             logger.info('Loading %s as comments', filename)
             specs.read_comment_csv(filename)
         if config:
+            code_roots: list[Path] = []
+            for source in config.sources:
+                source_root = _materialize_source_root(source, config.manifest_path.parent)
+                code_roots.extend(_expand_code_roots(source_root, source.code_roots))
+            for ref in discover_code_references(config.name, code_roots, config.manifest_path.parent):
+                specs.load_code_reference(ref)
             return specs, config.display_name
         return specs, project_name or 'Speky'
 
@@ -70,6 +78,7 @@ def load_specification(
     config = resolve_project(project_name=project_name, manifest_path=manifest_path, cwd=cwd)
     specs = Specification(project_name=config.name)
 
+    code_roots: list[Path] = []
     for source in config.sources:
         source_root = _materialize_source_root(source, config.manifest_path.parent)
         for filename in _expand_yaml_files(source_root, source):
@@ -78,6 +87,10 @@ def load_specification(
         for filename in _expand_patterns(source_root, source.comment_csv):
             logger.info('Loading %s as comments', filename)
             specs.read_comment_csv(str(filename))
+        code_roots.extend(_expand_code_roots(source_root, source.code_roots))
+
+    for ref in discover_code_references(config.name, code_roots, config.manifest_path.parent):
+        specs.load_code_reference(ref)
     return specs, config.display_name
 
 
@@ -156,7 +169,7 @@ def _read_manifest(path: Path) -> ProjectConfig:
     if isinstance(raw_sources, dict):
         raw_sources = [raw_sources]
     if not raw_sources:
-        raw_sources = [{'kind': 'workspace', 'root': '.', 'files': ['specs/**/*.yaml']}]
+        raw_sources = [{'kind': 'workspace', 'root': '.', 'files': ['specs/**/*.yaml'], 'code_roots': ['tests', 'src']}]
 
     sources = [_validate_source(ProjectSource(**source), path) for source in raw_sources]
     return ProjectConfig(
@@ -174,7 +187,7 @@ def _validate_source(source: ProjectSource, manifest_path: Path) -> ProjectSourc
         raise KeyError(f'Manifest {manifest_path} path source requires root')
     if source.kind == 'git' and not source.git_url:
         raise KeyError(f'Manifest {manifest_path} git source requires git_url')
-    for field_name in ('files', 'requirements', 'tests', 'comments', 'comment_csv'):
+    for field_name in ('files', 'requirements', 'tests', 'comments', 'comment_csv', 'code_roots'):
         value = getattr(source, field_name)
         if not isinstance(value, list):
             raise KeyError(f'Manifest {manifest_path} field {field_name} must be a list')
@@ -229,3 +242,14 @@ def _expand_patterns(source_root: Path, patterns: list[str]) -> list[Path]:
                 seen.add(path)
                 paths.append(path)
     return paths
+
+
+def _expand_code_roots(source_root: Path, patterns: list[str]) -> list[Path]:
+    roots: list[Path] = []
+    seen: set[Path] = set()
+    for pattern in patterns or ['tests']:
+        for path in sorted(source_root.glob(pattern)):
+            if path.exists() and path not in seen:
+                seen.add(path)
+                roots.append(path)
+    return roots

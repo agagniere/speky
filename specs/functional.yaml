@@ -142,3 +142,13 @@ requirements:
     This lifecycle state shall be stored in the repository-tracked specification data so it can
     evolve through normal code review and version control flows.
   tags: [input, output:both]
+- id: SF017
+  short: Link code references
+  ref: [SF015]
+  long: |
+    The user shall be able to link tagged code references back to Speky objects by identifier,
+    regardless of whether the target is a requirement or a test.
+
+    A code reference shall appear under a generic "Mentioned in code by" view on the targeted
+    Speky object.
+  tags: [tooling, traceability]

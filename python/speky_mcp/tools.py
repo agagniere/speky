@@ -46,6 +46,14 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         content['referenced_by'] = [ref.json_oneliner(False) for ref in sorted(specs.references[requirement_id])]
     if requirement_id in specs.testers_of:
         content['tested_by'] = [test.json_oneliner(False) for test in sorted(specs.testers_of[requirement_id])]
+    if requirement_id in specs.code_references_by_item:
+        content['mentioned_in_code_by'] = [
+            code_ref.json_summary()
+            for code_ref in sorted(
+                specs.code_references_by_item[requirement_id],
+                key=lambda ref: (ref.path, ref.line, ref.symbol),
+            )
+        ]
     if requirement_id in specs.comments:
         content['comments'] = [
             {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
@@ -87,6 +95,11 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
     if test.prereq:
         content['prereq'] = [
             prereq_test.json_oneliner(False) for prereq_test in sorted(map(specs.by_id.__getitem__, test.prereq))
+        ]
+    if test.id in specs.code_references_by_item:
+        content['mentioned_in_code_by'] = [
+            code_ref.json_summary()
+            for code_ref in sorted(specs.code_references_by_item[test.id], key=lambda ref: (ref.path, ref.line, ref.symbol))
         ]
 
     return content
