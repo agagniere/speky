@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 
 from .generators import specification_to_myst
-from .specification import Specification
+from .project import load_specification
 
 assets = importlib.resources.files(__package__).joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
@@ -28,6 +28,7 @@ def main():
         PermissionError,
         NotADirectoryError,
         OSError,
+        ValueError,
         yaml.reader.ReaderError,
         RuntimeError,
     ) as err:
@@ -52,7 +53,7 @@ def run(argv: list[str] | None = None):
         'paths',
         type=str,
         metavar='FILE',
-        nargs='+',
+        nargs='*',
         help='The path to a YAML file containing requirements, tests or comments',
     )
     cli_parser.add_argument(
@@ -76,9 +77,10 @@ def run(argv: list[str] | None = None):
         '-p',
         '--project-name',
         type=str,
-        required=True,
         help='Name of the project used for the title',
     )
+    cli_parser.add_argument('--project', type=str, help='Load a checked-in project manifest by project name')
+    cli_parser.add_argument('--manifest', type=str, help='Load a project from an explicit speky.toml manifest')
     cli_parser.add_argument(
         '-l',
         '--logging-config',
@@ -96,19 +98,20 @@ def run(argv: list[str] | None = None):
         help='Sort requirements by ID. If false, the order of files passed as positionals is significant',
     )
     cli_args = cli_parser.parse_args(argv)
+    if not cli_args.paths and not cli_args.project and not cli_args.manifest:
+        cli_parser.error('either FILE arguments or --project/--manifest must be provided')
 
     logging_config_file = Path(cli_args.logging_config)
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
 
-    specs = Specification()
-    for filename in cli_args.paths:
-        logger.info('Loading %s', filename)
-        specs.read_yaml(filename)
-    if cli_args.comment_csvs:
-        for filename in cli_args.comment_csvs:
-            logger.info('Loading %s as comments', filename)
-            specs.read_comment_csv(filename)
+    specs, resolved_project_name = load_specification(
+        paths=cli_args.paths,
+        comment_csvs=cli_args.comment_csvs,
+        project_name=cli_args.project,
+        manifest_path=cli_args.manifest,
+    )
     specs.check_references()
     if not cli_args.check_only:
-        specification_to_myst(specs, cli_args.project_name, cli_args.output_folder, cli_args.sort)
+        final_project_name = cli_args.project_name or resolved_project_name
+        specification_to_myst(specs, final_project_name, cli_args.output_folder, cli_args.sort)

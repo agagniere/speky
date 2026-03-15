@@ -336,3 +336,13 @@ tests:
           - Baz, where `RF02` is listed
         4. `RF02` is listed directly inside the Lorem section
         5. `RF01` is listed inside the Ipsum subsection of Lorem
+- id: TF014
+  ref: [SF014, SF015]
+  short: Repo-tracked manifest loading
+  long: |
+    Create a checked-in `speky.toml` manifest in a repository and load the specification
+    by project name instead of enumerating YAML files.
+  steps:
+    - action: Create a repository manifest that points to the specification files and comment inputs
+    - action: Run `speky --project Demo --check-only`
+    - action: Verify the manifest-defined specification files are loaded successfully

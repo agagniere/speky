@@ -19,8 +19,9 @@ class Specification:
     speky:speky#SF001
     """
 
-    def __init__(self):
+    def __init__(self, project_name: str | None = None):
         """Initialize empty specification."""
+        self.project_name = project_name
         self.requirements = defaultdict(list)
         self.tests = defaultdict(list)
         self.references = defaultdict(list)

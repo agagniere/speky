@@ -68,6 +68,34 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    open sphinx/html/index.html
    ```
 
+## Load a repo-tracked project
+
+Instead of listing YAML files manually, you can check a `speky.toml` manifest into the repository
+and load the project by name.
+
+Example manifest:
+
+```toml
+[project]
+name = "demo"
+display_name = "Demo"
+
+[[source]]
+kind = "workspace"
+root = "."
+requirements = ["specs/requirements.yaml"]
+tests = ["specs/tests.yaml"]
+comments = ["specs/comments.yaml"]
+```
+
+Validate the project:
+
+```shell
+speky --project demo --check-only
+```
+
+The CLI also supports `--manifest path/to/speky.toml`.
+
 ## Used by
 
 ![safran](https://upload.wikimedia.org/wikipedia/fr/thumb/5/5f/Safran_-_logo_2016.png/330px-Safran_-_logo_2016.png)

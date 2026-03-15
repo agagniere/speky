@@ -15,6 +15,7 @@ from importlib.metadata import version
 from pathlib import Path
 
 import yaml
+from speky.project import load_specification
 from speky.specification import Specification
 
 from .protocol import JsonRpcError, ToolError, protocol_error, tool_error, tool_result
@@ -35,6 +36,7 @@ def main():
         PermissionError,
         NotADirectoryError,
         OSError,
+        ValueError,
         yaml.reader.ReaderError,
         RuntimeError,
     ) as err:
@@ -58,7 +60,7 @@ def run(argv: list[str] | None = None):
         'paths',
         type=str,
         metavar='FILE',
-        nargs='+',
+        nargs='*',
         help='Path(s) to YAML files containing requirements, tests, or comments',
     )
     parser.add_argument(
@@ -77,22 +79,24 @@ def run(argv: list[str] | None = None):
         default=default_logging_file,
         help='Specify a custom config file of the logging library',
     )
+    parser.add_argument('--project', type=str, help='Load a checked-in project manifest by project name')
+    parser.add_argument('--manifest', type=str, help='Load a project from an explicit speky.toml manifest')
 
     args = parser.parse_args(argv)
+    if not args.paths and not args.project and not args.manifest:
+        parser.error('either FILE arguments or --project/--manifest must be provided')
 
     logging_config_file = Path(args.logging_config)
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
 
     # speky:speky_mcp#MCP001
-    specs = Specification()
-    for filename in args.paths:
-        logger.info('Loading %s', filename)
-        specs.read_yaml(filename)
-    if args.comment_csvs:
-        for filename in args.comment_csvs:
-            logger.info('Loading %s as comments', filename)
-            specs.read_comment_csv(filename)
+    specs, _ = load_specification(
+        paths=args.paths,
+        comment_csvs=args.comment_csvs,
+        project_name=args.project,
+        manifest_path=args.manifest,
+    )
 
     # speky:speky_mcp#TMCP002
     specs.check_references()
