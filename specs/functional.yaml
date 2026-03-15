@@ -149,6 +149,16 @@ requirements:
     The user shall be able to link tagged code references back to Speky objects by identifier,
     regardless of whether the target is a requirement or a test.
 
-    A code reference shall appear under a generic "Mentioned in code by" view on the targeted
-    Speky object.
+    A code reference shall appear under a generic "Mentioned in code by" view unless a more
+    specific Speky flow already captures it.
+  tags: [tooling, traceability]
+- id: SF018
+  short: Distinguish executable test evidence
+  ref: [SF017]
+  long: |
+    When a tagged code reference targets a Speky test item and originates from an executable
+    test symbol, Speky shall expose it as executable test evidence for that Speky test.
+
+    This specific executable-test flow shall not duplicate the same reference under the generic
+    "Mentioned in code by" section of that Speky test.
   tags: [tooling, traceability]

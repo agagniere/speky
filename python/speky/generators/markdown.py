@@ -314,9 +314,16 @@ def test_to_myst(self, output: MystWriter, specs):
     if self.prereq:
         output.write_line('The expected state is the final state of')
         write_list_of_links(output, sorted(map(specs.by_id.__getitem__, self.prereq)))
-    if self.id in specs.code_references_by_item:
+    if self.id in specs.code_tests_by_test:
+        output.heading('Executable code tests', 1)
+        write_code_refs(output, sorted(specs.code_tests_by_test[self.id]))
+        output.empty_line()
+    generic_mentions = [
+        ref for ref in specs.code_references_by_item.get(self.id, []) if not ref.is_executable_test
+    ]
+    if generic_mentions:
         output.heading('Mentioned in code by', 1)
-        write_code_refs(output, sorted(specs.code_references_by_item[self.id]))
+        write_code_refs(output, sorted(generic_mentions))
         output.empty_line()
     output.heading('Procedure', 1)
     for i, step in enumerate(self.steps, 1):

@@ -11,10 +11,11 @@ tests:
     The current repository contains:
     - a checked-in `speky.toml` manifest with `project.name = "demo"`
     - manifest-defined YAML sources for requirements, tests and comments
-    - requirements `RF10` and `RF11`
-    - tests `T10` and `T11`
+    - functional requirements `RF10` and `RF11`, each with lifecycle stage `approved`
+    - Speky tests `T10` and `T11`, where `T10` has lifecycle stage `implemented`
     - a direct tagged code mention of requirement `RF10` from non-test code
-    - a direct tagged code mention of test `T11` from non-test code
+    - an executable code-test annotation linking `T10`
+    - a non-executable tagged code mention of Speky test `T11`
   steps:
   - action: Start the MCP server with project name `demo`
     run: speky-mcp --project demo
@@ -61,7 +62,7 @@ tests:
       }
 
 - id: TMCP045
-  ref: [MCP003, MCP017]
+  ref: [MCP003]
   short: get_requirement returns stage and code mentions
   long: |
     Call `get_requirement` for a requirement that has a lifecycle stage and a direct tagged
@@ -72,7 +73,7 @@ tests:
     sample_lang: json
     sample: |
       {
-        "id": 3,
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
@@ -84,7 +85,7 @@ tests:
     sample_lang: json
     sample: |
       {
-        "id": 3,
+        "id": 2,
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {
@@ -106,15 +107,15 @@ tests:
         }
       }
 
-- id: TMCP050
-  ref: [MCP004, MCP017]
-  short: get_test returns generic code mentions
+- id: TMCP051
+  ref: [MCP017]
+  short: get_requirement returns generic code mentions
   long: |
-    Call `get_test` for a Speky test that is tagged from non-test code and verify the generic
-    code mention appears in `mentioned_in_code_by`.
+    Call `get_requirement` for a requirement that is directly tagged from code and verify the
+    generic code mention appears in `mentioned_in_code_by`.
   prereq: [TMCP043]
   steps:
-  - action: The client calls `get_test` for test `T11`
+  - action: The client calls `get_requirement` for requirement `RF10`
     sample_lang: json
     sample: |
       {
@@ -122,8 +123,8 @@ tests:
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
-          "name": "get_test",
-          "arguments": {"id": "T11"}
+          "name": "get_requirement",
+          "arguments": {"id": "RF10"}
         }
       }
   - action: Verify the response contains `mentioned_in_code_by` for the direct tagged code mention
@@ -131,6 +132,96 @@ tests:
     sample: |
       {
         "id": 4,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "id": "RF10",
+            "mentioned_in_code_by": [
+              {
+                "language": "python",
+                "line": 2,
+                "path": "src/feature.py",
+                "project": "demo",
+                "symbol": "feature_entrypoint"
+              }
+            ]
+          }
+        }
+      }
+
+- id: TMCP046
+  ref: [MCP004]
+  short: get_test returns stage and executable tests
+  long: |
+    Call `get_test` for a staged Speky test with linked executable test annotations.
+  prereq: [TMCP043]
+  steps:
+  - action: The client calls `get_test` for test `T10`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T10"}
+        }
+      }
+  - action: Verify the response contains both `stage` and `code_tests`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "id": "T10",
+            "category": "functional",
+            "long": "Executable proof",
+            "stage": "implemented",
+            "code_tests": [
+              {
+                "framework": "pytest",
+                "language": "python",
+                "line": 12,
+                "path": "tests/test_feature.py",
+                "project": "demo",
+                "symbol": "test_feature"
+              }
+            ]
+          }
+        }
+      }
+
+- id: TMCP050
+  ref: [MCP017]
+  short: get_test returns generic code mentions without duplication
+  long: |
+    Call `get_test` for a Speky test that is tagged from non-test code and verify the generic
+    code mention appears in `mentioned_in_code_by`.
+
+    Also verify that executable test evidence is not duplicated into `mentioned_in_code_by`
+    for Speky tests already covered by `code_tests`.
+  prereq: [TMCP043]
+  steps:
+  - action: The client calls `get_test` for test `T11`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T11"}
+        }
+      }
+  - action: Verify the response contains `mentioned_in_code_by` for the non-test code mention
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {
@@ -150,44 +241,106 @@ tests:
           }
         }
       }
-
-- id: TMCP051
-  ref: [MCP017]
-  short: get_requirement returns generic code mentions
-  long: |
-    Call `get_requirement` for a requirement that is directly tagged from code and verify the
-    generic code mention appears in `mentioned_in_code_by`.
-  prereq: [TMCP043]
-  steps:
-  - action: The client calls `get_requirement` for requirement `RF10`
+  - action: The client calls `get_test` for test `T10`
     sample_lang: json
     sample: |
       {
-        "id": 5,
+        "id": 3,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
-          "name": "get_requirement",
-          "arguments": {"id": "RF10"}
+          "name": "get_test",
+          "arguments": {"id": "T10"}
         }
       }
-  - action: Verify the response contains `mentioned_in_code_by` for the direct tagged code mention
+  - action: Verify the executable test evidence remains under `code_tests` and is not duplicated in `mentioned_in_code_by`
     sample_lang: json
     sample: |
       {
-        "id": 5,
+        "id": 3,
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {
-            "id": "RF10",
-            "mentioned_in_code_by": [
+            "id": "T10",
+            "code_tests": [
               {
+                "framework": "pytest",
                 "language": "python",
-                "line": 3,
-                "path": "src/feature.py",
+                "line": 12,
+                "path": "tests/test_feature.py",
                 "project": "demo",
-                "symbol": "feature_entrypoint"
+                "symbol": "test_feature"
               }
+            ]
+          }
+        }
+      }
+
+- id: TMCP047
+  ref: [MCP014]
+  short: list_tests_without_code_tests returns uncovered tests
+  long: |
+    Call `list_tests_without_code_tests` and verify it returns only Speky tests
+    that have no executable code-test annotations.
+  prereq: [TMCP043]
+  steps:
+  - action: The client calls `list_tests_without_code_tests` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_tests_without_code_tests",
+          "arguments": {}
+        }
+      }
+  - action: Verify only tests without executable links are returned
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "functional", "id": "T11", "short": "Spec-only test"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP048
+  ref: [MCP015]
+  short: list_requirements_without_code_tests returns uncovered requirements
+  long: |
+    Call `list_requirements_without_code_tests` and verify it returns requirements
+    that have no executable code-test evidence through their related Speky tests.
+  prereq: [TMCP043]
+  steps:
+  - action: The client calls `list_requirements_without_code_tests` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "list_requirements_without_code_tests",
+          "arguments": {}
+        }
+      }
+  - action: Verify only requirements without executable coverage are returned
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "functional", "id": "RF11", "short": "Unimplemented requirement", "stage": "approved"}
             ]
           }
         }
@@ -205,7 +358,7 @@ tests:
     sample_lang: json
     sample: |
       {
-        "id": 6,
+        "id": 2,
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
@@ -217,7 +370,7 @@ tests:
     sample_lang: json
     sample: |
       {
-        "id": 6,
+        "id": 2,
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {

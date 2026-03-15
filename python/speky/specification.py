@@ -31,6 +31,8 @@ class Specification:
         self.by_id = {}
         self.tags = defaultdict(list)
         self.code_references_by_item = defaultdict(list)
+        self.code_tests_by_test = defaultdict(list)
+        self.requirements_covered_by_code_tests = defaultdict(list)
         self._code_reference_keys = set()
 
     def load_requirement(self, requirement: Requirement, category: str):
@@ -89,8 +91,14 @@ class Specification:
         if code_reference.target_id not in self.by_id:
             logger.warning('Ignoring code reference for unknown Speky ID %s', code_reference.target_id)
             return
+        target = self.by_id[code_reference.target_id]
+
         self._code_reference_keys.add(key)
         self.code_references_by_item[code_reference.target_id].append(code_reference)
+        if target.kind == 'test' and code_reference.is_executable_test:
+            self.code_tests_by_test[code_reference.target_id].append(code_reference)
+            for requirement_id in target.ref:
+                self.requirements_covered_by_code_tests[requirement_id].append(code_reference)
 
     def read_yaml(self, file_name: str):
         """

@@ -71,20 +71,22 @@ You can also bypass name lookup:
 speky-mcp --manifest path/to/speky.toml
 ```
 
-### Linking tagged code references
+### Linking executable tests
 
-Tagged code references can point to any Speky object by identifier.
+Tagged code references can point to any Speky object by identifier. When the target is a Speky
+test and the code symbol is an executable test, Speky also exposes that reference through the
+specific executable-test flow.
 
 Example source annotation:
 
 ```python
-# speky:demo#RF10
-def feature_entrypoint():
-    return True
+# speky:demo#T10
+def test_feature():
+    assert True
 ```
 
 When the project manifest defines `code_roots`, the MCP server discovers these links and exposes
-them as generic code mentions on the targeted requirement or test.
+them in `get_test`, `get_requirement`, and the executable-coverage tools.
 
 ## Available Tools
 
@@ -105,7 +107,7 @@ Query a requirement by ID.
 - `ref`: List of referenced requirements with `{id, short?}`
 - `referenced_by`: List of requirements that reference this one with `{id, short?}`
 - `tested_by`: List of tests covering this requirement with `{id, short?}`
-- `mentioned_in_code_by`: List of tagged code references to this requirement
+- `mentioned_in_code_by`: List of direct tagged code references to this requirement
 - `comments`: List of comments with `{date, from, text, external}`
 
 **Example:**
@@ -148,7 +150,8 @@ Query a test by ID.
 - `initial`: Initial state/prerequisites description (if present)
 - `prereq`: List of prerequisite tests with `{id, short?}`
 - `ref`: List of requirements tested by this test with `{id, short?}`
-- `mentioned_in_code_by`: List of tagged code references to this test
+- `code_tests`: List of executable code tests linked to this Speky test
+- `mentioned_in_code_by`: List of non-executable tagged code references to this Speky test
 - `steps`: Array of test steps, each containing:
   - `action`: Description of the step
   - `run`: Shell command (if present)
@@ -200,7 +203,6 @@ If no arguments are provided, all requirements are returned. An error is returne
 - `id`, `category`: Always present
 - `short`: Short description (if present)
 - `tags`: List of tags (if present)
-- `stage`: Lifecycle stage (if present)
 
 **Examples:**
 ```json
@@ -237,7 +239,6 @@ If no arguments are provided, all tests are returned. Filters can be combined.
 **Returns:** `tests` — a sorted list of matching test summaries, each with:
 - `id`, `category`: Always present
 - `short`: Short description (if present)
-- `stage`: Lifecycle stage (if present)
 
 **Examples:**
 ```json
@@ -303,6 +304,43 @@ List requirements that have no associated tests.
 ```json
 {"name": "list_untested_requirements", "arguments": {}}
 {"name": "list_untested_requirements", "arguments": {"category": "functional"}}
+```
+
+### `list_tests_without_code_tests`
+
+List Speky tests that have no linked executable code-test annotations.
+
+**Arguments** (all optional):
+- `category` (string): Restrict to a specific category. An error is returned if the category does not exist.
+
+**Returns:** `tests` — sorted list of uncovered Speky tests, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
+
+**Examples:**
+```json
+{"name": "list_tests_without_code_tests", "arguments": {}}
+{"name": "list_tests_without_code_tests", "arguments": {"category": "functional"}}
+```
+
+### `list_requirements_without_code_tests`
+
+List requirements that have no executable code-test evidence through their related Speky tests.
+
+**Arguments** (all optional):
+- `category` (string): Restrict to a specific category. An error is returned if the category does not exist.
+
+**Returns:** `requirements` — sorted list of uncovered requirements, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `tags`: List of tags (if present)
+- `stage`: Lifecycle stage (if present)
+
+**Examples:**
+```json
+{"name": "list_requirements_without_code_tests", "arguments": {}}
+{"name": "list_requirements_without_code_tests", "arguments": {"category": "functional"}}
 ```
 
 ### `list_all_tags`

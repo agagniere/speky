@@ -245,15 +245,15 @@ tests:
     - action: Run `speky --check-only`
     - action: Change the stage to an unsupported value and verify validation fails
 - id: TF016
-  ref: [SF017]
-  short: Generic code references
+  ref: [SF017, SF018]
+  short: Code references and executable test evidence
   long: |
     Link tagged code references back to Speky identifiers and verify generic code mentions
-    appear on the targeted Speky object.
+    stay distinct from the specific executable-test evidence flow.
   steps:
     - action: Add tagged code references such as `speky:Demo#RF01` and `speky:Demo#T01` in code
     - action: Run the MCP server or static output generation using the project manifest
-    - action: Verify generic code mentions appear on the targeted object
+    - action: Verify generic code mentions appear on the targeted object unless already captured by a specific executable-test flow
     - action: Install sphinx with dependencies
       run: uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
       expected: |

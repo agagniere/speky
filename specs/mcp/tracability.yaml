@@ -29,6 +29,64 @@ requirements:
   properties:
     since: '`0.2.0`'
     author: Claude
+- id: MCP014
+  short: List tests without executable coverage
+  client_statement: |
+    I would like to know which Speky tests still exist only as specification text and do not yet
+    have an executable implementation in code.
+  long: |
+    The user shall be able to retrieve all Speky tests that have no linked executable code tests.
+
+    The MCP server shall expose a tool named `list_tests_without_code_tests` that returns
+    all tests for which no code annotation references the test identifier.
+
+    An optional `category` parameter allows filtering by category.
+
+    The response shall be a list of test summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The test category
+    - stage: The lifecycle stage (if present)
+
+    If the category does not exist, an error shall be returned.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP011]
+  properties:
+    since: '`0.3.0`'
+    author: Codex
+- id: MCP015
+  short: List requirements without executable coverage
+  client_statement: |
+    I would like to know which requirements still have no executable code-test evidence, even when
+    they already have Speky tests written for them.
+  long: |
+    The user shall be able to retrieve all requirements that have no linked executable code tests
+    through their related Speky tests.
+
+    The MCP server shall expose a tool named `list_requirements_without_code_tests`.
+
+    An optional `category` parameter allows filtering by category.
+
+    A requirement shall be considered uncovered when no executable code test is linked to any
+    Speky test that references the requirement. Requirements with no Speky tests shall therefore
+    also be considered uncovered.
+
+    The response shall be a list of requirement summaries, each containing:
+    - id: The unique identifier
+    - short: The short description (if present)
+    - category: The requirement category
+    - tags: List of tags (if present)
+    - stage: The lifecycle stage (if present)
+
+    If the category does not exist, an error shall be returned.
+
+    This tool shall be distinct from `list_untested_requirements`, which only reports requirements
+    that have no Speky test items.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP010, MCP011]
+  properties:
+    since: '`0.3.0`'
+    author: Codex
 - id: MCP007
   short: List requirements referencing another
   client_statement: |
