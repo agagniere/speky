@@ -254,6 +254,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
     output.empty_line()
+    if self.stage:
+        output.write_line(f'**Stage:** `{self.stage}`')
+        output.empty_line()
     output.write_line(self.long)
     output.empty_line()
     if self.properties:
@@ -286,6 +289,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
 def test_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
     output.empty_line()
+    if self.stage:
+        output.write_line(f'**Stage:** `{self.stage}`')
+        output.empty_line()
     output.write_line(self.long)
     output.empty_line()
     with output.dropdown(0, 'Is a test for', 'primary', True, 'check-circle-fill') as dropdown:

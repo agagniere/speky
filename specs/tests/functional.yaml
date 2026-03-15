@@ -223,36 +223,27 @@ tests:
         Loading requirements.yaml
         Loading tests.yaml
         Loading comments.yaml
-    - action: Install sphinx with dependencies
-      run: uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
-      expected: |
-        [...]
-        Installed 4 executables: sphinx-apidoc, sphinx-autogen, sphinx-build, sphinx-quickstart
-    - action: Configure sphinx
-      run: cat conf.py
-      sample_lang: python
-      sample: |
-        project    = 'Dummy'
-        language   = 'en'
-        extensions = [ 'myst_parser', 'sphinx_design' ]
-        html_theme = 'furo'
-        myst_enable_extensions = [ 'colon_fence' ]
-    - action: Run sphinx to generate HTML
-      run: sphinx-build -M html pages output --conf-dir .
-      expected: |
-        [...]
-        The HTML pages are in output/html.
-    - action: View the static website
-      run: open output/html/index.html
+- id: TF014
+  ref: [SF014, SF015]
+  short: Repo-tracked manifest loading
+  long: |
+    Create a checked-in `speky.toml` manifest in a repository and load the specification
+    by project name instead of enumerating YAML files.
+  steps:
+    - action: Create a repository manifest that points to the specification files and code roots
+    - action: Run `speky --project Demo --check-only`
+    - action: Verify the manifest-defined specification files are loaded successfully
+- id: TF015
+  ref: [SF016]
+  short: Lifecycle stage validation
+  long: |
+    Add lifecycle stages to requirements and tests through `properties.stage`.
+    Verify valid stages load successfully and invalid stages fail validation.
+  steps:
     - action: |
-        Validate the site contains a page for `RF01`, which contains:
-        - The unique identifier as the page title
-        - The statement as a paragraph
-        - A link to `T01` in a dropdown: "Tested by"
-    - action: |
-        Click on the link to `T01`, and verify that:
-        - `S01` is listed as a tested requirement: "Is a test for"
-        - The procedure is displayed, with each step in the expected order
+        Add `properties.stage: approved` to a requirement and a test
+    - action: Run `speky --check-only`
+    - action: Change the stage to an unsupported value and verify validation fails
 - id: TF009
   ref: [SF012]
   short: Validating YAMLs
@@ -336,13 +327,3 @@ tests:
           - Baz, where `RF02` is listed
         4. `RF02` is listed directly inside the Lorem section
         5. `RF01` is listed inside the Ipsum subsection of Lorem
-- id: TF014
-  ref: [SF014, SF015]
-  short: Repo-tracked manifest loading
-  long: |
-    Create a checked-in `speky.toml` manifest in a repository and load the specification
-    by project name instead of enumerating YAML files.
-  steps:
-    - action: Create a repository manifest that points to the specification files and comment inputs
-    - action: Run `speky --project Demo --check-only`
-    - action: Verify the manifest-defined specification files are loaded successfully

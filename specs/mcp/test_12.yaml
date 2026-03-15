@@ -11,8 +11,8 @@ tests:
     The current repository contains:
     - a checked-in `speky.toml` manifest with `project.name = "demo"`
     - manifest-defined YAML sources for requirements, tests and comments
-    - requirement `RF10`
-    - test `T10`
+    - requirements `RF10` and `RF11`
+    - tests `T10` and `T11`
   steps:
   - action: Start the MCP server with project name `demo`
     run: speky-mcp --project demo
@@ -22,3 +22,73 @@ tests:
       speky_mcp     INFO  Specifications loaded successfully
       speky_mcp     INFO  MCP server ready, waiting for requests
   - action: Verify the server started without explicit YAML file arguments
+
+- id: TMCP044
+  ref: [MCP013]
+  short: search_requirements filters by lifecycle stage
+  long: |
+    Call `search_requirements` with a `stage` filter and verify only requirements
+    with the requested lifecycle stage are returned.
+  prereq: [TMCP043]
+  steps:
+  - action: The client calls `search_requirements` with stage `approved`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_requirements",
+          "arguments": {"stage": "approved"}
+        }
+      }
+  - action: Verify only requirements at stage `approved` are returned, and each summary includes the stage
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"category": "functional", "id": "RF10", "short": "Approved requirement", "stage": "approved"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP049
+  ref: [MCP016]
+  short: search_tests filters by lifecycle stage
+  long: |
+    Call `search_tests` with a `stage` filter and verify only tests
+    with the requested lifecycle stage are returned.
+  prereq: [TMCP043]
+  steps:
+  - action: The client calls `search_tests` with stage `implemented`
+    sample_lang: json
+    sample: |
+      {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "search_tests",
+          "arguments": {"stage": "implemented"}
+        }
+      }
+  - action: Verify only tests at stage `implemented` are returned, and each summary includes the stage
+    sample_lang: json
+    sample: |
+      {
+        "id": 3,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "tests": [
+              {"category": "functional", "id": "T10", "short": "Implemented test", "stage": "implemented"}
+            ]
+          }
+        }
+      }
