@@ -244,6 +244,46 @@ tests:
         Add `properties.stage: approved` to a requirement and a test
     - action: Run `speky --check-only`
     - action: Change the stage to an unsupported value and verify validation fails
+- id: TF016
+  ref: [SF017]
+  short: Generic code references
+  long: |
+    Link tagged code references back to Speky identifiers and verify generic code mentions
+    appear on the targeted Speky object.
+  steps:
+    - action: Add tagged code references such as `speky:Demo#RF01` and `speky:Demo#T01` in code
+    - action: Run the MCP server or static output generation using the project manifest
+    - action: Verify generic code mentions appear on the targeted object
+    - action: Install sphinx with dependencies
+      run: uv tool install sphinx --with furo,sphinx-design,sphinx-copybutton,myst-parser
+      expected: |
+        [...]
+        Installed 4 executables: sphinx-apidoc, sphinx-autogen, sphinx-build, sphinx-quickstart
+    - action: Configure sphinx
+      run: cat conf.py
+      sample_lang: python
+      sample: |
+        project    = 'Dummy'
+        language   = 'en'
+        extensions = [ 'myst_parser', 'sphinx_design' ]
+        html_theme = 'furo'
+        myst_enable_extensions = [ 'colon_fence' ]
+    - action: Run sphinx to generate HTML
+      run: sphinx-build -M html pages output --conf-dir .
+      expected: |
+        [...]
+        The HTML pages are in output/html.
+    - action: View the static website
+      run: open output/html/index.html
+    - action: |
+        Validate the site contains a page for `RF01`, which contains:
+        - The unique identifier as the page title
+        - The statement as a paragraph
+        - A link to `T01` in a dropdown: "Tested by"
+    - action: |
+        Click on the link to `T01`, and verify that:
+        - `S01` is listed as a tested requirement: "Is a test for"
+        - The procedure is displayed, with each step in the expected order
 - id: TF009
   ref: [SF012]
   short: Validating YAMLs

@@ -96,6 +96,20 @@ speky --project demo --check-only
 
 The CLI also supports `--manifest path/to/speky.toml`.
 
+## Link code references
+
+Tagged source annotations can point to Speky identifiers directly. For example:
+
+```python
+# speky:demo#RF10
+def feature_entrypoint():
+    return True
+```
+
+When a project is loaded from a manifest and the manifest defines `code_roots`, Speky discovers
+these annotations and exposes them as generic code mentions in generated output and through the
+MCP server.
+
 ## Used by
 
 ![safran](https://upload.wikimedia.org/wikipedia/fr/thumb/5/5f/Safran_-_logo_2016.png/330px-Safran_-_logo_2016.png)

@@ -10,6 +10,7 @@ from speky_mcp.server import handle_request
 def write_demo_project(root: Path) -> Path:
     root.mkdir(parents=True, exist_ok=True)
     (root / 'specs').mkdir()
+    (root / 'src').mkdir()
     (root / 'speky.toml').write_text(
         """\
 [project]
@@ -21,6 +22,7 @@ kind = "workspace"
 root = "."
 requirements = ["specs/requirements.yaml"]
 tests = ["specs/tests.yaml"]
+code_roots = ["src"]
 """,
         encoding='utf8',
     )
@@ -57,13 +59,25 @@ tests:
   - action: Run the implemented test
 - id: T11
   short: Review test
-  long: Review test
+  long: Specification only
   ref: [RF11]
   properties:
-    stage: review
+    stage: approved
   steps:
-  - action: Run the review test
+  - action: Run the specification-only test
 """,
+        encoding='utf8',
+    )
+    (root / 'src' / 'feature.py').write_text(
+        '''\
+# speky:demo#RF10
+def feature_entrypoint():
+    return True
+
+# speky:demo#T11
+def speky_lookup():
+    return "lookup"
+''',
         encoding='utf8',
     )
     return root
@@ -96,6 +110,7 @@ def test_load_specification_from_local_manifest(tmp_path):
     assert display_name == 'Demo'
     assert specs.project_name == 'demo'
     assert sorted(specs.by_id) == ['RF10', 'RF11', 'T10', 'T11']
+    assert [item.symbol for item in specs.code_references_by_item['RF10']] == ['feature_entrypoint']
 
 
 def test_explicit_paths_reuse_local_manifest_context(tmp_path):
@@ -115,6 +130,7 @@ def test_explicit_paths_reuse_local_manifest_context(tmp_path):
     assert display_name == 'Demo'
     assert specs.project_name == 'demo'
     assert sorted(specs.by_id) == ['RF10', 'RF11', 'T10', 'T11']
+    assert [item.symbol for item in specs.code_references_by_item['T11']] == ['speky_lookup']
 
 
 def test_load_specification_from_manifest_search_path(tmp_path, monkeypatch):
@@ -200,3 +216,22 @@ def test_get_test_includes_stage(tmp_path):
 
     test = mcp_call('get_test', {'id': 'T10'}, specs)
     assert test['stage'] == 'implemented'
+
+
+# speky:speky_mcp#TMCP045
+# speky:speky_mcp#TMCP051
+def test_get_requirement_includes_stage_and_code_mentions(tmp_path):
+    specs = load_demo_specs(tmp_path)
+
+    requirement = mcp_call('get_requirement', {'id': 'RF10'}, specs)
+    assert requirement['stage'] == 'approved'
+    assert requirement['mentioned_in_code_by'][0]['path'] == 'src/feature.py'
+
+
+# speky:speky_mcp#TMCP050
+def test_get_test_includes_generic_code_mentions(tmp_path):
+    specs = load_demo_specs(tmp_path)
+
+    test = mcp_call('get_test', {'id': 'T11'}, specs)
+    assert test['stage'] == 'approved'
+    assert test['mentioned_in_code_by'][0]['symbol'] == 'speky_lookup'

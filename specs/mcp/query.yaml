@@ -24,6 +24,7 @@ requirements:
     - client_statement: Client's original statement (if present)
     - ref: List of referenced requirement IDs (if present)
     - tested_by: List of test IDs that validate this requirement
+    - mentioned_in_code_by: List of tagged code references that directly mention this requirement
     - referenced_by: List of requirement IDs that reference this requirement
     - comments: List of comments about this requirement
 
@@ -52,6 +53,7 @@ requirements:
     - ref: List of requirement IDs this test validates
     - initial: Initial state description (if present)
     - prereq: List of prerequisite test IDs (if present)
+    - mentioned_in_code_by: List of tagged code references that directly mention this test
     - steps: List of test steps, each containing:
       - action: The action description
       - run: Shell command to execute (if present)
@@ -65,3 +67,18 @@ requirements:
   properties:
     since: '`0.2.0`'
     author: Claude
+- id: MCP017
+  short: Expose generic code mentions
+  client_statement: |
+    I would like tagged code references to be linked to any Speky object by identifier so I can
+    inspect where a requirement or test is mentioned in the codebase, even outside executable tests.
+  long: |
+    Tagged code references shall be linked to Speky objects regardless of the target kind.
+
+    The `get_requirement` and `get_test` tools shall expose a `mentioned_in_code_by` field for
+    direct tagged code references.
+  tags: [mcp:tools, mcp:query, mcp:traceability]
+  ref: [MCP003, MCP004]
+  properties:
+    since: '`0.3.0`'
+    author: Codex

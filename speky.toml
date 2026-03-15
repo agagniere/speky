@@ -12,3 +12,4 @@ requirements = [
   "specs/mcp/nonfunctional.yaml",
 ]
 tests = ["specs/mcp/test_*.yaml"]
+code_roots = ["tests"]

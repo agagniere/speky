@@ -71,6 +71,21 @@ You can also bypass name lookup:
 speky-mcp --manifest path/to/speky.toml
 ```
 
+### Linking tagged code references
+
+Tagged code references can point to any Speky object by identifier.
+
+Example source annotation:
+
+```python
+# speky:demo#RF10
+def feature_entrypoint():
+    return True
+```
+
+When the project manifest defines `code_roots`, the MCP server discovers these links and exposes
+them as generic code mentions on the targeted requirement or test.
+
 ## Available Tools
 
 ### `get_requirement`
@@ -83,12 +98,14 @@ Query a requirement by ID.
 **Returns:**
 - `id`, `category`, `long`: Core requirement fields
 - `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
 - `tags`: List of tags (if present)
 - `client_statement`: User story (if present)
 - `properties`: Custom properties dict (if present)
 - `ref`: List of referenced requirements with `{id, short?}`
 - `referenced_by`: List of requirements that reference this one with `{id, short?}`
 - `tested_by`: List of tests covering this requirement with `{id, short?}`
+- `mentioned_in_code_by`: List of tagged code references to this requirement
 - `comments`: List of comments with `{date, from, text, external}`
 
 **Example:**
@@ -127,9 +144,11 @@ Query a test by ID.
 **Returns:**
 - `id`, `category`, `long`: Core test fields
 - `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
 - `initial`: Initial state/prerequisites description (if present)
 - `prereq`: List of prerequisite tests with `{id, short?}`
 - `ref`: List of requirements tested by this test with `{id, short?}`
+- `mentioned_in_code_by`: List of tagged code references to this test
 - `steps`: Array of test steps, each containing:
   - `action`: Description of the step
   - `run`: Shell command (if present)
@@ -173,6 +192,7 @@ Search and filter requirements.
 **Arguments** (all optional):
 - `tag` (string): Filter by tag, exact match (e.g., `"security"` or `"output:pdf"`)
 - `category` (string): Filter by category (e.g., `"functional"`)
+- `stage` (string): Filter by lifecycle stage (e.g., `"approved"`)
 
 If no arguments are provided, all requirements are returned. An error is returned if the tag or category does not exist.
 
@@ -180,6 +200,7 @@ If no arguments are provided, all requirements are returned. An error is returne
 - `id`, `category`: Always present
 - `short`: Short description (if present)
 - `tags`: List of tags (if present)
+- `stage`: Lifecycle stage (if present)
 
 **Examples:**
 ```json
@@ -209,12 +230,14 @@ Search and filter tests.
 **Arguments** (all optional):
 - `category` (string): Filter by category (e.g., `"functional"`). An error is returned if the category does not exist.
 - `tester_of` (string): Filter by requirement ID — returns only tests that reference that requirement in their `ref` field. An error is returned if the requirement ID does not exist.
+- `stage` (string): Filter by lifecycle stage (e.g., `"implemented"`)
 
 If no arguments are provided, all tests are returned. Filters can be combined.
 
 **Returns:** `tests` — a sorted list of matching test summaries, each with:
 - `id`, `category`: Always present
 - `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
 
 **Examples:**
 ```json
