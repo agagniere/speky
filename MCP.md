@@ -52,6 +52,25 @@ Add the server to your Claude Code MCP configuration (`~/.claude/mcp_config.json
 - Add `-C path/to/comments.csv` to include CSV comment files
 - Add `-l path/to/logging.yaml` for custom logging configuration
 
+### Loading a checked-in project by name
+
+If the repository tracks its own Speky project with a checked-in `speky.toml`, the MCP server can
+load it directly:
+
+```bash
+speky-mcp --project demo
+```
+
+Resolution order:
+- search upward from the current working directory for `speky.toml`
+- then search directories listed in `SPEKY_PROJECTS_PATH`
+
+You can also bypass name lookup:
+
+```bash
+speky-mcp --manifest path/to/speky.toml
+```
+
 ## Available Tools
 
 ### `get_requirement`

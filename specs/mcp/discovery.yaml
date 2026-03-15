@@ -111,3 +111,30 @@ requirements:
   properties:
     since: '`0.2.0`'
     author: Claude
+- id: MCP012
+  short: Load project by name
+  client_statement: |
+    I would like to connect the MCP server to a specification project without listing every YAML
+    file by hand. If the project already tracks its specification in the repository, I should be
+    able to refer to it by project name.
+  long: |
+    The MCP server shall be able to load a specification project by its project name.
+
+    Project loading shall use a checked-in `speky.toml` manifest.
+
+    Resolution order:
+    - first search from the current working directory upward for a `speky.toml` manifest whose
+      `project.name` matches the requested project
+    - then search manifest locations provided through `SPEKY_PROJECTS_PATH`
+
+    The manifest may define sources from:
+    - the current repository
+    - another local repository path
+    - an external git repository
+
+    When a project is loaded by name, the server shall load the manifest-defined YAML sources
+    and optional comment CSV files without requiring explicit YAML paths on the command line.
+  tags: [mcp:discovery, tooling]
+  properties:
+    since: '`0.3.0`'
+    author: Codex
