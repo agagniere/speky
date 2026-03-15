@@ -5,6 +5,9 @@
 Write your requirements and functional tests in a textual format to easily version it with Git,
 then generate a PDF and a static website.
 
+Track the specification in the same repository as the code by checking in a `speky.toml`
+manifest and the related YAML sources.
+
 ## Roadmap
 - [x] PDF with all relevant cross references
 - [x] Static website
@@ -67,6 +70,50 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    ```shell
    open sphinx/html/index.html
    ```
+
+## Load a repo-tracked project
+
+Instead of listing YAML files manually, you can check a `speky.toml` manifest into the repository
+and load the project by name.
+
+Example manifest:
+
+```toml
+[project]
+name = "demo"
+display_name = "Demo"
+
+[[source]]
+kind = "workspace"
+root = "."
+requirements = ["specs/requirements.yaml"]
+tests = ["specs/tests.yaml"]
+comments = ["specs/comments.yaml"]
+code_roots = ["tests"]
+```
+
+Validate the project:
+
+```shell
+speky --project demo --check-only
+```
+
+The CLI also supports `--manifest path/to/speky.toml`.
+
+## Link code references
+
+Tagged source annotations can now point to Speky identifiers directly. For example:
+
+```python
+# speky:demo#T10
+def test_feature():
+    assert True
+```
+
+When a project is loaded from a manifest, Speky will discover these annotations and expose
+generic code mentions in generated output and through the MCP server. If the target is a Speky
+test and the code symbol is an executable test, Speky also exposes that reference as executable
+test evidence for the Speky test.
 
 ## Used by
 

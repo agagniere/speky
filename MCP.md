@@ -52,6 +52,42 @@ Add the server to your Claude Code MCP configuration (`~/.claude/mcp_config.json
 - Add `-C path/to/comments.csv` to include CSV comment files
 - Add `-l path/to/logging.yaml` for custom logging configuration
 
+### Loading a checked-in project by name
+
+If the repository tracks its own Speky project with a checked-in `speky.toml`, the MCP server can
+load it directly:
+
+```bash
+speky-mcp --project demo
+```
+
+Resolution order:
+- search upward from the current working directory for `speky.toml`
+- then search directories listed in `SPEKY_PROJECTS_PATH`
+
+You can also bypass name lookup:
+
+```bash
+speky-mcp --manifest path/to/speky.toml
+```
+
+### Linking executable tests
+
+Tagged code references can point to any Speky object by identifier. When the target is a Speky
+test and the code symbol is an executable test, Speky also exposes that reference through the
+specific executable-test flow.
+
+Example source annotation:
+
+```python
+# speky:demo#T10
+def test_feature():
+    assert True
+```
+
+When the project manifest defines `code_roots`, the MCP server discovers these links and exposes
+them in `get_test`, `get_requirement`, and the executable-coverage tools.
+
 ## Available Tools
 
 ### `get_requirement`
@@ -64,12 +100,14 @@ Query a requirement by ID.
 **Returns:**
 - `id`, `category`, `long`: Core requirement fields
 - `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
 - `tags`: List of tags (if present)
 - `client_statement`: User story (if present)
 - `properties`: Custom properties dict (if present)
 - `ref`: List of referenced requirements with `{id, short?}`
 - `referenced_by`: List of requirements that reference this one with `{id, short?}`
 - `tested_by`: List of tests covering this requirement with `{id, short?}`
+- `mentioned_in_code_by`: List of direct tagged code references to this requirement
 - `comments`: List of comments with `{date, from, text, external}`
 
 **Example:**
@@ -108,9 +146,12 @@ Query a test by ID.
 **Returns:**
 - `id`, `category`, `long`: Core test fields
 - `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
 - `initial`: Initial state/prerequisites description (if present)
 - `prereq`: List of prerequisite tests with `{id, short?}`
 - `ref`: List of requirements tested by this test with `{id, short?}`
+- `code_tests`: List of executable code tests linked to this Speky test
+- `mentioned_in_code_by`: List of non-executable tagged code references to this Speky test
 - `steps`: Array of test steps, each containing:
   - `action`: Description of the step
   - `run`: Shell command (if present)
@@ -154,6 +195,7 @@ Search and filter requirements.
 **Arguments** (all optional):
 - `tag` (string): Filter by tag, exact match (e.g., `"security"` or `"output:pdf"`)
 - `category` (string): Filter by category (e.g., `"functional"`)
+- `stage` (string): Filter by lifecycle stage (e.g., `"approved"`)
 
 If no arguments are provided, all requirements are returned. An error is returned if the tag or category does not exist.
 
@@ -190,6 +232,7 @@ Search and filter tests.
 **Arguments** (all optional):
 - `category` (string): Filter by category (e.g., `"functional"`). An error is returned if the category does not exist.
 - `tester_of` (string): Filter by requirement ID — returns only tests that reference that requirement in their `ref` field. An error is returned if the requirement ID does not exist.
+- `stage` (string): Filter by lifecycle stage (e.g., `"implemented"`)
 
 If no arguments are provided, all tests are returned. Filters can be combined.
 
@@ -261,6 +304,43 @@ List requirements that have no associated tests.
 ```json
 {"name": "list_untested_requirements", "arguments": {}}
 {"name": "list_untested_requirements", "arguments": {"category": "functional"}}
+```
+
+### `list_tests_without_code_tests`
+
+List Speky tests that have no linked executable code-test annotations.
+
+**Arguments** (all optional):
+- `category` (string): Restrict to a specific category. An error is returned if the category does not exist.
+
+**Returns:** `tests` — sorted list of uncovered Speky tests, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `stage`: Lifecycle stage (if present)
+
+**Examples:**
+```json
+{"name": "list_tests_without_code_tests", "arguments": {}}
+{"name": "list_tests_without_code_tests", "arguments": {"category": "functional"}}
+```
+
+### `list_requirements_without_code_tests`
+
+List requirements that have no executable code-test evidence through their related Speky tests.
+
+**Arguments** (all optional):
+- `category` (string): Restrict to a specific category. An error is returned if the category does not exist.
+
+**Returns:** `requirements` — sorted list of uncovered requirements, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `tags`: List of tags (if present)
+- `stage`: Lifecycle stage (if present)
+
+**Examples:**
+```json
+{"name": "list_requirements_without_code_tests", "arguments": {}}
+{"name": "list_requirements_without_code_tests", "arguments": {"category": "functional"}}
 ```
 
 ### `list_all_tags`

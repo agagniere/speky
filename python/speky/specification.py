@@ -6,6 +6,7 @@ from collections import defaultdict
 
 import yaml
 
+from .code_tests import CodeReference
 from .models import Comment, Requirement, Test
 from .utils import ensure_fields
 
@@ -19,8 +20,9 @@ class Specification:
     speky:speky#SF001
     """
 
-    def __init__(self):
+    def __init__(self, project_name: str | None = None):
         """Initialize empty specification."""
+        self.project_name = project_name
         self.requirements = defaultdict(list)
         self.tests = defaultdict(list)
         self.references = defaultdict(list)
@@ -28,6 +30,10 @@ class Specification:
         self.comments = defaultdict(list)
         self.by_id = {}
         self.tags = defaultdict(list)
+        self.code_references_by_item = defaultdict(list)
+        self.code_tests_by_test = defaultdict(list)
+        self.requirements_covered_by_code_tests = defaultdict(list)
+        self._code_reference_keys = set()
 
     def load_requirement(self, requirement: Requirement, category: str):
         """
@@ -69,6 +75,30 @@ class Specification:
             comment: Comment instance
         """
         self.comments[comment.about].append(comment)
+
+    def load_code_reference(self, code_reference: CodeReference):
+        """Attach a tagged code reference to the related Speky object."""
+        key = (
+            code_reference.project,
+            code_reference.target_id,
+            code_reference.language,
+            code_reference.path,
+            code_reference.symbol,
+            code_reference.line,
+        )
+        if key in self._code_reference_keys:
+            return
+        if code_reference.target_id not in self.by_id:
+            logger.warning('Ignoring code reference for unknown Speky ID %s', code_reference.target_id)
+            return
+        target = self.by_id[code_reference.target_id]
+
+        self._code_reference_keys.add(key)
+        self.code_references_by_item[code_reference.target_id].append(code_reference)
+        if target.kind == 'test' and code_reference.is_executable_test:
+            self.code_tests_by_test[code_reference.target_id].append(code_reference)
+            for requirement_id in target.ref:
+                self.requirements_covered_by_code_tests[requirement_id].append(code_reference)
 
     def read_yaml(self, file_name: str):
         """

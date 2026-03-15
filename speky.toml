@@ -1,0 +1,15 @@
+[project]
+name = "speky_mcp"
+display_name = "spekymcp"
+
+[[source]]
+kind = "workspace"
+root = "."
+requirements = [
+  "specs/mcp/discovery.yaml",
+  "specs/mcp/query.yaml",
+  "specs/mcp/tracability.yaml",
+  "specs/mcp/nonfunctional.yaml",
+]
+tests = ["specs/mcp/test_*.yaml"]
+code_roots = ["tests"]

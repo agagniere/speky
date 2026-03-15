@@ -32,6 +32,8 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         content['short'] = requirement.short
     if requirement.tags:
         content['tags'] = requirement.tags
+    if requirement.stage:
+        content['stage'] = requirement.stage
     if requirement.client_statement:
         content['client_statement'] = requirement.client_statement
     if requirement.properties:
@@ -44,6 +46,14 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         content['referenced_by'] = [ref.json_oneliner(False) for ref in sorted(specs.references[requirement_id])]
     if requirement_id in specs.testers_of:
         content['tested_by'] = [test.json_oneliner(False) for test in sorted(specs.testers_of[requirement_id])]
+    if requirement_id in specs.code_references_by_item:
+        content['mentioned_in_code_by'] = [
+            code_ref.json_summary()
+            for code_ref in sorted(
+                specs.code_references_by_item[requirement_id],
+                key=lambda ref: (ref.path, ref.line, ref.symbol),
+            )
+        ]
     if requirement_id in specs.comments:
         content['comments'] = [
             {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
@@ -78,11 +88,23 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
     # speky:speky_mcp#TMCP008
     if test.short:
         content['short'] = test.short
+    if test.stage:
+        content['stage'] = test.stage
     if test.initial:
         content['initial'] = test.initial
     if test.prereq:
         content['prereq'] = [
             prereq_test.json_oneliner(False) for prereq_test in sorted(map(specs.by_id.__getitem__, test.prereq))
+        ]
+    if test.id in specs.code_tests_by_test:
+        content['code_tests'] = [
+            code_test.json_summary()
+            for code_test in sorted(specs.code_tests_by_test[test.id], key=lambda ref: (ref.path, ref.line, ref.symbol))
+        ]
+    generic_mentions = [ref for ref in specs.code_references_by_item.get(test.id, []) if not ref.is_executable_test]
+    if generic_mentions:
+        content['mentioned_in_code_by'] = [
+            code_ref.json_summary() for code_ref in sorted(generic_mentions, key=lambda ref: (ref.path, ref.line, ref.symbol))
         ]
 
     return content
@@ -92,6 +114,7 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP005"""
     tag = arguments.get('tag')
     category = arguments.get('category')
+    stage = arguments.get('stage')
 
     if tag and tag not in specs.tags:
         raise ToolError(f'Tag {tag!r} not found')
@@ -109,6 +132,8 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
         candidates = specs.requirements[category]
     else:
         candidates = [r for reqs in specs.requirements.values() for r in reqs]
+    if stage:
+        candidates = [r for r in candidates if r.stage == stage]
 
     # speky:speky_mcp#TMCP015
     requirements = sorted(
@@ -142,10 +167,26 @@ def handle_list_untested_requirements(arguments: dict, specs: Specification) -> 
     return {'requirements': requirements}
 
 
+def handle_list_requirements_without_code_tests(arguments: dict, specs: Specification) -> dict:
+    """List requirements that have no executable code-test evidence."""
+    category = arguments.get('category')
+
+    if category and category not in specs.requirements:
+        raise ToolError(f'Category {category!r} not found')
+
+    candidates = specs.requirements[category] if category else [r for reqs in specs.requirements.values() for r in reqs]
+    requirements = [
+        requirement.json_oneliner(True)
+        for requirement in sorted(r for r in candidates if r.id not in specs.requirements_covered_by_code_tests)
+    ]
+    return {'requirements': requirements}
+
+
 def handle_search_tests(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP011"""
     tester_of = arguments.get('tester_of')
     category = arguments.get('category')
+    stage = arguments.get('stage')
 
     if tester_of and tester_of not in specs.by_id:
         raise ToolError(f'Requirement {tester_of!r} not found')
@@ -161,8 +202,22 @@ def handle_search_tests(arguments: dict, specs: Specification) -> dict:
         candidates = specs.tests[category]
     else:
         candidates = [t for tests in specs.tests.values() for t in tests]
+    if stage:
+        candidates = [t for t in candidates if t.stage == stage]
 
     tests = sorted((t.json_oneliner(True) for t in candidates), key=lambda t: t['id'])
+    return {'tests': tests}
+
+
+def handle_list_tests_without_code_tests(arguments: dict, specs: Specification) -> dict:
+    """List Speky tests that do not yet have executable implementations."""
+    category = arguments.get('category')
+
+    if category and category not in specs.tests:
+        raise ToolError(f'Category {category!r} not found')
+
+    candidates = specs.tests[category] if category else [t for tests in specs.tests.values() for t in tests]
+    tests = [test.json_oneliner(True) for test in sorted(t for t in candidates if t.id not in specs.code_tests_by_test)]
     return {'tests': tests}
 
 
@@ -186,6 +241,8 @@ TOOLS: dict[str, Callable] = {
     'search_tests': handle_search_tests,
     'list_references_to': handle_list_references_to,
     'list_untested_requirements': handle_list_untested_requirements,
+    'list_requirements_without_code_tests': handle_list_requirements_without_code_tests,
+    'list_tests_without_code_tests': handle_list_tests_without_code_tests,
     'list_all_tags': handle_list_all_tags,
     'list_all_ids': handle_list_all_ids,
 }

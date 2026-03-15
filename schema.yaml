@@ -40,6 +40,7 @@ test:
   long: str()
   initial: str(required=False)
   prereq: list(include('id'), required=False)
+  properties: map(str(), any(str(), int()),required=False)
   steps: list(include('step'))
 
 step:

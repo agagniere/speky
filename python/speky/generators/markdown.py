@@ -240,6 +240,12 @@ def write_list_of_links(output: MarkdownWriter, items: list):
             output.write_line(f'- {link_to(item)}')
 
 
+def write_code_refs(output: MarkdownWriter, items: list):
+    for item in items:
+        label = f'`{item.path}:{item.line}` {item.symbol}'
+        output.write_line(f'- {label}')
+
+
 def requirement_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
 
@@ -254,6 +260,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
     if self.client_statement:
         output.quote(self.client_statement.split('\n'))
     output.empty_line()
+    if self.stage:
+        output.write_line(f'**Stage:** `{self.stage}`')
+        output.empty_line()
     output.write_line(self.long)
     output.empty_line()
     if self.properties:
@@ -264,6 +273,10 @@ def requirement_to_myst(self, output: MystWriter, specs):
     if self.id in specs.testers_of:
         with output.dropdown(0, 'Tested by', 'success', True, 'check-circle-fill') as dropdown:
             write_list_of_links(dropdown, sorted(specs.testers_of[self.id]))
+        output.empty_line()
+    if self.id in specs.code_references_by_item:
+        with output.dropdown(0, 'Mentioned in code by', 'secondary', False, 'code-slash') as dropdown:
+            write_code_refs(dropdown, sorted(specs.code_references_by_item[self.id]))
         output.empty_line()
     if self.id in specs.references or self.ref:
         with output.dropdown(0, 'References', 'secondary', False, 'link') as dropdown:
@@ -286,6 +299,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
 def test_to_myst(self, output: MystWriter, specs):
     output.heading(self.title, 0)
     output.empty_line()
+    if self.stage:
+        output.write_line(f'**Stage:** `{self.stage}`')
+        output.empty_line()
     output.write_line(self.long)
     output.empty_line()
     with output.dropdown(0, 'Is a test for', 'primary', True, 'check-circle-fill') as dropdown:
@@ -298,6 +314,17 @@ def test_to_myst(self, output: MystWriter, specs):
     if self.prereq:
         output.write_line('The expected state is the final state of')
         write_list_of_links(output, sorted(map(specs.by_id.__getitem__, self.prereq)))
+    if self.id in specs.code_tests_by_test:
+        output.heading('Executable code tests', 1)
+        write_code_refs(output, sorted(specs.code_tests_by_test[self.id]))
+        output.empty_line()
+    generic_mentions = [
+        ref for ref in specs.code_references_by_item.get(self.id, []) if not ref.is_executable_test
+    ]
+    if generic_mentions:
+        output.heading('Mentioned in code by', 1)
+        write_code_refs(output, sorted(generic_mentions))
+        output.empty_line()
     output.heading('Procedure', 1)
     for i, step in enumerate(self.steps, 1):
         output.heading(f'Step {i}', 2)
