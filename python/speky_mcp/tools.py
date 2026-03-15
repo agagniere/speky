@@ -32,6 +32,8 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         content['short'] = requirement.short
     if requirement.tags:
         content['tags'] = requirement.tags
+    if requirement.stage:
+        content['stage'] = requirement.stage
     if requirement.client_statement:
         content['client_statement'] = requirement.client_statement
     if requirement.properties:
@@ -78,6 +80,8 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
     # speky:speky_mcp#TMCP008
     if test.short:
         content['short'] = test.short
+    if test.stage:
+        content['stage'] = test.stage
     if test.initial:
         content['initial'] = test.initial
     if test.prereq:
@@ -92,6 +96,7 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP005"""
     tag = arguments.get('tag')
     category = arguments.get('category')
+    stage = arguments.get('stage')
 
     if tag and tag not in specs.tags:
         raise ToolError(f'Tag {tag!r} not found')
@@ -109,6 +114,8 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
         candidates = specs.requirements[category]
     else:
         candidates = [r for reqs in specs.requirements.values() for r in reqs]
+    if stage:
+        candidates = [r for r in candidates if r.stage == stage]
 
     # speky:speky_mcp#TMCP015
     requirements = sorted(
@@ -146,6 +153,7 @@ def handle_search_tests(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP011"""
     tester_of = arguments.get('tester_of')
     category = arguments.get('category')
+    stage = arguments.get('stage')
 
     if tester_of and tester_of not in specs.by_id:
         raise ToolError(f'Requirement {tester_of!r} not found')
@@ -161,6 +169,8 @@ def handle_search_tests(arguments: dict, specs: Specification) -> dict:
         candidates = specs.tests[category]
     else:
         candidates = [t for tests in specs.tests.values() for t in tests]
+    if stage:
+        candidates = [t for t in candidates if t.stage == stage]
 
     tests = sorted((t.json_oneliner(True) for t in candidates), key=lambda t: t['id'])
     return {'tests': tests}

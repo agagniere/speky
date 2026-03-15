@@ -20,6 +20,7 @@ requirements:
     - long: The full description
     - tags: List of tags (if present)
     - properties: Key-value properties (if present)
+    - stage: The lifecycle stage when available
     - client_statement: Client's original statement (if present)
     - ref: List of referenced requirement IDs (if present)
     - tested_by: List of test IDs that validate this requirement
@@ -47,6 +48,7 @@ requirements:
     - id: The unique identifier
     - short: The short description (if present)
     - long: The full description
+    - stage: The lifecycle stage when available
     - ref: List of requirement IDs this test validates
     - initial: Initial state description (if present)
     - prereq: List of prerequisite test IDs (if present)
