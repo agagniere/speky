@@ -108,3 +108,27 @@ requirements:
   tags: [output:both]
   properties:
     since: '`0.1.0`'
+- id: SF014
+  short: Repo-tracked project manifest
+  long: |
+    A project using Speky shall be able to define a checked-in project manifest.
+
+    The manifest shall describe:
+    - the project name
+    - where requirements, tests and comments are stored
+
+    The manifest shall be versioned in the same repository as the related product specification
+    so that specification changes are tracked directly with the implementation they describe.
+  tags: [input, versioning]
+- id: SF015
+  short: Load a project by name
+  ref: [SF014]
+  long: |
+    The user shall be able to load a specification project by its project name instead of
+    enumerating YAML files manually.
+
+    This shall work when the specification lives:
+    - in the current repository
+    - in another local repository
+    - in an external git repository
+  tags: [input, tooling]

@@ -1,0 +1,24 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP043
+  ref: [MCP012]
+  short: project loading uses checked-in manifest
+  long: |
+    Start the MCP server with `--project` and verify it loads the YAML sources declared
+    by the checked-in `speky.toml` manifest instead of requiring explicit YAML paths.
+  initial: |
+    The current repository contains:
+    - a checked-in `speky.toml` manifest with `project.name = "demo"`
+    - manifest-defined YAML sources for requirements, tests and comments
+    - requirement `RF10`
+    - test `T10`
+  steps:
+  - action: Start the MCP server with project name `demo`
+    run: speky-mcp --project demo
+    expected: |
+      speky_mcp     INFO  Loading [...]
+      [...]
+      speky_mcp     INFO  Specifications loaded successfully
+      speky_mcp     INFO  MCP server ready, waiting for requests
+  - action: Verify the server started without explicit YAML file arguments
