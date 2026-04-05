@@ -16,10 +16,10 @@ requirements:
     An optional `category` parameter allows filtering by category.
 
     The response shall be a list of requirement summaries, each containing:
-    - id: The unique identifier
-    - short: The short description (if present)
-    - category: The requirement category
-    - tags: List of tags (if present)
+    - `id`: The unique identifier
+    - `short`: The short description (if present)
+    - `category`: The requirement category
+    - `tags`: List of tags (if present)
 
     The list shall be sorted alphabetically by ID.
 
@@ -42,9 +42,9 @@ requirements:
     a requirement ID and returns all requirements that reference it in their `ref` field.
 
     The response shall be a list of requirement summaries, each containing:
-    - id: The unique identifier
-    - short: The short description (if present)
-    - category: The requirement category
+    - `id`: The unique identifier
+    - `short`: The short description (if present)
+    - `category`: The requirement category
 
     The list shall be sorted alphabetically by ID.
 

@@ -14,18 +14,18 @@ requirements:
     optional filter parameters and returns matching requirements.
 
     Filter parameters:
-    - tag: Filter by tag (exact match, e.g., "input" or "output:pdf"). If the
+    - `tag`: Filter by tag (exact match, e.g., "input" or "output:pdf"). If the
       tag does not exist in the loaded specifications, an error shall be returned.
-    - category: Filter by category (exact match, e.g., "functional"). If the
+    - `category`: Filter by category (exact match, e.g., "functional"). If the
       category does not exist in the loaded specifications, an error shall be returned.
 
     If no filters are provided, all requirements shall be returned.
 
     The response shall be a list of requirement summaries, each containing:
-    - id: The unique identifier
-    - short: The short description (if present)
-    - category: The requirement category
-    - tags: List of tags (if present)
+    - `id`: The unique identifier
+    - `short`: The short description (if present)
+    - `category`: The requirement category
+    - `tags`: List of tags (if present)
 
     The list shall be sorted alphabetically by ID.
   tags: [mcp:tools, mcp:query, mcp:discovery]
@@ -46,9 +46,9 @@ requirements:
     optional filter parameters and returns matching tests.
 
     Filter parameters:
-    - category: Filter by category (exact match, e.g., "functional"). If the
+    - `category`: Filter by category (exact match, e.g., "functional"). If the
       category does not exist in the loaded specifications, an error shall be returned.
-    - tester_of: Filter by requirement ID — returns only tests that reference
+    - `tester_of`: Filter by requirement ID — returns only tests that reference
       that requirement in their `ref` field. If the requirement ID does not
       exist, an error shall be returned.
 
@@ -56,9 +56,9 @@ requirements:
     Filters can be combined.
 
     The response shall be a list of test summaries, each containing:
-    - id: The unique identifier
-    - short: The short description (if present)
-    - category: The test category
+    - `id`: The unique identifier
+    - `short`: The short description (if present)
+    - `category`: The test category
 
     The list shall be sorted alphabetically by ID.
   tags: [mcp:tools, mcp:query, mcp:discovery, mcp:traceability]
@@ -101,8 +101,8 @@ requirements:
     all requirement and test IDs in the specification.
 
     The response shall be an object with two fields:
-    - requirements: Sorted list of all requirement IDs
-    - tests: Sorted list of all test IDs
+    - `requirements`: Sorted list of all requirement IDs
+    - `tests`: Sorted list of all test IDs
 
     Each list shall be sorted alphabetically.
 
