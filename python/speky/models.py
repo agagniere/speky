@@ -34,11 +34,11 @@ class SpecItem(SimpleNamespace):
         Raises:
             KeyError: If required fields are missing
         """
-        result = SimpleNamespace()
+        result = SimpleNamespace(source_file=location)
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, [cls.id_field])
-        location = f'Definition of {cls.__name__} {data[cls.id_field]} in "{location}"'
-        ensure_fields(location, data, cls.mandatory_fields)
-        warn_extra_fields(location, data, cls.fields())
+        item_location = f'Definition of {cls.__name__} {data[cls.id_field]} in "{location}"'
+        ensure_fields(item_location, data, cls.mandatory_fields)
+        warn_extra_fields(item_location, data, cls.fields())
         import_fields(result, data, cls.fields())
         return cls(**result.__dict__)
 

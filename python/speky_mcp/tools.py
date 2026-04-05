@@ -25,6 +25,7 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         'category': requirement.category,
         'id': requirement.id,
         'long': requirement.long,
+        'source_file': requirement.source_file,
     }
 
     # speky:speky_mcp#TMCP005
@@ -49,7 +50,6 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
             {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
             for comment in specs.comments[requirement_id]
         ]
-
     return content
 
 
@@ -72,6 +72,7 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         'id': test.id,
         'long': test.long,
         'ref': [referred.json_oneliner(False) for referred in sorted(map(specs.by_id.__getitem__, test.ref))],
+        'source_file': test.source_file,
         'steps': test.steps,
     }
 
@@ -84,7 +85,6 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         content['prereq'] = [
             prereq_test.json_oneliner(False) for prereq_test in sorted(map(specs.by_id.__getitem__, test.prereq))
         ]
-
     return content
 
 

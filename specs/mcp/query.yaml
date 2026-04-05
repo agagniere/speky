@@ -17,6 +17,7 @@ requirements:
     - `id`: The unique identifier
     - `category`: The category this requirement is from
     - `long`: The full description
+    - `source_file`: Path to the YAML file this requirement was loaded from
     - `short`: The short description (if present)
     - `tags`: List of tags (if present)
     - `properties`: Key-value properties (if present)
@@ -48,6 +49,7 @@ requirements:
     - `short`: The short description (if present)
     - `long`: The full description
     - `ref`: List of requirement IDs this test validates
+    - `source_file`: Path to the YAML file this test was loaded from
     - `initial`: Initial state description (if present)
     - `prereq`: List of prerequisite test IDs (if present)
     - `steps`: List of test steps, each containing:
