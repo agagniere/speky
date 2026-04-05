@@ -122,10 +122,10 @@ class Comment(SimpleNamespace):
         Raises:
             KeyError: If required fields are missing
         """
-        result = SimpleNamespace()
-        location = f'Definition of a {cls.__name__} in "{location}"'
-        ensure_fields(location, data, cls.fields)
-        warn_extra_fields(location, data, cls.fields)
+        result = SimpleNamespace(source_file=location)
+        item_location = f'Definition of a {cls.__name__} in "{location}"'
+        ensure_fields(item_location, data, cls.fields)
+        warn_extra_fields(item_location, data, cls.fields)
         import_fields(result, data, cls.fields)
         result.external = result.external in ['True', 'true', True, 1, '1']
         result.time = datetime.datetime.strptime(result.date, '%d/%m/%Y').astimezone(datetime.UTC)

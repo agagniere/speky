@@ -23,7 +23,7 @@ def test_error_msg(sample):
         ('com_missing_from', 'Missing field from Definition of a Comment in "[^"]+": from'),
         ('com_missing_text', 'Missing field from Definition of a Comment in "[^"]+": text'),
         ('com_missing_3_fields', 'Missing fields from Definition of a Comment in "[^"]+": about, date, from'),
-        ('com_unknown_ref', r'Requirement or Test \w+, referred from a comment, does not exist'),
+        ('com_unknown_ref', r'Requirement or Test \w+, referred from a comment in "[^"]+", does not exist'),
         ('missing_kind', 'Missing field from Top-level of "[^"]+": kind'),
         ('req_missing_category', 'Missing field from Top-level of requirements file "[^"]+": category'),
         ('req_missing_id', 'Missing field from Definition of a Requirement in "[^"]+": id'),

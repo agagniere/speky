@@ -139,7 +139,8 @@ class Specification:
                 if referred not in self.by_id:
                     message = f'Requirement {referred}, referred from {req.id} in "{req.source_file}", does not exist'
                     raise KeyError(message)
-        for referred in self.comments.keys():
+        for referred, comment_list in self.comments.items():
             if referred not in self.by_id:
-                message = f'Requirement or Test {referred}, referred from a comment, does not exist'
+                source_file = comment_list[0].source_file
+                message = f'Requirement or Test {referred}, referred from a comment in "{source_file}", does not exist'
                 raise KeyError(message)
