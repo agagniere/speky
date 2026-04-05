@@ -37,7 +37,8 @@ class Specification:
             KeyError: If requirement ID is already defined
         """
         if requirement.id in self.by_id:
-            message = f'Multiple definitions of requirement "{requirement.id}". ID must be unique'
+            existing = self.by_id[requirement.id]
+            message = f'Multiple definitions of {requirement.id}: already defined in "{existing.source_file}", redefined in "{requirement.source_file}"'
             raise KeyError(message)
         requirement.category = category
         requirement.kind = 'requirement'
@@ -136,7 +137,7 @@ class Specification:
                 continue
             for referred in req.ref:
                 if referred not in self.by_id:
-                    message = f'Requirement {referred}, referred from {req.id}, does not exist'
+                    message = f'Requirement {referred}, referred from {req.id} in "{req.source_file}", does not exist'
                     raise KeyError(message)
         for referred in self.comments.keys():
             if referred not in self.by_id:
