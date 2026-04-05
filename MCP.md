@@ -15,40 +15,19 @@ This creates a feedback loop where specifications inform code generation, and Cl
 
 ## Configuration
 
-### Installing the MCP Server
-
-The MCP server is included with Speky:
-
-```bash
-uv tool install git+https://github.com/agagniere/speky#master
-```
-
-This installs two executables:
-- `speky` - The CLI tool for generating documentation
-- `speky-mcp` - The MCP server
+Requires [uv](https://github.com/astral-sh/uv).
 
 ### Configuring Claude Code
 
-Add the server to your Claude Code MCP configuration (`~/.claude/mcp_config.json`):
+Run this command at your project root:
 
-```json
-{
-  "mcpServers": {
-    "speky": {
-      "command": "speky-mcp",
-      "args": [
-        "specs/**/*.yaml",
-        "tests/samples/*.yaml"
-      ],
-      "cwd": "/path/to/your/project"
-    }
-  }
-}
+```bash
+claude mcp add --scope project speky bash -- -O globstar -c "uvx --from git+https://github.com/agagniere/speky speky-mcp specs/**/*.yaml"
 ```
 
-**Arguments:**
-- List all YAML files containing requirements, tests, or comments
-- Use glob patterns or explicit paths
+Replace `specs/**/*.yaml` with the path(s) to your own YAML specification files.
+
+**Additional options:**
 - Add `-C path/to/comments.csv` to include CSV comment files
 - Add `-l path/to/logging.yaml` for custom logging configuration
 

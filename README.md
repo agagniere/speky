@@ -68,6 +68,16 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    open sphinx/html/index.html
    ```
 
+## Use with an LLM agent (MCP)
+
+Requires [uv](https://github.com/astral-sh/uv)
+
+```shell
+claude mcp add --scope project speky bash -- -O globstar -c "uvx --from git+https://github.com/agagniere/speky speky-mcp specs/**/*.yaml"
+```
+
+Replace `specs/**/*.yaml` with the path(s) to your own YAML specification files.
+
 ## Used by
 
 ![safran](https://upload.wikimedia.org/wikipedia/fr/thumb/5/5f/Safran_-_logo_2016.png/330px-Safran_-_logo_2016.png)

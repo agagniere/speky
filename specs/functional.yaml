@@ -67,6 +67,9 @@ requirements:
     - `short`
     - `long`
   tags: [input:formats]
+  properties:
+    deprecated_since: '`0.2.0`'
+    will_be_removed: '`0.3.0`'
 - id: SF010
   short: CSV for comments
   long: |
