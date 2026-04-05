@@ -197,7 +197,10 @@ TOOL_REGISTRY: dict[str, dict] = {
     },
     'search_tests': {
         'description': 'Search tests, optionally filtering by category and/or requirement ID',
-        'inputSchema': {'type': 'object', 'properties': {'category': {'type': 'string'}, 'tester_of': {'type': 'string'}}},
+        'inputSchema': {
+            'type': 'object',
+            'properties': {'category': {'type': 'string'}, 'tester_of': {'type': 'string'}},
+        },
         'handler': handle_search_tests,
     },
     'list_references_to': {
@@ -223,4 +226,7 @@ TOOL_REGISTRY: dict[str, dict] = {
 }
 
 TOOLS: dict[str, Callable] = {name: t['handler'] for name, t in TOOL_REGISTRY.items()}
-TOOL_DEFINITIONS = [{'name': name, 'description': t['description'], 'inputSchema': t['inputSchema']} for name, t in TOOL_REGISTRY.items()]
+TOOL_DEFINITIONS = [
+    {'name': name, 'description': t['description'], 'inputSchema': t['inputSchema']}
+    for name, t in TOOL_REGISTRY.items()
+]
