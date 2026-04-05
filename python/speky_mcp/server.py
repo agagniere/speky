@@ -18,7 +18,7 @@ import yaml
 from speky.specification import Specification
 
 from .protocol import JsonRpcError, ToolError, protocol_error, tool_error, tool_result
-from .tools import TOOLS
+from .tools import TOOL_DEFINITIONS, TOOLS
 
 assets = importlib.resources.files('speky').joinpath('assets')
 default_logging_file = assets.joinpath('logging.yaml')
@@ -161,6 +161,9 @@ def handle_request(request: dict, specs: Specification, initialized: bool) -> di
 
     if not initialized and method != 'notifications/initialized':
         return protocol_error(request_id, JsonRpcError.SERVER_NOT_INITIALIZED, 'Server not initialized')
+
+    if method == 'tools/list':
+        return {'jsonrpc': '2.0', 'id': request_id, 'result': {'tools': TOOL_DEFINITIONS}}
 
     if method == 'tools/call':
         tool_name = request.get('params', {}).get('name')

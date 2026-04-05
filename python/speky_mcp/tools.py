@@ -179,13 +179,48 @@ def handle_list_all_tags(arguments: dict, specs: Specification) -> dict:
     return {'tags': sorted(specs.tags.keys())}
 
 
-TOOLS: dict[str, Callable] = {
-    'get_requirement': handle_get_requirement,
-    'get_test': handle_get_test,
-    'search_requirements': handle_search_requirements,
-    'search_tests': handle_search_tests,
-    'list_references_to': handle_list_references_to,
-    'list_untested_requirements': handle_list_untested_requirements,
-    'list_all_tags': handle_list_all_tags,
-    'list_all_ids': handle_list_all_ids,
+TOOL_REGISTRY: dict[str, dict] = {
+    'get_requirement': {
+        'description': 'Get a requirement by ID',
+        'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
+        'handler': handle_get_requirement,
+    },
+    'get_test': {
+        'description': 'Get a test by ID',
+        'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
+        'handler': handle_get_test,
+    },
+    'search_requirements': {
+        'description': 'Search requirements, optionally filtering by tag and/or category',
+        'inputSchema': {'type': 'object', 'properties': {'tag': {'type': 'string'}, 'category': {'type': 'string'}}},
+        'handler': handle_search_requirements,
+    },
+    'search_tests': {
+        'description': 'Search tests, optionally filtering by category and/or requirement ID',
+        'inputSchema': {'type': 'object', 'properties': {'category': {'type': 'string'}, 'tester_of': {'type': 'string'}}},
+        'handler': handle_search_tests,
+    },
+    'list_references_to': {
+        'description': 'List all requirements and tests that reference a given ID',
+        'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
+        'handler': handle_list_references_to,
+    },
+    'list_untested_requirements': {
+        'description': 'List requirements that have no associated tests',
+        'inputSchema': {'type': 'object', 'properties': {'category': {'type': 'string'}}},
+        'handler': handle_list_untested_requirements,
+    },
+    'list_all_tags': {
+        'description': 'List all tags used across all requirements',
+        'inputSchema': {'type': 'object', 'properties': {}},
+        'handler': handle_list_all_tags,
+    },
+    'list_all_ids': {
+        'description': 'List all requirement and test IDs',
+        'inputSchema': {'type': 'object', 'properties': {}},
+        'handler': handle_list_all_ids,
+    },
 }
+
+TOOLS: dict[str, Callable] = {name: t['handler'] for name, t in TOOL_REGISTRY.items()}
+TOOL_DEFINITIONS = [{'name': name, 'description': t['description'], 'inputSchema': t['inputSchema']} for name, t in TOOL_REGISTRY.items()]
