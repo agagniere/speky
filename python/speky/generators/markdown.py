@@ -275,6 +275,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
                 dropdown.write_line(Markdown.bold('Referenced by:'))
                 write_list_of_links(dropdown, sorted(specs.references[self.id]))
         output.empty_line()
+    with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
+        dropdown.write_line(f'**Source file:** `{os.path.relpath(self.source_file)}`')
+    output.empty_line()
     if self.id in specs.comments:
         output.write_line('-' * 10)
         output.write_line(Markdown.bold('Comments'))
@@ -310,6 +313,10 @@ def test_to_myst(self, output: MystWriter, specs):
         if 'sample' in step:
             with output.code_block(step.get('sample_lang', 'text')) as codeblock:
                 codeblock.write_line(step['sample'])
+    output.empty_line()
+    with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
+        dropdown.write_line(f'**Source file:** `{os.path.relpath(self.source_file)}`')
+    output.empty_line()
     if self.id in specs.comments:
         output.heading('Comments', 1)
         for comment in sorted(specs.comments[self.id]):

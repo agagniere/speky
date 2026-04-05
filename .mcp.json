@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "speky": {
+      "type": "stdio",
+      "command": "bash",
+      "args": ["-O", "globstar", "-c", "uv run speky-mcp specs/**/*.yaml"]
+    }
+  }
+}
