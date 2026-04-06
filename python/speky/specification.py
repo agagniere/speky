@@ -2,8 +2,10 @@
 
 import csv
 import logging
+import os
 import tomllib
 from collections import defaultdict
+from pathlib import Path
 
 import yaml
 
@@ -29,6 +31,8 @@ class Specification:
         self.comments = defaultdict(list)
         self.by_id = {}
         self.tags = defaultdict(list)
+        self.project_name = None
+        self.root_dir = Path()
 
     def load_requirement(self, requirement: Requirement, category: str):
         """
@@ -85,6 +89,8 @@ class Specification:
             RuntimeError: If file is empty
             KeyError: If required fields are missing
         """
+        display_name = os.path.relpath(file_name, start=self.root_dir)
+        logger.info('Loading %s', display_name)
         if file_name.endswith('.toml'):
             with open(file_name, 'rb') as f:
                 data = tomllib.load(f)
@@ -94,27 +100,39 @@ class Specification:
         if not data:
             message = f'Empty file "{file_name}"'
             raise RuntimeError(message)
-        ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
+        ensure_fields(f'Top-level of "{display_name}"', data, ['kind'])
         match data['kind']:
             case 'requirements':
                 ensure_fields(
-                    f'Top-level of requirements file "{file_name}"',
+                    f'Top-level of requirements file "{display_name}"',
                     data,
                     ['requirements', 'category'],
                 )
                 for req in data['requirements']:
-                    self.load_requirement(Requirement.from_dict(req, file_name), data['category'])
+                    self.load_requirement(Requirement.from_dict(req, display_name), data['category'])
             case 'tests':
-                ensure_fields(f'Top-level of tests file "{file_name}"', data, ['tests', 'category'])
+                ensure_fields(f'Top-level of tests file "{display_name}"', data, ['tests', 'category'])
                 for test in data['tests']:
-                    self.load_test(Test.from_dict(test, file_name), data['category'])
+                    self.load_test(Test.from_dict(test, display_name), data['category'])
             case 'comments':
-                ensure_fields(f'Top-level of comments file "{file_name}"', data, ['comments'])
+                ensure_fields(f'Top-level of comments file "{display_name}"', data, ['comments'])
                 default = {'external': False}
                 if 'default' in data:
                     default |= data['default']
                 for comment in data['comments']:
-                    self.load_comment(Comment.from_dict(default | comment, file_name))
+                    self.load_comment(Comment.from_dict(default | comment, display_name))
+            case 'project':
+                ensure_fields(f'Manifest "{file_name}"', data, ['name', 'files'])
+                self.project_name = data['name']
+                manifest_dir = Path(file_name).parent
+                self.root_dir = (manifest_dir / data.get('root_directory', '.')).resolve()
+                logger.debug('Now loading from %s', self.root_dir)
+                for pattern in data['files']:
+                    for path in sorted(self.root_dir.glob(pattern)):
+                        self.read_file(str(path))
+                for pattern in data.get('comments_csvs', []):
+                    for path in sorted(self.root_dir.glob(pattern)):
+                        self.read_comment_csv(str(path))
 
     def read_comment_csv(self, file_name: str):
         """
@@ -125,10 +143,12 @@ class Specification:
         Args:
             file_name: Path to CSV file
         """
+        display_name = os.path.relpath(file_name, start=self.root_dir)
+        logger.info('Loading %s as comments', display_name)
         with open(file_name, encoding='utf8', newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                self.load_comment(Comment.from_dict(row, file_name))
+                self.load_comment(Comment.from_dict(row, display_name))
 
     def check_references(self):
         """
