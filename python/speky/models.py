@@ -64,14 +64,14 @@ class SpecItem(SimpleNamespace):
 
 
 class Requirement(SpecItem):
-    """Requirement specification item."""
+    """speky:speky#SF001 — Requirement specification item."""
 
     folder = 'requirements'
     optional_fields = SpecItem.optional_fields + ['tags', 'client_statement', 'properties', 'ref']
 
 
 class Test(SpecItem):
-    """Test specification item."""
+    """speky:speky#SF001 — Test specification item."""
 
     folder = 'tests'
     mandatory_fields = SpecItem.mandatory_fields + ['ref', 'steps']
@@ -103,7 +103,7 @@ class Test(SpecItem):
 
 
 class Comment(SimpleNamespace):
-    """Comment on a requirement or test."""
+    """speky:speky#SF006 — Comment on a requirement or test."""
 
     fields = ['about', 'from', 'date', 'text', 'external']
 
