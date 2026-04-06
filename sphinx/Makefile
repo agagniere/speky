@@ -30,8 +30,7 @@ clean:
 
 $(MarkdownIndex): $(YamlSources) $(PythonSources) $(CSVComments)
 	$(Speky) $(ManifestSource) \
-		--output-folder $(@D) \
-		--project-name Speky
+		--output-folder $(@D)
 
 $(SphinxHtml): $(MarkdownIndex) conf.py Makefile
 	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) \

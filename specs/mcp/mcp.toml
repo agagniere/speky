@@ -1,5 +1,4 @@
 kind = "project"
-name = "Speky MCP"
 files = [
   "nonfunctional.yaml",
   "query.yaml",

@@ -44,9 +44,7 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    ```
 1. Generate Myst Markdown:
    ```shell
-   speky requirements.yaml tests.yaml comments.yaml \
-	   --output-folder markdown \
-	   --project-name Toto
+   speky requirements.yaml tests.yaml comments.yaml --output-folder markdown
    ```
 1. Configure Sphinx:
    ```shell
@@ -55,7 +53,8 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    language   = 'en'
    extensions = [ 'myst_parser', 'sphinx_design' ]
    html_theme = 'furo'
-   myst_enable_extensions = [ 'colon_fence' ]
+   myst_enable_extensions = [ 'colon_fence', 'substitution' ]
+   myst_substitutions     = {'project': project}
    EOF
    ```
 1. Generate HTML with Sphinx:

@@ -13,8 +13,6 @@ def test_simple_sample(sample):
     speky.run(
         [
             '--check-only',
-            '-p',
-            'project',
             sample('simple_requirements'),
             sample('simple_comments'),
             sample('simple_tests'),
@@ -26,8 +24,6 @@ def test_more_samples(sample):
     speky.run(
         [
             '--check-only',
-            '--project-name',
-            'Project',
             sample('simple_requirements'),
             sample('simple_comments'),
             sample('simple_tests'),

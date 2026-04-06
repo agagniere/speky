@@ -74,12 +74,7 @@ def run(argv: list[str] | None = None):
         action='append',
         help='The path to a CSV file containing comments',
     )
-    cli_parser.add_argument(
-        '-p',
-        '--project-name',
-        type=str,
-        help='Name of the project used for the title',
-    )
+
     cli_parser.add_argument(
         '-l',
         '--logging-config',
@@ -111,7 +106,4 @@ def run(argv: list[str] | None = None):
     specs.check_references()
 
     if not cli_args.check_only:
-        project_name = cli_args.project_name or specs.project_name
-        if not project_name:
-            cli_parser.error('-p/--project-name is required when not using a manifest')
-        specification_to_myst(specs, project_name, cli_args.output_folder, cli_args.sort)
+        specification_to_myst(specs, cli_args.output_folder, cli_args.sort)

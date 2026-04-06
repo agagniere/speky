@@ -1,5 +1,4 @@
 kind: project
-name: Speky
 files:
   - functional.yaml
   - nonfunctional.yaml
