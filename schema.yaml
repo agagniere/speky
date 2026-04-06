@@ -1,4 +1,4 @@
-any(include('requirements'), include('comments'), include('tests'))
+any(include('requirements'), include('comments'), include('tests'), include('project'))
 ---
 requirements:
   kind: str(equals='requirements')
@@ -48,6 +48,14 @@ step:
   expected: str(required=False)
   sample_lang: str(required=False)
   sample: str(required=False)
+
+---
+project:
+  kind: str(equals='project')
+  name: str(min=1)
+  files: list(str())
+  root_directory: str(required=False)
+  comments_csvs: list(str(), required=False)
 
 ---
 id: str(min=2, matches='[A-Z0-9_-]+')

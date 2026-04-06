@@ -110,9 +110,8 @@ def run(argv: list[str] | None = None):
             specs.read_comment_csv(filename)
     specs.check_references()
 
-    project_name = cli_args.project_name or specs.project_name
-    if not project_name:
-        cli_parser.error('-p/--project-name is required when not using a manifest')
-
     if not cli_args.check_only:
+        project_name = cli_args.project_name or specs.project_name
+        if not project_name:
+            cli_parser.error('-p/--project-name is required when not using a manifest')
         specification_to_myst(specs, project_name, cli_args.output_folder, cli_args.sort)
