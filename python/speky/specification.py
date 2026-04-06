@@ -80,8 +80,6 @@ class Specification:
         """
         Load a YAML or TOML file containing requirements, tests, or comments.
 
-        speky:speky#SF001
-
         Args:
             file_name: Path to YAML or TOML file
 

@@ -11,13 +11,11 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP003"""
     requirement_id = arguments['id']
 
-    # speky:speky_mcp#TMCP006
     if requirement_id not in specs.by_id:
         raise ToolError(f'Requirement {requirement_id} not found')
 
     requirement = specs.by_id[requirement_id]
 
-    # speky:speky_mcp#TMCP006
     if requirement.kind != 'requirement':
         raise ToolError(f'{requirement_id} is a {requirement.kind}, not a requirement')
 
@@ -28,7 +26,6 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         'source_file': requirement.source_file,
     }
 
-    # speky:speky_mcp#TMCP005
     if requirement.short:
         content['short'] = requirement.short
     if requirement.tags:
@@ -57,13 +54,11 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP004"""
     test_id = arguments['id']
 
-    # speky:speky_mcp#TMCP009
     if test_id not in specs.by_id:
         raise ToolError(f'Test {test_id} not found')
 
     test = specs.by_id[test_id]
 
-    # speky:speky_mcp#TMCP010
     if test.kind != 'test':
         raise ToolError(f'{test_id} is a {test.kind}, not a test')
 
@@ -76,7 +71,6 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         'steps': test.steps,
     }
 
-    # speky:speky_mcp#TMCP008
     if test.short:
         content['short'] = test.short
     if test.initial:
@@ -98,8 +92,6 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
     if category and category not in specs.requirements:
         raise ToolError(f'Category {category!r} not found')
 
-    # speky:speky_mcp#TMCP012
-    # speky:speky_mcp#TMCP014
     if tag and category:
         by_tag = {r.id for r in specs.tags[tag]}
         candidates = [r for r in specs.requirements[category] if r.id in by_tag]
@@ -110,7 +102,6 @@ def handle_search_requirements(arguments: dict, specs: Specification) -> dict:
     else:
         candidates = [r for reqs in specs.requirements.values() for r in reqs]
 
-    # speky:speky_mcp#TMCP015
     requirements = sorted(
         (r.json_oneliner(True) for r in candidates),
         key=lambda r: r['id'],
@@ -122,7 +113,6 @@ def handle_list_references_to(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP007"""
     requirement_id = arguments['id']
 
-    # speky:speky_mcp#TMCP022
     if requirement_id not in specs.by_id:
         raise ToolError(f'Requirement {requirement_id} not found')
 

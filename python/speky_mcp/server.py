@@ -45,11 +45,7 @@ def main():
 
 
 def run(argv: list[str] | None = None):
-    """
-    speky:speky_mcp#TMCP001
-
-    When argv is None, sys.argv is used instead
-    """
+    """When argv is None, sys.argv is used instead."""
     parser = argparse.ArgumentParser(
         prog='speky-mcp',
         description='MCP server for querying Speky specifications',
@@ -86,7 +82,6 @@ def run(argv: list[str] | None = None):
     with logging_config_file.open() as f:
         logging.config.dictConfig(yaml.safe_load(f))
 
-    # speky:speky_mcp#MCP001
     specs = Specification()
     for filename in args.paths:
         specs.read_file(filename)
@@ -94,12 +89,10 @@ def run(argv: list[str] | None = None):
         for filename in args.comment_csvs:
             specs.read_comment_csv(filename)
 
-    # speky:speky_mcp#TMCP002
     specs.check_references()
 
     logger.info('Specifications loaded successfully')
 
-    # speky:speky_mcp#MCP002
     run_server(specs)
 
 
@@ -142,7 +135,6 @@ def handle_request(request: dict, specs: Specification, initialized: bool) -> di
     method = request.get('method')
     request_id = request.get('id')
 
-    # speky:speky_mcp#TMCP003
     if method == 'initialize':
         return {
             'jsonrpc': '2.0',

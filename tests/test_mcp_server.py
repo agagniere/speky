@@ -38,8 +38,7 @@ class TestInitialization:
     """Tests for MCP server initialization protocol."""
 
     def test_initialize(self, simple_specs):
-        """Test server initialization protocol (TMCP003)."""
-        # speky:speky_mcp#TMCP003
+        """speky:speky_mcp#TMCP003 — Test server initialization protocol."""
         request = {
             'jsonrpc': '2.0',
             'method': 'initialize',
@@ -61,8 +60,7 @@ class TestInitialization:
         assert response['result']['serverInfo']['name'] == 'speky-mcp'
 
     def test_reject_before_initialization(self, simple_specs):
-        """Test that server rejects calls before initialization."""
-        # speky:speky_mcp#TMCP003
+        """speky:speky_mcp#TMCP003 — Test that server rejects calls before initialization."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -98,8 +96,7 @@ class TestGetRequirement:
     """Tests for get_requirement tool."""
 
     def test_get_simple_requirement(self, simple_specs):
-        """Test getting a simple requirement with comments and tested_by (TMCP004)."""
-        # speky:speky_mcp#TMCP004
+        """speky:speky_mcp#TMCP004 — Test getting a simple requirement with comments and tested_by."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -139,8 +136,7 @@ class TestGetRequirement:
         assert comment['external'] is False
 
     def test_get_requirement_all_fields(self, complex_specs):
-        """Test getting a requirement with all possible fields (TMCP005)."""
-        # speky:speky_mcp#TMCP005
+        """speky:speky_mcp#TMCP005 — Test getting a requirement with all possible fields."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -187,8 +183,7 @@ class TestGetRequirement:
         assert len(content['comments']) == 3
 
     def test_get_requirement_not_found(self, simple_specs):
-        """Test error when requirement ID doesn't exist (TMCP006)."""
-        # speky:speky_mcp#TMCP006
+        """speky:speky_mcp#TMCP006 — Test error when requirement ID doesn't exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -209,8 +204,7 @@ class TestGetRequirement:
         assert 'not found' in error_msg
 
     def test_get_requirement_wrong_type(self, simple_specs):
-        """Test error when ID is a test, not a requirement (TMCP006)."""
-        # speky:speky_mcp#TMCP006
+        """speky:speky_mcp#TMCP006 — Test error when ID is a test, not a requirement."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -235,8 +229,7 @@ class TestGetTest:
     """Tests for get_test tool."""
 
     def test_get_simple_test(self, simple_specs):
-        """Test getting a simple test with minimal fields (TMCP007)."""
-        # speky:speky_mcp#TMCP007
+        """speky:speky_mcp#TMCP007 — Test getting a simple test with minimal fields."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -272,8 +265,7 @@ class TestGetTest:
         assert content['steps'][0]['action'] == 'The only step'
 
     def test_get_test_all_fields(self, complex_specs):
-        """Test getting a test with all optional fields (TMCP008)."""
-        # speky:speky_mcp#TMCP008
+        """speky:speky_mcp#TMCP008 — Test getting a test with all optional fields."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -312,8 +304,7 @@ class TestGetTest:
         assert len(content['steps']) > 0
 
     def test_get_test_not_found(self, simple_specs):
-        """Test error when test ID doesn't exist (TMCP009)."""
-        # speky:speky_mcp#TMCP009
+        """speky:speky_mcp#TMCP009 — Test error when test ID doesn't exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -334,8 +325,7 @@ class TestGetTest:
         assert 'not found' in error_msg
 
     def test_get_test_wrong_type(self, simple_specs):
-        """Test error when ID is a requirement, not a test (TMCP010)."""
-        # speky:speky_mcp#TMCP010
+        """speky:speky_mcp#TMCP010 — Test error when ID is a requirement, not a test."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -360,8 +350,7 @@ class TestSearchRequirements:
     """Tests for search_requirements tool."""
 
     def test_search_all(self, complex_specs):
-        """Test searching with no filters returns all requirements (TMCP011)."""
-        # speky:speky_mcp#TMCP011
+        """speky:speky_mcp#TMCP011 — Test searching with no filters returns all requirements."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -377,8 +366,7 @@ class TestSearchRequirements:
         assert all('category' in r for r in requirements)
 
     def test_search_by_tag(self, complex_specs):
-        """Test filtering by tag (TMCP012)."""
-        # speky:speky_mcp#TMCP012
+        """speky:speky_mcp#TMCP012 — Test filtering by tag."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -397,8 +385,7 @@ class TestSearchRequirements:
         assert 'RF04' not in [r['id'] for r in requirements]
 
     def test_search_by_namespaced_tag(self, complex_specs):
-        """Test filtering by namespaced tag (TMCP013)."""
-        # speky:speky_mcp#TMCP013
+        """speky:speky_mcp#TMCP013 — Test filtering by namespaced tag."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -413,8 +400,7 @@ class TestSearchRequirements:
         assert requirements[0]['id'] == 'RF03'
 
     def test_search_by_category(self, simple_specs):
-        """Test filtering by category (TMCP014)."""
-        # speky:speky_mcp#TMCP014
+        """speky:speky_mcp#TMCP014 — Test filtering by category."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -432,8 +418,7 @@ class TestSearchRequirements:
         assert 'RF02' in ids
 
     def test_search_unknown_tag(self, simple_specs):
-        """Test error when filtering by a tag that does not exist (TMCP015)."""
-        # speky:speky_mcp#TMCP015
+        """speky:speky_mcp#TMCP015 — Test error when filtering by a tag that does not exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -447,8 +432,7 @@ class TestSearchRequirements:
         assert 'nonexistent' in response['result']['structuredContent']['error']
 
     def test_search_unknown_category(self, simple_specs):
-        """Test error when filtering by a category that does not exist (TMCP031)."""
-        # speky:speky_mcp#TMCP031
+        """speky:speky_mcp#TMCP031 — Test error when filtering by a category that does not exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -466,8 +450,7 @@ class TestSearchTests:
     """Tests for search_tests tool."""
 
     def test_search_all(self, complex_specs):
-        """Test searching with no filters returns all tests sorted by ID (TMCP036)."""
-        # speky:speky_mcp#TMCP036
+        """speky:speky_mcp#TMCP036 — Test searching with no filters returns all tests sorted by ID."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -482,8 +465,7 @@ class TestSearchTests:
         assert all('category' in t for t in tests)
 
     def test_search_by_category(self, complex_specs):
-        """Test filtering by category (TMCP037)."""
-        # speky:speky_mcp#TMCP037
+        """speky:speky_mcp#TMCP037 — Test filtering by category."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -498,8 +480,7 @@ class TestSearchTests:
         assert all(t['category'] == 'functional' for t in tests)
 
     def test_search_by_tester_of(self, complex_specs):
-        """Test filtering by tester_of returns tests referencing that requirement (TMCP038)."""
-        # speky:speky_mcp#TMCP038
+        """speky:speky_mcp#TMCP038 — Test filtering by tester_of returns tests referencing that requirement."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -515,8 +496,7 @@ class TestSearchTests:
         assert tests[1]['short'] == 'Yet another test'
 
     def test_search_combined_filters(self, complex_specs):
-        """Test combining category and tester_of filters (TMCP039)."""
-        # speky:speky_mcp#TMCP039
+        """speky:speky_mcp#TMCP039 — Test combining category and tester_of filters."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -531,8 +511,7 @@ class TestSearchTests:
         assert tests[0]['id'] == 'T01'
 
     def test_search_tester_of_empty(self, complex_specs):
-        """Test empty list when requirement has no associated tests (TMCP040)."""
-        # speky:speky_mcp#TMCP040
+        """speky:speky_mcp#TMCP040 — Test empty list when requirement has no associated tests."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -546,8 +525,7 @@ class TestSearchTests:
         assert tests == []
 
     def test_search_unknown_category(self, simple_specs):
-        """Test error when filtering by a category that does not exist (TMCP041)."""
-        # speky:speky_mcp#TMCP041
+        """speky:speky_mcp#TMCP041 — Test error when filtering by a category that does not exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -561,8 +539,7 @@ class TestSearchTests:
         assert 'nonexistent' in response['result']['structuredContent']['error']
 
     def test_search_unknown_tester_of(self, simple_specs):
-        """Test error when tester_of requirement does not exist (TMCP042)."""
-        # speky:speky_mcp#TMCP042
+        """speky:speky_mcp#TMCP042 — Test error when tester_of requirement does not exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -580,8 +557,7 @@ class TestListReferencesTo:
     """Tests for list_references_to tool."""
 
     def test_list_references_to_one(self, complex_specs):
-        """Test listing requirements that reference a given requirement (TMCP020)."""
-        # speky:speky_mcp#TMCP020
+        """speky:speky_mcp#TMCP020 — Test listing requirements that reference a given requirement."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -599,8 +575,7 @@ class TestListReferencesTo:
         assert 'foo' in requirements[0]['tags']
 
     def test_list_references_to_empty(self, complex_specs):
-        """Test empty list for a requirement no one references (TMCP021)."""
-        # speky:speky_mcp#TMCP021
+        """speky:speky_mcp#TMCP021 — Test empty list for a requirement no one references."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -614,8 +589,7 @@ class TestListReferencesTo:
         assert requirements == []
 
     def test_list_references_to_not_found(self, simple_specs):
-        """Test error when requirement ID does not exist (TMCP022)."""
-        # speky:speky_mcp#TMCP022
+        """speky:speky_mcp#TMCP022 — Test error when requirement ID does not exist."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -635,8 +609,7 @@ class TestListUntestedRequirements:
     """Tests for list_untested_requirements tool."""
 
     def test_list_untested_requirements(self, complex_specs):
-        """Test listing requirements with no associated tests (TMCP032)."""
-        # speky:speky_mcp#TMCP032
+        """speky:speky_mcp#TMCP032 — Test listing requirements with no associated tests."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -652,8 +625,7 @@ class TestListUntestedRequirements:
         assert requirements[0]['category'] == 'non-functional'
 
     def test_list_untested_requirements_by_category(self, complex_specs):
-        """Test filtering untested requirements by category (TMCP033)."""
-        # speky:speky_mcp#TMCP033
+        """speky:speky_mcp#TMCP033 — Test filtering untested requirements by category."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -670,8 +642,7 @@ class TestListUntestedRequirements:
         assert 'RF03' not in ids
 
     def test_list_untested_requirements_empty(self, complex_specs):
-        """Test empty list when all requirements in a category are tested (TMCP034)."""
-        # speky:speky_mcp#TMCP034
+        """speky:speky_mcp#TMCP034 — Test empty list when all requirements in a category are tested."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -685,8 +656,7 @@ class TestListUntestedRequirements:
         assert requirements == []
 
     def test_list_untested_requirements_unknown_category(self, simple_specs):
-        """Test error on unknown category (TMCP035)."""
-        # speky:speky_mcp#TMCP035
+        """speky:speky_mcp#TMCP035 — Test error on unknown category."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -704,8 +674,7 @@ class TestListAllTags:
     """Tests for list_all_tags tool."""
 
     def test_list_all_tags(self, complex_specs):
-        """Test listing all unique tags sorted alphabetically (TMCP024)."""
-        # speky:speky_mcp#TMCP024
+        """speky:speky_mcp#TMCP024 — Test listing all unique tags sorted alphabetically."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -719,8 +688,7 @@ class TestListAllTags:
         assert tags == ['bar:baz', 'foo']
 
     def test_list_all_tags_empty(self, simple_specs):
-        """Test empty list when no requirements have tags (TMCP025)."""
-        # speky:speky_mcp#TMCP025
+        """speky:speky_mcp#TMCP025 — Test empty list when no requirements have tags."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -738,8 +706,7 @@ class TestListAllIds:
     """Tests for list_all_ids tool."""
 
     def test_list_all_ids(self, simple_specs):
-        """Test listing all IDs in two sorted lists (TMCP029)."""
-        # speky:speky_mcp#TMCP029
+        """speky:speky_mcp#TMCP029 — Test listing all IDs in two sorted lists."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
@@ -754,8 +721,7 @@ class TestListAllIds:
         assert content['tests'] == ['T01', 'T02']
 
     def test_list_all_ids_multi_category(self, complex_specs):
-        """Test that IDs from all categories are merged and sorted (TMCP030)."""
-        # speky:speky_mcp#TMCP030
+        """speky:speky_mcp#TMCP030 — Test that IDs from all categories are merged and sorted."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
