@@ -1,0 +1,9 @@
+kind: project
+name: Speky
+files:
+  - functional.yaml
+  - nonfunctional.yaml
+  - tests/*.yaml
+  - comments/*.yaml
+comments_csvs:
+  - comments/*.csv
