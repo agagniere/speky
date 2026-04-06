@@ -3,17 +3,11 @@ category: non-functional
 requirements:
 - id: SN001
   ref: [SF001]
-  short: Format is YAML
+  short: Format is YAML or TOML
   long: |
-    The requirements, functional tests and comments will be written in the YAML format.
-
-    Other formats will be supported as alternative inputs.
-    For example, for the PDF output, other formats can already be used:
-      - JSON
-      - XML
-      - TOML
+    The requirements, functional tests and comments can be written in YAML or TOML format.
   properties:
-    version: 2
+    version: 3
 - id: SN002
   ref: [SF001]
   short: Do not constraint file names

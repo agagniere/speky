@@ -4,7 +4,7 @@ requirements:
 - id: MCP001
   short: Start server with specifications
   long: |
-    The system shall be started with one or more specification YAML files
+    The system shall be started with one or more specification files (YAML or TOML)
     provided as command-line arguments.
 
     If the specification files contain validation errors
@@ -18,7 +18,7 @@ requirements:
   short: Multiple queries per session
   client_statement: |
     I would like to send multiple queries in one conversation without the overhead of
-    reloading YAML files each time. When exploring a specification interactively, I might
+    reloading the specification files each time. When exploring a specification interactively, I might
     search for tags, then get specific requirements, then check their tests - all in quick
     succession. Fast responses are crucial for a smooth user experience.
   long: |
