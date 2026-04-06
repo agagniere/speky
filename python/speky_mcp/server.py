@@ -11,6 +11,7 @@ import json
 import logging
 import logging.config
 import sys
+import tomllib
 from importlib.metadata import version
 from pathlib import Path
 
@@ -36,6 +37,7 @@ def main():
         NotADirectoryError,
         OSError,
         yaml.reader.ReaderError,
+        tomllib.TOMLDecodeError,
         RuntimeError,
     ) as err:
         logger.critical(err)
@@ -59,7 +61,7 @@ def run(argv: list[str] | None = None):
         type=str,
         metavar='FILE',
         nargs='+',
-        help='Path(s) to YAML files containing requirements, tests, or comments',
+        help='Path(s) to YAML or TOML files containing requirements, tests, comments, or a manifest',
     )
     parser.add_argument(
         '-C',
@@ -87,11 +89,9 @@ def run(argv: list[str] | None = None):
     # speky:speky_mcp#MCP001
     specs = Specification()
     for filename in args.paths:
-        logger.info('Loading %s', filename)
-        specs.read_yaml(filename)
+        specs.read_file(filename)
     if args.comment_csvs:
         for filename in args.comment_csvs:
-            logger.info('Loading %s as comments', filename)
             specs.read_comment_csv(filename)
 
     # speky:speky_mcp#TMCP002
