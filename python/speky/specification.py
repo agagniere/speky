@@ -98,18 +98,18 @@ class Specification:
                         ['requirements', 'category'],
                     )
                     for req in data['requirements']:
-                        self.load_requirement(Requirement.from_yaml(req, file_name), data['category'])
+                        self.load_requirement(Requirement.from_dict(req, file_name), data['category'])
                 case 'tests':
                     ensure_fields(f'Top-level of tests file "{file_name}"', data, ['tests', 'category'])
                     for test in data['tests']:
-                        self.load_test(Test.from_yaml(test, file_name), data['category'])
+                        self.load_test(Test.from_dict(test, file_name), data['category'])
                 case 'comments':
                     ensure_fields(f'Top-level of comments file "{file_name}"', data, ['comments'])
                     default = {'external': False}
                     if 'default' in data:
                         default |= data['default']
                     for comment in data['comments']:
-                        self.load_comment(Comment.from_yaml(default | comment, file_name))
+                        self.load_comment(Comment.from_dict(default | comment, file_name))
 
     def read_comment_csv(self, file_name: str):
         """
@@ -123,7 +123,7 @@ class Specification:
         with open(file_name, encoding='utf8', newline='') as f:
             reader = csv.DictReader(f)
             for row in reader:
-                self.load_comment(Comment.from_yaml(row, file_name))
+                self.load_comment(Comment.from_dict(row, file_name))
 
     def check_references(self):
         """
