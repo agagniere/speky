@@ -1,4 +1,4 @@
-#import "@local/speky:0.1.3": speky
+#import "@local/speky:0.3.0": speky
 #speky(
   (
     "simple_requirements.yaml",
