@@ -21,14 +21,4 @@ def test_simple_sample(sample):
 
 
 def test_more_samples(sample):
-    speky.run(
-        [
-            '--check-only',
-            sample('simple_requirements'),
-            sample('simple_comments'),
-            sample('simple_tests'),
-            sample('more_requirements'),
-            sample('more_comments'),
-            sample('more_tests'),
-        ]
-    )
+    speky.run(['--check-only', sample('more_samples')])
