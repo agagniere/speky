@@ -355,3 +355,44 @@ tests:
         Loading speky.yaml
         Loading requirements.yaml
         Loading tests.yaml
+- id: TF013
+  ref: [SF015, SF016]
+  short: Scan code for references
+  long: Declare code sources in the manifest and verify Speky discovers tagged references
+  prereq: [TF012]
+  steps:
+    - action: Add a `name` and `code_sources` to the manifest
+      run: cat speky.yaml
+      sample_lang: yaml
+      sample: |
+        kind: project
+        name: my-project
+        files:
+          - requirements.yaml
+          - tests.yaml
+        code_sources:
+          - src/
+    - action: Create a Python source file with a tagged comment
+      run: cat src/feature.py
+      sample_lang: python
+      sample: |
+        # speky:my-project#RF01
+        def feature():
+            pass
+    - action: Run speky and verify the reference to RF01 is reported
+      run: speky speky.yaml --check-only
+      expected: |
+        Loading speky.yaml
+        Loading requirements.yaml
+        Loading tests.yaml
+        Scanning src/
+        Found reference to RF01 in src/feature.py:1 (feature)
+    - action: Verify that a tag with an unknown namespace is silently ignored
+      run: cat src/other.py
+      sample_lang: python
+      sample: |
+        # speky:other-project#RF01
+        def unrelated():
+            pass
+    - action: Run speky again and verify the foreign tag does not appear in the output
+      run: speky speky.yaml --check-only
