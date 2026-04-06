@@ -5,6 +5,7 @@ import importlib.resources
 import logging
 import logging.config
 import sys
+import tomllib
 from importlib.metadata import version
 from pathlib import Path
 
@@ -29,6 +30,7 @@ def main():
         NotADirectoryError,
         OSError,
         yaml.reader.ReaderError,
+        tomllib.TOMLDecodeError,
         RuntimeError,
     ) as err:
         logger.critical(err)
@@ -53,7 +55,7 @@ def run(argv: list[str] | None = None):
         type=str,
         metavar='FILE',
         nargs='+',
-        help='The path to a YAML file containing requirements, tests or comments',
+        help='The path to a YAML or TOML file containing requirements, tests or comments',
     )
     cli_parser.add_argument(
         '-o',
@@ -104,7 +106,7 @@ def run(argv: list[str] | None = None):
     specs = Specification()
     for filename in cli_args.paths:
         logger.info('Loading %s', filename)
-        specs.read_yaml(filename)
+        specs.read_file(filename)
     if cli_args.comment_csvs:
         for filename in cli_args.comment_csvs:
             logger.info('Loading %s as comments', filename)

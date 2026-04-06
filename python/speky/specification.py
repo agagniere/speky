@@ -2,6 +2,7 @@
 
 import csv
 import logging
+import tomllib
 from collections import defaultdict
 
 import yaml
@@ -71,45 +72,49 @@ class Specification:
         """
         self.comments[comment.about].append(comment)
 
-    def read_yaml(self, file_name: str):
+    def read_file(self, file_name: str):
         """
-        Load a YAML file containing requirements, tests, or comments.
+        Load a YAML or TOML file containing requirements, tests, or comments.
 
         speky:speky#SF001
 
         Args:
-            file_name: Path to YAML file
+            file_name: Path to YAML or TOML file
 
         Raises:
             RuntimeError: If file is empty
             KeyError: If required fields are missing
         """
-        with open(file_name, encoding='utf8') as f:
-            data = yaml.safe_load(f)
-            if data is None:
-                message = f'Empty file "{file_name}"'
-                raise RuntimeError(message)
-            ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
-            match data['kind']:
-                case 'requirements':
-                    ensure_fields(
-                        f'Top-level of requirements file "{file_name}"',
-                        data,
-                        ['requirements', 'category'],
-                    )
-                    for req in data['requirements']:
-                        self.load_requirement(Requirement.from_dict(req, file_name), data['category'])
-                case 'tests':
-                    ensure_fields(f'Top-level of tests file "{file_name}"', data, ['tests', 'category'])
-                    for test in data['tests']:
-                        self.load_test(Test.from_dict(test, file_name), data['category'])
-                case 'comments':
-                    ensure_fields(f'Top-level of comments file "{file_name}"', data, ['comments'])
-                    default = {'external': False}
-                    if 'default' in data:
-                        default |= data['default']
-                    for comment in data['comments']:
-                        self.load_comment(Comment.from_dict(default | comment, file_name))
+        if file_name.endswith('.toml'):
+            with open(file_name, 'rb') as f:
+                data = tomllib.load(f)
+        else:
+            with open(file_name, encoding='utf8') as f:
+                data = yaml.safe_load(f)
+        if not data:
+            message = f'Empty file "{file_name}"'
+            raise RuntimeError(message)
+        ensure_fields(f'Top-level of "{file_name}"', data, ['kind'])
+        match data['kind']:
+            case 'requirements':
+                ensure_fields(
+                    f'Top-level of requirements file "{file_name}"',
+                    data,
+                    ['requirements', 'category'],
+                )
+                for req in data['requirements']:
+                    self.load_requirement(Requirement.from_dict(req, file_name), data['category'])
+            case 'tests':
+                ensure_fields(f'Top-level of tests file "{file_name}"', data, ['tests', 'category'])
+                for test in data['tests']:
+                    self.load_test(Test.from_dict(test, file_name), data['category'])
+            case 'comments':
+                ensure_fields(f'Top-level of comments file "{file_name}"', data, ['comments'])
+                default = {'external': False}
+                if 'default' in data:
+                    default |= data['default']
+                for comment in data['comments']:
+                    self.load_comment(Comment.from_dict(default | comment, file_name))
 
     def read_comment_csv(self, file_name: str):
         """
