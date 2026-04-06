@@ -30,3 +30,15 @@ requirements:
   short: Apply fields to lists of comments
   long: It should be possible to set a default value to comment fields in the same comment file
   tags: [input]
+- id: SN006
+  ref: [SF016]
+  short: Use tree-sitter for code scanning
+  long: |
+    Code scanning shall use tree-sitter to parse source files into an AST, extracting
+    comment nodes and correlating them with the symbol they document.
+
+    This avoids custom parsing logic and correctly handles language-specific constructs
+    such as Python docstrings, Rust doc comments (`///`), and C preprocessor directives.
+
+    Each supported language requires its corresponding tree-sitter grammar package
+    (`tree-sitter-python`, `tree-sitter-go`, `tree-sitter-rust`).
