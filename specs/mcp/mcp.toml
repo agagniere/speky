@@ -1,0 +1,9 @@
+kind = "project"
+name = "Speky MCP"
+files = [
+  "nonfunctional.yaml",
+  "query.yaml",
+  "discovery.yaml",
+  "tracability.yaml",
+  "test_*.yaml",
+]
