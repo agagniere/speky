@@ -1,0 +1,5 @@
+kind: project
+files:
+  - simple_*.yaml
+  - more_*.yaml
+  - more_*.toml
