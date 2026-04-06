@@ -32,6 +32,7 @@ class Specification:
         self.by_id = {}
         self.tags = defaultdict(list)
         self.root_dir = Path()
+        self.loaded_files: set[str] = set()
 
     def load_requirement(self, requirement: Requirement, category: str):
         """
@@ -88,6 +89,10 @@ class Specification:
             RuntimeError: If file is empty
             KeyError: If required fields are missing
         """
+        resolved = str(Path(file_name).resolve())
+        if resolved in self.loaded_files:
+            return
+        self.loaded_files.add(resolved)
         display_name = os.path.relpath(file_name, start=self.root_dir)
         logger.info('Loading %s', display_name)
         if file_name.endswith('.toml'):
