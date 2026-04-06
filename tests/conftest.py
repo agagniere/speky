@@ -17,9 +17,10 @@ def sample(tests_folder):
 
     def get_path(name) -> str:
         for subdir in ['samples', 'failing_samples']:
-            path = tests_folder / subdir / (name + '.yaml')
-            if path.is_file():
-                return str(path)
+            for extension in ['yaml', 'toml']:
+                path = tests_folder / subdir / f'{name}.{extension}'
+                if path.is_file():
+                    return str(path)
         message = f'Sample {name} not found'
         raise FileNotFoundError(message)
 
