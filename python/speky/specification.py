@@ -31,7 +31,6 @@ class Specification:
         self.comments = defaultdict(list)
         self.by_id = {}
         self.tags = defaultdict(list)
-        self.project_name = None
         self.root_dir = Path()
 
     def load_requirement(self, requirement: Requirement, category: str):
@@ -122,8 +121,7 @@ class Specification:
                 for comment in data['comments']:
                     self.load_comment(Comment.from_dict(default | comment, display_name))
             case 'project':
-                ensure_fields(f'Manifest "{file_name}"', data, ['name', 'files'])
-                self.project_name = data['name']
+                ensure_fields(f'Manifest "{file_name}"', data, ['files'])
                 manifest_dir = Path(file_name).parent
                 self.root_dir = (manifest_dir / data.get('root_directory', '.')).resolve()
                 logger.debug('Now loading from %s', self.root_dir)

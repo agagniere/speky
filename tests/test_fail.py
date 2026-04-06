@@ -5,15 +5,15 @@ import yaml
 
 def test_invalid_file(tests_folder):
     with pytest.raises(FileNotFoundError):
-        speky.run(['-p', 'project', 'doesntexist'])
+        speky.run(['doesntexist'])
     with pytest.raises(OSError, match='File name too long'):
-        speky.run(['-p', 'project', 'ToooOOOoooOOOLLllLllooOOoOOoOooOOnnnNnnNGGGgGgggG' * 32])
+        speky.run(['ToooOOOoooOOOLLllLllooOOoOOoOooOOnnnNnnNGGGgGgggG' * 32])
     with pytest.raises(NotADirectoryError):
-        speky.run(['-p', 'project', str(tests_folder / 'conftest.py' / 'foo.yaml')])
+        speky.run([str(tests_folder / 'conftest.py' / 'foo.yaml')])
     with pytest.raises(yaml.reader.ReaderError):
-        speky.run(['-p', 'project', '/dev/zero'])
+        speky.run(['/dev/zero'])
     with pytest.raises(RuntimeError, match='Empty file'):
-        speky.run(['-p', 'project', '/dev/null'])
+        speky.run(['/dev/null'])
 
 
 def test_error_msg(sample):
@@ -39,4 +39,4 @@ def test_error_msg(sample):
 
     for name, reason in error_list:
         with pytest.raises(KeyError, match=reason):
-            speky.run(['-p', 'project', sample(name)])
+            speky.run([sample(name)])

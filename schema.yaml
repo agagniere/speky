@@ -52,7 +52,6 @@ step:
 ---
 project:
   kind: str(equals='project')
-  name: str(min=1)
   files: list(str())
   root_directory: str(required=False)
   comments_csvs: list(str(), required=False)
