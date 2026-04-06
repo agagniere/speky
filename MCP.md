@@ -22,13 +22,13 @@ Requires [uv](https://github.com/astral-sh/uv).
 Run this command at your project root:
 
 ```bash
-claude mcp add --scope project speky bash -- -O globstar -c "uvx --from git+https://github.com/agagniere/speky speky-mcp specs/**/*.yaml"
+claude mcp add --scope project speky -- uvx --from git+https://github.com/agagniere/speky speky-mcp specs/speky.yaml
 ```
 
-Replace `specs/**/*.yaml` with the path(s) to your own YAML specification files.
+Replace `specs/speky.yaml` with the path to your manifest file, or list individual YAML/TOML specification files.
 
 **Additional options:**
-- Add `-C path/to/comments.csv` to include CSV comment files
+- Add `-C path/to/comments.csv` to include CSV comment files not covered by the manifest
 - Add `-l path/to/logging.yaml` for custom logging configuration
 
 ## Available Tools
@@ -316,7 +316,7 @@ Claude can:
 
 ### Server Lifecycle
 
-1. **Startup**: Load and validate all YAML specification files
+1. **Startup**: Load and validate all YAML/TOML specification files (or a manifest that references them)
 2. **Initialization**: Handle MCP protocol initialization handshake
 3. **Request Loop**: Process tool calls over stdin/stdout using JSON-RPC 2.0
 4. **Shutdown**: Clean exit on stdin close
@@ -388,7 +388,7 @@ printf '%s\n%s\n%s\n' \
   '{"jsonrpc":"2.0","method":"initialize","params":{"protocolVersion":"2025-11-25","capabilities":{}},"id":1}' \
   '{"jsonrpc":"2.0","method":"notifications/initialized"}' \
   '{"jsonrpc":"2.0","method":"tools/call","params":{"name":"get_requirement","arguments":{"id":"RF01"}},"id":2}' \
-| uv run speky-mcp tests/samples/*.yaml | jq
+| uv run speky-mcp tests/samples/more_samples.yaml | jq
 ```
 
 ### Code Quality

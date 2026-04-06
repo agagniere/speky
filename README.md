@@ -1,4 +1,4 @@
-# Speky: Specifications in YAML
+# Speky: Specifications in YAML/TOML
 
 ![logo](sphinx/assets/Speky-256.png)
 
@@ -42,20 +42,28 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    ```shell
    uv tool install git+https://github.com/agagniere/speky#master
    ```
-1. Generate Myst Markdown:
+1. Create a manifest listing your spec files:
+   ```yaml
+   # speky.yaml
+   kind: project
+   files:
+     - requirements.yaml
+     - tests.yaml
+     - comments/*.yaml
+   ```
+1. Generate MyST Markdown:
    ```shell
-   speky requirements.yaml tests.yaml comments.yaml --output-folder markdown
+   speky speky.yaml --output-folder markdown
    ```
 1. Configure Sphinx:
-   ```shell
-   cat <<-EOF > conf.py
-   project    = 'Toto'
+   ```python
+   # conf.py
+   project    = 'My Project'
    language   = 'en'
    extensions = [ 'myst_parser', 'sphinx_design' ]
    html_theme = 'furo'
    myst_enable_extensions = [ 'colon_fence', 'substitution' ]
    myst_substitutions     = {'project': project}
-   EOF
    ```
 1. Generate HTML with Sphinx:
    ```shell
@@ -71,11 +79,26 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 
 Requires [uv](https://github.com/astral-sh/uv)
 
-```shell
-claude mcp add --scope project speky bash -- -O globstar -c "uvx --from git+https://github.com/agagniere/speky speky-mcp specs/**/*.yaml"
+Add to your MCP client's config:
+
+```json
+{
+  "mcpServers": {
+    "speky": {
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/agagniere/speky", "speky-mcp", "speky.yaml"]
+    }
+  }
+}
 ```
 
-Replace `specs/**/*.yaml` with the path(s) to your own YAML specification files.
+Replace `speky.yaml` with the path to your manifest, or list individual YAML/TOML specification files.
+
+For Claude Code specifically:
+
+```shell
+claude mcp add --scope project speky -- uvx --from git+https://github.com/agagniere/speky speky-mcp speky.yaml
+```
 
 ## Used by
 
