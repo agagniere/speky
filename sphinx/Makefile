@@ -5,6 +5,7 @@ PROJECT_VERSION ?= $(shell $(Speky) --version | cut -d' ' -f2)
 PythonSources  := $(shell find ../python -type f -name '*.py')
 YamlSources    := $(shell find ../specs -type f -name '*.yaml')
 CSVComments    := $(shell find ../specs/comments -type f -name '*.csv')
+ManifestSource := ../specs/speky.yaml ../specs/mcp/mcp.toml
 
 MarkdownFolder := markdown
 MarkdownIndex  := $(MarkdownFolder)/index.md
@@ -28,10 +29,8 @@ clean:
 	$(RM) -r $(SphinxFolder) $(MarkdownFolder)
 
 $(MarkdownIndex): $(YamlSources) $(PythonSources) $(CSVComments)
-	$(Speky) $(YamlSources) \
-		$(addprefix -C ,$(CSVComments)) \
+	$(Speky) $(ManifestSource) \
 		--output-folder $(@D) \
-		--project-name Speky
 
 $(SphinxHtml): $(MarkdownIndex) conf.py Makefile
 	$(Sphinx) -M html $(MarkdownFolder) $(SphinxFolder) \

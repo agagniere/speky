@@ -276,7 +276,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
                 write_list_of_links(dropdown, sorted(specs.references[self.id]))
         output.empty_line()
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
-        dropdown.write_line(f'**Source file:** `{os.path.relpath(self.source_file)}`')
+        dropdown.write_line(f'**Source file:** `{self.source_file}`')
     output.empty_line()
     if self.id in specs.comments:
         output.write_line('-' * 10)
@@ -294,7 +294,7 @@ def test_to_myst(self, output: MystWriter, specs):
     with output.dropdown(0, 'Is a test for', 'primary', True, 'check-circle-fill') as dropdown:
         write_list_of_links(dropdown, sorted(map(specs.by_id.__getitem__, self.ref)))
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
-        dropdown.write_line(f'**Source file:** `{os.path.relpath(self.source_file)}`')
+        dropdown.write_line(f'**Source file:** `{self.source_file}`')
     output.empty_line()
     output.heading('Initial state', 1)
     if self.initial:
