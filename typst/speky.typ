@@ -1,5 +1,5 @@
 // speky:speky#SF002
-#import "conversions.typ": table_to_comments, table_to_requirements
+#import "conversions.typ": table_to_comments
 #import "requirement.typ": display_requirement
 #import "common.typ": append_at, display_title, link_to
 #import "@preview/suboutline:0.3.0": suboutline

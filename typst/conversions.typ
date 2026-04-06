@@ -18,14 +18,6 @@
   return result
 }
 
-#let table_to_requirements(table, category) = {
-  (
-    "kind": "requirements",
-    "category": category,
-    "requirements": table_to_dict_list(table),
-  )
-}
-
 // speky:speky#SF010
 #let table_to_comments(table) = {
   (

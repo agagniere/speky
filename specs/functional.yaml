@@ -55,21 +55,6 @@ requirements:
   client_statement: We need to be able to read the original statement a requirement is based on
   long: The user shall be able to provide a variant of a requirement, as it was worded by the client. It shall be displayed atop the requirement, in the style of a quote.
   tags: [input]
-- id: SF009
-  short: CSV for requirements
-  client_statement: We are currently using Excel and want to easily import an existing requirements table
-  long: |
-    The user shall be able to provide a CSV for the `specifications` kind of input file.
-
-    The first row must specify the field of the column, valid values include:
-    - `id`
-    - `client_statement`
-    - `short`
-    - `long`
-  tags: [input:formats]
-  properties:
-    deprecated_since: '`0.2.0`'
-    will_be_removed: '`0.3.0`'
 - id: SF010
   short: CSV for comments
   long: |

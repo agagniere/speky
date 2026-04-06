@@ -4,29 +4,31 @@ tests:
 - id: TF007
   short: CSVs
   ref:
-    - SF009
     - SF010
-  long: Load requirements and comments from CSVs
+  long: Load requirements from YAML and comments from a CSV
   initial: Blank project
   steps:
-  - action: Write a CSV file for requirements
-    run: cat requirements.csv
-    sample_lang: csv
+  - action: Write a YAML file for requirements
+    run: cat requirements.yaml
+    sample_lang: yaml
     sample: |
-      id,short,long
-      RF01,"Lorem ipsum","A requirement from CSV"
+      kind: requirements
+      category: functional
+      requirements:
+        - id: RF01
+          long: A requirement
   - action: Write a CSV file for comments
     run: cat comments.csv
     sample_lang: csv
     sample: |
       from,about,date,text
       "Some Person",RF01,"01/01/2025","A comment from CSV"
-  - action: Write a typst file importing the CSVs
+  - action: Write a typst file importing them
     run: cat dummy.typ
     sample_lang: typst
     sample: |
-      #import "@local/speky:0.3.0": speky, table_to_comments, table_to_requirements
-      #speky((table_to_requirements(csv("requirements.csv"), "functional"),
+      #import "@local/speky:0.3.0": speky, table_to_comments
+      #speky((yaml("requirements.yaml"),
               table_to_comments(csv("comments.csv"))))
   - action: Generate the PDF
     run: typst compile dummy.typ --open
