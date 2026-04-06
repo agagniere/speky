@@ -20,7 +20,7 @@ class SpecItem(SimpleNamespace):
         return [cls.id_field] + cls.mandatory_fields + cls.optional_fields
 
     @classmethod
-    def from_yaml(cls, data: dict, location: str):
+    def from_dict(cls, data: dict, location: str):
         """
         Create a SpecItem from YAML data.
 
@@ -80,7 +80,7 @@ class Test(SpecItem):
     step_fields = {'action', 'run', 'expected', 'sample', 'sample_lang'}
 
     @classmethod
-    def from_yaml(cls, data: dict, location: str):
+    def from_dict(cls, data: dict, location: str):
         """
         Create a Test from YAML data, validating step structure.
 
@@ -94,7 +94,7 @@ class Test(SpecItem):
         Raises:
             KeyError: If required fields are missing
         """
-        result = super().from_yaml(data, location)
+        result = super().from_dict(data, location)
         for i, step in enumerate(result.steps, 1):
             name = f'Step {i} of {cls.__name__} {data[cls.id_field]} in "{location}"'
             ensure_fields(name, step, ['action'])
@@ -108,7 +108,7 @@ class Comment(SimpleNamespace):
     fields = ['about', 'from', 'date', 'text', 'external']
 
     @classmethod
-    def from_yaml(cls, data: dict, location: str):
+    def from_dict(cls, data: dict, location: str):
         """
         Create a Comment from YAML data.
 
