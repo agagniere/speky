@@ -4,5 +4,6 @@ files:
   - nonfunctional.yaml
   - tests/*.yaml
   - comments/*.yaml
+  - comments/*.toml
 comments_csvs:
   - comments/*.csv

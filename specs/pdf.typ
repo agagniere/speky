@@ -25,6 +25,9 @@
     "comments/2025-09-10.yaml",
   ).map(yaml)
     + (
+      "comments/2026-04-05.toml",
+    ).map(toml)
+    + (
       "comments/2025-05-27.csv",
     ).map(f => table_to_comments(csv(f))),
 )
