@@ -335,3 +335,23 @@ tests:
           - Baz, where `RF02` is listed
         4. `RF02` is listed directly inside the Lorem section
         5. `RF01` is listed inside the Ipsum subsection of Lorem
+- id: TF012
+  ref: [SF014]
+  short: Use a project manifest
+  long: Group all spec files in a manifest and pass it to speky instead of listing individual files
+  prereq: [TF001]
+  steps:
+    - action: Create a manifest file
+      run: cat speky.yaml
+      sample_lang: yaml
+      sample: |
+        kind: project
+        files:
+          - requirements.yaml
+          - tests.yaml
+    - action: Run speky with just the manifest instead of individual files
+      run: speky speky.yaml --check-only
+      expected: |
+        Loading speky.yaml
+        Loading requirements.yaml
+        Loading tests.yaml

@@ -1,0 +1,9 @@
+kind = "comments"
+
+[default]
+from = "Antoine"
+date = "05/04/2026"
+
+[[comments]]
+about = "SF014"
+text = "For now, the Typst output uses a .typ file as its equivalent and does not support manifests."

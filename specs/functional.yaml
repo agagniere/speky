@@ -111,3 +111,18 @@ requirements:
   tags: [output:both]
   properties:
     since: '`0.1.0`'
+- id: SF014
+  short: Project manifest
+  long: |
+    The user shall be able to group all input files of a project in a single manifest file,
+    and pass that manifest to the speky CLI instead of listing individual files.
+
+    A manifest is a YAML or TOML file with `kind: project` containing:
+    - `files`: a list of glob patterns matching specification files to load
+    - `root_directory`: an optional path relative to the manifest, used as the base for
+      glob patterns and displayed file paths (defaults to the manifest's own directory)
+    - `comments_csvs`: an optional list of glob patterns for CSV comment files
+
+    When a manifest is loaded, all matched files are loaded in sorted order.
+  tags: [input, tooling]
+  ref: [SF001, SF012]
