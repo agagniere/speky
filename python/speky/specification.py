@@ -78,6 +78,10 @@ class Specification:
 
     def read_file(self, file_name: str):
         """
+        speky:speky#SF001
+        speky:speky#SN001
+        speky:speky#SF014
+
         Load a YAML or TOML file containing requirements, tests, or comments.
 
         Args:

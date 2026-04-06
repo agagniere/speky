@@ -26,6 +26,7 @@
   )
 }
 
+// speky:speky#SF010
 #let table_to_comments(table) = {
   (
     "kind": "comments",
