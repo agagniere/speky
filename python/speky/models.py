@@ -139,6 +139,13 @@ class Comment(SimpleNamespace):
         return self.time < other.time
 
 
+class NullSourceLinks:
+    """A no-op source link config that never generates URLs."""
+
+    def url_for(self, path: Path) -> None:
+        return None
+
+
 def normalize_remote_url(url: str) -> str:
     """Normalize a git remote URL to HTTPS without .git suffix."""
     if url.startswith('git@'):
@@ -156,12 +163,14 @@ class SourceLinkConfig:
         self.git_root = git_root
 
     @classmethod
-    def from_dict(cls, data: dict, cwd: Path) -> 'SourceLinkConfig | None':
+    def from_dict(cls, data: dict | None, cwd: Path) -> SourceLinkConfig | NullSourceLinks:
         """
         Build a SourceLinkConfig from a `source_links` manifest dict.
 
-        Returns None if any required value cannot be resolved.
+        Returns a NullSourceLinks if data is None or any required value cannot be resolved.
         """
+        if data is None:
+            return NullSourceLinks()
         log = logging.getLogger(__name__)
 
         url = data.get('url')
@@ -171,7 +180,7 @@ class SourceLinkConfig:
             result = subprocess.run(['git', 'remote', 'get-url', 'origin'], cwd=cwd, capture_output=True, text=True)
             if result.returncode != 0:
                 log.warning('Could not detect git remote URL: %s', result.stderr.strip())
-                return None
+                return NullSourceLinks()
             url = normalize_remote_url(result.stdout.strip())
 
         if branch == 'auto':
@@ -180,13 +189,13 @@ class SourceLinkConfig:
             )
             if result.returncode != 0:
                 log.warning('Could not detect git branch: %s', result.stderr.strip())
-                return None
+                return NullSourceLinks()
             branch = result.stdout.strip()
 
         result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], cwd=cwd, capture_output=True, text=True)
         if result.returncode != 0:
             log.warning('Could not find git root: %s', result.stderr.strip())
-            return None
+            return NullSourceLinks()
         git_root = Path(result.stdout.strip())
 
         return cls(url=url, branch=branch, git_root=git_root)
