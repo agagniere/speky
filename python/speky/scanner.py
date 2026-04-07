@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import logging
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import tree_sitter_go as tsgo
@@ -25,7 +25,7 @@ from tree_sitter import Language, Node, Parser
 
 logger = logging.getLogger(__name__)
 
-ANNOTATION_RE = re.compile(r'speky:(?P<project>[A-Za-z0-9_.-]+)#(?P<id>[A-Z0-9_-]+)')
+ANNOTATION_RE = re.compile(r'speky:(?P<project>[A-Za-z0-9_.-]+)#(?P<id>[A-Za-z0-9_-]+)')
 
 _PY_LANG = Language(tspython.language())
 _GO_LANG = Language(tsgo.language())
@@ -53,10 +53,11 @@ class CodeReference:
     target_id: str
     symbol: str | None  # None for free references (tag not adjacent to a named symbol)
     is_test: bool  # True if the associated symbol is a test function
+    url: str | None = field(default=None)  # clickable link to the source line, if source_links configured
 
 
 def scan_sources(sources: list[Path], project_name: str, root: Path) -> list[CodeReference]:
-    """Scan a list of source directories or files for speky tags."""
+    """Scan a list of source files for speky tags."""
     refs: list[CodeReference] = []
     for source in sources:
         if source.is_file():
@@ -118,12 +119,13 @@ def _walk(node: Node, source: bytes, ext: str, project_name: str, file: str, ref
         for m in ANNOTATION_RE.finditer(text):
             if m.group('project') != project_name:
                 continue
-            symbol, is_test = _following_symbol(node, source, ext)
+            symbol, is_test, symbol_node = _following_symbol(node, source, ext)
+            line = (symbol_node.start_point[0] + 1) if symbol_node else (node.start_point[0] + 1)
             refs.append(
                 CodeReference(
                     target_id=m.group('id'),
                     file=file,
-                    line=node.start_point[0] + 1,
+                    line=line,
                     symbol=symbol,
                     is_test=is_test,
                 )
@@ -134,26 +136,26 @@ def _walk(node: Node, source: bytes, ext: str, project_name: str, file: str, ref
         _walk(child, source, ext, project_name, file, refs)
 
 
-def _following_symbol(comment: Node, source: bytes, ext: str) -> tuple[str | None, bool]:
-    """Return (name, is_test) of the named symbol immediately after this comment, or (None, False)."""
+def _following_symbol(comment: Node, source: bytes, ext: str) -> tuple[str | None, bool, Node | None]:
+    """Return (name, is_test, node) of the named symbol immediately after this comment, or (None, False, None)."""
     parent = comment.parent
     if not parent:
-        return None, False
+        return None, False, None
 
     siblings = parent.children
     idx = next((i for i, c in enumerate(siblings) if c.id == comment.id), -1)
     if idx < 0:
-        return None, False
+        return None, False, None
 
     for sibling in siblings[idx + 1 :]:
         if sibling.type in _COMMENT_TYPES[ext]:
             continue  # consecutive comments are still "adjacent"
         if sibling.type in _SYMBOL_TYPES[ext]:
             name = _symbol_name(sibling, source)
-            return name, _is_test(sibling, siblings, idx + 1, source, ext, name)
+            return name, _is_test(sibling, siblings, idx + 1, source, ext, name), sibling
         break
 
-    return None, False
+    return None, False, None
 
 
 def _symbol_name(node: Node, source: bytes) -> str | None:
@@ -198,7 +200,7 @@ def _collect_python_docstrings(root: Node, source: bytes, project_name: str, fil
                                 CodeReference(
                                     target_id=m.group('id'),
                                     file=file,
-                                    line=string.start_point[0] + 1,
+                                    line=root.start_point[0] + 1,
                                     symbol=name,
                                     is_test=is_test,
                                 )
