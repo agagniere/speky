@@ -26,6 +26,8 @@ requirements:
     - `tested_by`: List of test IDs that validate this requirement
     - `referenced_by`: List of requirement IDs that reference this requirement
     - `comments`: List of comments about this requirement
+    - `code_references`: List of code locations tagged with this requirement ID (if any),
+      each with `file`, `line`, and `symbol` (or null for free references)
 
     If the requirement ID does not exist, the tool shall return an error message.
   tags: [mcp:tools, mcp:query]
@@ -59,6 +61,9 @@ requirements:
       - `sample`: Sample data (if present)
       - `sample_lang`: Language of sample data (if present)
     - `comments`: List of comments about this test (if any)
+    - `code_references`: List of code locations tagged with this test ID (if any),
+      each with `file`, `line`, `symbol` (or null for free references), and `is_test`
+      (whether the tagged symbol is an automated test implementation)
 
     If the test ID does not exist, the tool shall return an error message.
   tags: [mcp:tools, mcp:query]

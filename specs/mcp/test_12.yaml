@@ -1,0 +1,85 @@
+kind: tests
+category: functional
+tests:
+- id: TMCP043
+  ref: [MCP003]
+  short: get_requirement includes code references
+  long: |
+    When code sources are declared in the manifest and a requirement has been
+    tagged in source code, `get_requirement` shall include a `code_references`
+    field listing the file, line, and symbol of each tagged location.
+  prereq: [TMCP003]
+  steps:
+  - action: Call `get_requirement` for a requirement that has a code reference
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "RF01"}
+        }
+      }
+  - action: Verify the response includes a `code_references` field with file, line, and symbol
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "functional",
+            "id": "RF01",
+            "long": "The first requirement",
+            "code_references": [
+              {"file": "src/feature.py", "line": 5, "symbol": "my_function"}
+            ]
+          }
+        }
+      }
+
+- id: TMCP044
+  ref: [MCP004]
+  short: get_test includes code references with is_test flag
+  long: |
+    When code sources are declared in the manifest and a test has been
+    tagged in source code, `get_test` shall include a `code_references`
+    field with file, line, symbol, and an `is_test` boolean indicating
+    whether the tagged symbol is an automated test implementation.
+  prereq: [TMCP003]
+  steps:
+  - action: Call `get_test` for a test that has code references
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T01"}
+        }
+      }
+  - action: |
+      Verify the response includes `code_references` with `is_test` set to true
+      for automated test functions, and false for non-test symbols.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "functional",
+            "id": "T01",
+            "long": "The first test",
+            "ref": [{"id": "RF01"}],
+            "steps": [],
+            "code_references": [
+              {"file": "tests/test_feature.py", "line": 12, "symbol": "test_my_function", "is_test": true}
+            ]
+          }
+        }
+      }
