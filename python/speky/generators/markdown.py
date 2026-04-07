@@ -15,6 +15,10 @@ class Markdown:
     def link(text: str, link: str) -> str:
         return f'[{text}]({link})'
 
+    @staticmethod
+    def literal(string: str) -> str:
+        return f'`{string}`'
+
 
 class MarkdownWriter:
     def __init__(self, output: TextIO):
@@ -236,12 +240,26 @@ def link_to(item) -> str:
     return Markdown.link(item.title, f'/{item.folder}/{item.id}')
 
 
-def write_list_of_links(output: MarkdownWriter, items: list):
-    if len(items) == 1:
-        output.write_line(link_to(items[0]))
-    else:
-        for item in sorted(items):
-            output.write_line(f'- {link_to(item)}')
+def code_reference(ref) -> str:
+    location = Markdown.literal(f'{ref.file}:{ref.line}')
+    if ref.url:
+        return Markdown.link(Markdown.literal(ref.symbol) if ref.symbol else location, ref.url)
+    return f'{Markdown.literal(ref.symbol)} at {location}' if ref.symbol else location
+
+
+def make_list_writer(function):
+    def result(output: MarkdownWriter, items: list):
+        if len(items) == 1:
+            output.write_line(function(items[0]))
+        else:
+            for item in sorted(items):
+                output.write_line(f'- {function(item)}')
+
+    return result
+
+
+write_list_of_code_links = make_list_writer(code_reference)
+write_list_of_links = make_list_writer(link_to)
 
 
 def requirement_to_myst(self, output: MystWriter, specs):
@@ -263,13 +281,13 @@ def requirement_to_myst(self, output: MystWriter, specs):
     if self.properties:
         with output.dropdown(0, 'Properties', 'primary', False, 'note') as dropdown:
             for key, value in sorted(self.properties.items()):
-                dropdown.write_line(f'**{key}:** {value}')
+                dropdown.write_line(f'{Markdown.bold(key)}: {value}')
                 dropdown.empty_line()
     if self.id in specs.testers_of:
         with output.dropdown(0, 'Tested by', 'success', True, 'check-circle-fill') as dropdown:
-            write_list_of_links(dropdown, sorted(specs.testers_of[self.id]))
+            write_list_of_links(dropdown, specs.testers_of[self.id])
         output.empty_line()
-    if self.id in specs.references or self.ref:
+    if (self.id in specs.references) or self.ref:
         with output.dropdown(0, 'References', 'secondary', False, 'link') as dropdown:
             if self.ref:
                 output.write_line(Markdown.bold('Relates to:'))
@@ -277,17 +295,15 @@ def requirement_to_myst(self, output: MystWriter, specs):
                 dropdown.empty_line()
             if self.id in specs.references:
                 dropdown.write_line(Markdown.bold('Referenced by:'))
-                write_list_of_links(dropdown, sorted(specs.references[self.id]))
+                write_list_of_links(dropdown, specs.references[self.id])
+                dropdown.empty_line()
         output.empty_line()
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
-        dropdown.write_line(f'**Source file:** `{self.source_file}`')
+        dropdown.write_line(f'{Markdown.bold("Source file")}: {Markdown.literal(self.source_file)}')
+        dropdown.empty_line()
         if self.id in specs.code_refs_by_id:
-            dropdown.empty_line()
-            dropdown.write_line('**Code references:**')
-            for ref in specs.code_refs_by_id[self.id]:
-                location = f'`{ref.file}:{ref.line}`'
-                label = f'`{ref.symbol}` — {location}' if ref.symbol else location
-                dropdown.write_line(f'- {label}')
+            dropdown.write_line(Markdown.bold('Implemented in:'))
+            write_list_of_code_links(dropdown, specs.code_refs_by_id[self.id])
     output.empty_line()
     if self.id in specs.comments:
         output.write_line('-' * 10)
@@ -304,15 +320,16 @@ def test_to_myst(self, output: MystWriter, specs):
     output.empty_line()
     with output.dropdown(0, 'Is a test for', 'primary', True, 'check-circle-fill') as dropdown:
         write_list_of_links(dropdown, sorted(map(specs.by_id.__getitem__, self.ref)))
+    test_code_refs = [r for r in specs.code_refs_by_id.get(self.id, []) if r.is_test]
+    misc_code_refs = [r for r in specs.code_refs_by_id.get(self.id, []) if not r.is_test]
+    if test_code_refs:
+        with output.dropdown(0, 'Automated in', 'success', True, 'check-circle-fill') as dropdown:
+            write_list_of_code_links(dropdown, test_code_refs)
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
-        dropdown.write_line(f'**Source file:** `{self.source_file}`')
-        if self.id in specs.code_refs_by_id:
-            dropdown.empty_line()
-            dropdown.write_line('**Code references:**')
-            for ref in specs.code_refs_by_id[self.id]:
-                location = f'`{ref.file}:{ref.line}`'
-                label = f'`{ref.symbol}` — {location}' if ref.symbol else location
-                dropdown.write_line(f'- {label}')
+        dropdown.write_line(f'{Markdown.bold("Source file")}: `{self.source_file}`')
+        if misc_code_refs:
+            dropdown.write_line(Markdown.bold('Code references:'))
+            write_list_of_code_links(dropdown, misc_code_refs)
     output.empty_line()
     output.heading('Initial state', 1)
     if self.initial:
