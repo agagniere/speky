@@ -250,7 +250,7 @@ def source_file_label(item) -> str:
 
 
 def code_reference(ref) -> str:
-    location = Markdown.literal(f'{ref.file}:{ref.line}')
+    location = Markdown.literal(f'{ref.filename}:{ref.line}')
     if ref.url:
         return Markdown.link(Markdown.literal(ref.symbol) if ref.symbol else location, ref.url)
     return f'{Markdown.literal(ref.symbol)} at {location}' if ref.symbol else location
