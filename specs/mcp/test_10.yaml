@@ -3,11 +3,11 @@ category: functional
 tests:
 - id: TMCP032
   ref: [MCP010]
-  short: list_untested_requirements returns requirements with no tests
-  long: Call list_untested_requirements with no filter and verify only requirements with no associated tests are returned
+  short: test_plan_coverage partitions requirements into coverage buckets
+  long: Call test_plan_coverage with no filter and verify requirements are correctly partitioned
   prereq: [TMCP003]
   steps:
-  - action: The client calls `list_untested_requirements` with no arguments
+  - action: The client calls `test_plan_coverage` with no arguments
     sample_lang: json
     sample: |
       {
@@ -15,11 +15,16 @@ tests:
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
-          "name": "list_untested_requirements",
+          "name": "test_plan_coverage",
           "arguments": {}
         }
       }
-  - action: Verify only RF04 is returned, as it is the only requirement with no associated tests
+  - action: |
+      Verify the response partitions requirements into four groups:
+      - RF04 has no tests: `no_test_plan`
+      - RF01 and RF02 have only manual tests: `manual_test_plan`
+      - RF03 has one automated test (T04) and one manual test (T03): `partially_manual_test_plan`
+      - `automated_test_plan` is empty
     sample_lang: json
     sample: |
       {
@@ -27,20 +32,28 @@ tests:
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {
-            "requirements": [
+            "no_test_plan": [
               {"category": "non-functional", "id": "RF04"}
-            ]
+            ],
+            "manual_test_plan": [
+              {"category": "functional", "id": "RF01"},
+              {"category": "functional", "id": "RF02"}
+            ],
+            "partially_manual_test_plan": [
+              {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]}
+            ],
+            "automated_test_plan": []
           }
         }
       }
 
 - id: TMCP033
   ref: [MCP010]
-  short: list_untested_requirements filtered by category
-  long: Call list_untested_requirements with a category filter and verify only untested requirements from that category are returned
+  short: test_plan_coverage filtered by category
+  long: Call test_plan_coverage with a category filter and verify only requirements from that category appear
   prereq: [TMCP003]
   steps:
-  - action: The client calls `list_untested_requirements` with category `non-functional`
+  - action: The client calls `test_plan_coverage` with category `non-functional`
     sample_lang: json
     sample: |
       {
@@ -48,13 +61,13 @@ tests:
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
-          "name": "list_untested_requirements",
+          "name": "test_plan_coverage",
           "arguments": {"category": "non-functional"}
         }
       }
   - action: |
-      Verify only RF04 is returned.
-      RF03 must not appear as it is covered by T03 and T04.
+      Verify only non-functional requirements appear:
+      RF04 in `no_test_plan`, RF03 in `partially_manual_test_plan`
     sample_lang: json
     sample: |
       {
@@ -62,20 +75,25 @@ tests:
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {
-            "requirements": [
+            "no_test_plan": [
               {"category": "non-functional", "id": "RF04"}
-            ]
+            ],
+            "manual_test_plan": [],
+            "partially_manual_test_plan": [
+              {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]}
+            ],
+            "automated_test_plan": []
           }
         }
       }
 
 - id: TMCP034
   ref: [MCP010]
-  short: list_untested_requirements returns empty list when all are tested
-  long: Call list_untested_requirements filtered by a category where all requirements have tests, verify an empty list is returned
+  short: test_plan_coverage filtered to category with no gaps
+  long: Call test_plan_coverage filtered by a category where all requirements have tests
   prereq: [TMCP003]
   steps:
-  - action: The client calls `list_untested_requirements` with category `functional`
+  - action: The client calls `test_plan_coverage` with category `functional`
     sample_lang: json
     sample: |
       {
@@ -83,11 +101,11 @@ tests:
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
-          "name": "list_untested_requirements",
+          "name": "test_plan_coverage",
           "arguments": {"category": "functional"}
         }
       }
-  - action: Verify an empty list is returned as RF01 and RF02 are both covered by tests
+  - action: Verify RF01 and RF02 appear in `manual_test_plan` and all other buckets are empty
     sample_lang: json
     sample: |
       {
@@ -95,20 +113,26 @@ tests:
         "jsonrpc": "2.0",
         "result": {
           "structuredContent": {
-            "requirements": []
+            "no_test_plan": [],
+            "manual_test_plan": [
+              {"category": "functional", "id": "RF01"},
+              {"category": "functional", "id": "RF02"}
+            ],
+            "partially_manual_test_plan": [],
+            "automated_test_plan": []
           }
         }
       }
 
 - id: TMCP035
   ref: [MCP010]
-  short: list_untested_requirements errors on unknown category
+  short: test_plan_coverage errors on unknown category
   long: |
     The user shall receive a tool execution error when filtering by a category
     that does not exist in the loaded specifications.
   prereq: [TMCP003]
   steps:
-  - action: The client calls `list_untested_requirements` with a non-existent category
+  - action: The client calls `test_plan_coverage` with a non-existent category
     sample_lang: json
     sample: |
       {
@@ -116,7 +140,7 @@ tests:
         "jsonrpc": "2.0",
         "method": "tools/call",
         "params": {
-          "name": "list_untested_requirements",
+          "name": "test_plan_coverage",
           "arguments": {"category": "nonexistent"}
         }
       }

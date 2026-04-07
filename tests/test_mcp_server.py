@@ -601,63 +601,67 @@ class TestListReferencesTo:
         assert 'not found' in error_msg
 
 
-class TestListUntestedRequirements:
-    """Tests for list_untested_requirements tool."""
+class TestTestPlanCoverage:
+    """Tests for test_plan_coverage tool."""
 
-    def test_list_untested_requirements(self, complex_specs):
-        """speky:speky_mcp#TMCP032 — Test listing requirements with no associated tests."""
+    def test_test_plan_coverage(self, complex_specs):
+        """speky:speky_mcp#TMCP032 — Test partitioning requirements into coverage buckets."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
             'id': 2,
-            'params': {'name': 'list_untested_requirements', 'arguments': {}},
+            'params': {'name': 'test_plan_coverage', 'arguments': {}},
         }
 
         response = handle_request(request, complex_specs, initialized=True)
-        requirements = response['result']['structuredContent']['requirements']
+        content = response['result']['structuredContent']
 
-        assert len(requirements) == 1
-        assert requirements[0]['id'] == 'RF04'
-        assert requirements[0]['category'] == 'non-functional'
+        assert [r['id'] for r in content['no_test_plan']] == ['RF04']
+        assert [r['id'] for r in content['manual_test_plan']] == ['RF01', 'RF02']
+        assert [r['id'] for r in content['partially_manual_test_plan']] == ['RF03']
+        assert content['automated_test_plan'] == []
 
-    def test_list_untested_requirements_by_category(self, complex_specs):
-        """speky:speky_mcp#TMCP033 — Test filtering untested requirements by category."""
+    def test_test_plan_coverage_by_category(self, complex_specs):
+        """speky:speky_mcp#TMCP033 — Test filtering coverage by category."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
             'id': 2,
-            'params': {'name': 'list_untested_requirements', 'arguments': {'category': 'non-functional'}},
+            'params': {'name': 'test_plan_coverage', 'arguments': {'category': 'non-functional'}},
         }
 
         response = handle_request(request, complex_specs, initialized=True)
-        requirements = response['result']['structuredContent']['requirements']
+        content = response['result']['structuredContent']
 
-        assert len(requirements) == 1
-        assert requirements[0]['id'] == 'RF04'
-        ids = [r['id'] for r in requirements]
-        assert 'RF03' not in ids
+        assert [r['id'] for r in content['no_test_plan']] == ['RF04']
+        assert content['manual_test_plan'] == []
+        assert [r['id'] for r in content['partially_manual_test_plan']] == ['RF03']
+        assert content['automated_test_plan'] == []
 
-    def test_list_untested_requirements_empty(self, complex_specs):
-        """speky:speky_mcp#TMCP034 — Test empty list when all requirements in a category are tested."""
+    def test_test_plan_coverage_no_gaps(self, complex_specs):
+        """speky:speky_mcp#TMCP034 — Test coverage report for a category with all requirements tested."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
             'id': 2,
-            'params': {'name': 'list_untested_requirements', 'arguments': {'category': 'functional'}},
+            'params': {'name': 'test_plan_coverage', 'arguments': {'category': 'functional'}},
         }
 
         response = handle_request(request, complex_specs, initialized=True)
-        requirements = response['result']['structuredContent']['requirements']
+        content = response['result']['structuredContent']
 
-        assert requirements == []
+        assert content['no_test_plan'] == []
+        assert [r['id'] for r in content['manual_test_plan']] == ['RF01', 'RF02']
+        assert content['partially_manual_test_plan'] == []
+        assert content['automated_test_plan'] == []
 
-    def test_list_untested_requirements_unknown_category(self, simple_specs):
+    def test_test_plan_coverage_unknown_category(self, simple_specs):
         """speky:speky_mcp#TMCP035 — Test error on unknown category."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',
             'id': 2,
-            'params': {'name': 'list_untested_requirements', 'arguments': {'category': 'nonexistent'}},
+            'params': {'name': 'test_plan_coverage', 'arguments': {'category': 'nonexistent'}},
         }
 
         response = handle_request(request, simple_specs, initialized=True)

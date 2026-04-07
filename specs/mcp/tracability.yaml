@@ -2,32 +2,40 @@ kind: requirements
 category: functional
 requirements:
 - id: MCP010
-  short: List requirements without test coverage
+  short: Get test plan coverage for requirements
   client_statement: |
     I would like to know which requirements have no tests validating them, so I can
     identify coverage gaps. When preparing for a release or reviewing a specification,
     I need to quickly find what still needs test procedures written for it.
+    I also want to distinguish between requirements that have only manual tests
+    and those that are fully covered by automated tests.
   long: |
-    The user shall be able to retrieve all requirements that have no associated tests.
+    The user shall be able to retrieve the test plan coverage status of requirements.
 
-    The MCP server shall expose a tool named `list_untested_requirements` that returns
-    all requirements for which no test references them in its `ref` field.
+    The MCP server shall expose a tool named `test_plan_coverage` that partitions
+    requirements into four groups:
+
+    - `no_test_plan`: requirements for which no test references them in its `ref` field
+    - `manual_test_plan`: requirements that have at least one test, but none of those
+      tests have an associated automated code test reference
+    - `partially_manual_test_plan`: requirements where some but not all associated tests
+      have at least one automated code test reference
+    - `automated_test_plan`: requirements where every associated test has at least one
+      automated code test reference (a tagged code reference where the symbol is a test function)
 
     An optional `category` parameter allows filtering by category.
 
-    The response shall be a list of requirement summaries, each containing:
+    Each group shall be a list of requirement summaries sorted alphabetically by ID,
+    each containing:
     - `id`: The unique identifier
     - `short`: The short description (if present)
     - `category`: The requirement category
     - `tags`: List of tags (if present)
-
-    The list shall be sorted alphabetically by ID.
-
-    If all requirements have at least one test, an empty list shall be returned.
   tags: [mcp:tools, mcp:query, mcp:traceability]
   ref: [MCP005]
   properties:
-    since: '`0.2.0`'
+    since: '`0.3.1`'
+    version: 2
     author: Claude
 - id: MCP007
   short: List requirements referencing another

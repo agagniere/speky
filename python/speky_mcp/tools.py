@@ -144,16 +144,38 @@ def handle_list_references_to(arguments: dict, specs: Specification) -> dict:
     return {'requirements': requirements}
 
 
-def handle_list_untested_requirements(arguments: dict, specs: Specification) -> dict:
+def handle_test_plan_coverage(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP010"""
     category = arguments.get('category')
 
     if category and category not in specs.requirements:
         raise ToolError(f'Category {category!r} not found')
 
+    def automation_count(req_id: str) -> tuple[int, int]:
+        """Return (automated_tests, total_tests) for a requirement."""
+        tests = specs.testers_of[req_id]
+        automated = sum(1 for test in tests if any(r.is_test for r in specs.code_refs_by_id.get(test.id, [])))
+        return automated, len(tests)
+
     candidates = specs.requirements[category] if category else [r for reqs in specs.requirements.values() for r in reqs]
-    requirements = [r.json_oneliner(True) for r in sorted(r for r in candidates if r.id not in specs.testers_of)]
-    return {'requirements': requirements}
+    no_test_plan, manual, partial, automated = [], [], [], []
+    for r in sorted(candidates):
+        if r.id not in specs.testers_of:
+            no_test_plan.append(r.json_oneliner(True))
+        else:
+            auto, total = automation_count(r.id)
+            if auto == 0:
+                manual.append(r.json_oneliner(True))
+            elif auto == total:
+                automated.append(r.json_oneliner(True))
+            else:
+                partial.append(r.json_oneliner(True))
+    return {
+        'no_test_plan': no_test_plan,
+        'manual_test_plan': manual,
+        'partially_manual_test_plan': partial,
+        'automated_test_plan': automated,
+    }
 
 
 def handle_search_tests(arguments: dict, specs: Specification) -> dict:
@@ -222,10 +244,13 @@ TOOL_REGISTRY: dict[str, dict] = {
         'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
         'handler': handle_list_references_to,
     },
-    'list_untested_requirements': {
-        'description': 'List requirements that have no associated tests',
-        'inputSchema': {'type': 'object', 'properties': {'category': {'type': 'string'}}},
-        'handler': handle_list_untested_requirements,
+    'test_plan_coverage': {
+        'description': 'Partition requirements by test plan coverage: no tests, manual only, partially automated, or fully automated',
+        'inputSchema': {
+            'type': 'object',
+            'properties': {'category': {'type': 'string'}},
+        },
+        'handler': handle_test_plan_coverage,
     },
     'list_all_tags': {
         'description': 'List all tags used across all requirements',
