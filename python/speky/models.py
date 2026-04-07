@@ -1,5 +1,7 @@
 """Data models for Speky requirements, tests, and comments."""
 
+from __future__ import annotations
+
 import datetime
 import logging
 import subprocess
@@ -23,13 +25,14 @@ class SpecItem(SimpleNamespace):
         return [cls.id_field] + cls.mandatory_fields + cls.optional_fields
 
     @classmethod
-    def from_dict(cls, data: dict, location: str):
+    def from_dict(cls, data: dict, location: str, manifest=None):
         """
         Create a SpecItem from YAML data.
 
         Args:
             data: Dictionary from YAML
             location: Source file path for error messages
+            manifest: The Manifest that loaded this file, if any
 
         Returns:
             Instance of the class
@@ -37,7 +40,7 @@ class SpecItem(SimpleNamespace):
         Raises:
             KeyError: If required fields are missing
         """
-        result = SimpleNamespace(source_file=location)
+        result = SimpleNamespace(source_file=location, manifest=manifest)
         ensure_fields(f'Definition of a {cls.__name__} in "{location}"', data, [cls.id_field])
         item_location = f'Definition of {cls.__name__} {data[cls.id_field]} in "{location}"'
         ensure_fields(item_location, data, cls.mandatory_fields)
@@ -83,13 +86,14 @@ class Test(SpecItem):
     step_fields = {'action', 'run', 'expected', 'sample', 'sample_lang'}
 
     @classmethod
-    def from_dict(cls, data: dict, location: str):
+    def from_dict(cls, data: dict, location: str, manifest=None):
         """
         Create a Test from YAML data, validating step structure.
 
         Args:
             data: Dictionary from YAML
             location: Source file path for error messages
+            manifest: The Manifest that loaded this file, if any
 
         Returns:
             Test instance
@@ -97,7 +101,7 @@ class Test(SpecItem):
         Raises:
             KeyError: If required fields are missing
         """
-        result = super().from_dict(data, location)
+        result = super().from_dict(data, location, manifest=manifest)
         for i, step in enumerate(result.steps, 1):
             name = f'Step {i} of {cls.__name__} {data[cls.id_field]} in "{location}"'
             ensure_fields(name, step, ['action'])
@@ -144,6 +148,28 @@ class NullSourceLinks:
 
     def url_for(self, path: Path) -> None:
         return None
+
+
+class Manifest:
+    """A loaded project manifest, holding context for file loading and link generation."""
+
+    def __init__(
+        self,
+        name: str,
+        root_dir: Path,
+        code_sources: list[str],
+        link_config: SourceLinkConfig | NullSourceLinks,
+        parent_manifest: Manifest | None,
+    ):
+        self.name = name
+        self.root_dir = root_dir
+        self.code_sources = code_sources
+        self.link_config = link_config
+        self.parent = parent_manifest
+
+    def relative_path(self, absolute: Path) -> str:
+        """Return the display name of a file: path relative to root_dir."""
+        return str(absolute.relative_to(self.root_dir))
 
 
 def normalize_remote_url(url: str) -> str:
