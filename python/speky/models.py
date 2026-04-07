@@ -1,6 +1,9 @@
 """Data models for Speky requirements, tests, and comments."""
 
 import datetime
+import logging
+import subprocess
+from pathlib import Path
 from types import SimpleNamespace
 
 from .utils import ensure_fields, import_fields, warn_extra_fields
@@ -134,3 +137,63 @@ class Comment(SimpleNamespace):
     def __lt__(self, other):
         """Compare by timestamp for chronological sorting."""
         return self.time < other.time
+
+
+def normalize_remote_url(url: str) -> str:
+    """Normalize a git remote URL to HTTPS without .git suffix."""
+    if url.startswith('git@'):
+        host, path = url[len('git@') :].split(':', 1)
+        url = f'https://{host}/{path}'
+    return url.removesuffix('.git')
+
+
+class SourceLinkConfig:
+    """speky:speky#SF017 — Resolved configuration for generating clickable source links."""
+
+    def __init__(self, url: str, branch: str, git_root: Path):
+        self.url = url
+        self.branch = branch
+        self.git_root = git_root
+
+    @classmethod
+    def from_dict(cls, data: dict, cwd: Path) -> 'SourceLinkConfig | None':
+        """
+        Build a SourceLinkConfig from a `source_links` manifest dict.
+
+        Returns None if any required value cannot be resolved.
+        """
+        log = logging.getLogger(__name__)
+
+        url = data.get('url')
+        branch = data.get('branch', 'auto')
+
+        if url == 'auto':
+            result = subprocess.run(['git', 'remote', 'get-url', 'origin'], cwd=cwd, capture_output=True, text=True)
+            if result.returncode != 0:
+                log.warning('Could not detect git remote URL: %s', result.stderr.strip())
+                return None
+            url = normalize_remote_url(result.stdout.strip())
+
+        if branch == 'auto':
+            result = subprocess.run(
+                ['git', 'rev-parse', '--abbrev-ref', 'HEAD'], cwd=cwd, capture_output=True, text=True
+            )
+            if result.returncode != 0:
+                log.warning('Could not detect git branch: %s', result.stderr.strip())
+                return None
+            branch = result.stdout.strip()
+
+        result = subprocess.run(['git', 'rev-parse', '--show-toplevel'], cwd=cwd, capture_output=True, text=True)
+        if result.returncode != 0:
+            log.warning('Could not find git root: %s', result.stderr.strip())
+            return None
+        git_root = Path(result.stdout.strip())
+
+        return cls(url=url, branch=branch, git_root=git_root)
+
+    def url_for(self, path: Path) -> str | None:
+        """Return a URL to the given absolute path, or None if outside the git root."""
+        if path.is_relative_to(self.git_root):
+            repo_file = path.relative_to(self.git_root).as_posix()
+            return f'{self.url}/blob/{self.branch}/{repo_file}'
+        return None
