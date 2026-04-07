@@ -157,12 +157,14 @@ class Manifest:
         self,
         name: str,
         root_dir: Path,
+        source_file: Path,
         code_sources: list[str],
         link_config: SourceLinkConfig | NullSourceLinks,
         parent_manifest: Manifest | None,
     ):
         self.name = name
         self.root_dir = root_dir
+        self.source_file = source_file
         self.code_sources = code_sources
         self.link_config = link_config
         self.parent = parent_manifest
