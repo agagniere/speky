@@ -35,6 +35,7 @@ class Specification:
         self.loaded_files: set[str] = set()
         self.scan_configs: list[tuple[str, Path, list[str], SourceLinkConfig | None]] = []
         self.code_refs_by_id: dict[str, list] = defaultdict(list)
+        self.spec_file_urls: dict[str, str] = {}
 
     def load_requirement(self, requirement: Requirement, category: str):
         """
@@ -134,15 +135,20 @@ class Specification:
                 manifest_dir = Path(file_name).parent
                 self.root_dir = (manifest_dir / data.get('root_directory', '.')).resolve()
                 logger.debug('Now loading from %s', self.root_dir)
+                link_config = (
+                    SourceLinkConfig.from_dict(data['source_links'], manifest_dir)
+                    if 'source_links' in data
+                    else None
+                )
                 if sources := data.get('code_sources'):
-                    link_config = (
-                        SourceLinkConfig.from_dict(data['source_links'], manifest_dir)
-                        if 'source_links' in data
-                        else None
-                    )
                     self.scan_configs.append((data['name'], self.root_dir, sources, link_config))
                 for pattern in data['files']:
                     for path in sorted(self.root_dir.glob(pattern)):
+                        if link_config:
+                            display_name = os.path.relpath(str(path), start=self.root_dir)
+                            url = link_config.url_for(path)
+                            if url:
+                                self.spec_file_urls[display_name] = url
                         self.read_file(str(path))
                 for pattern in data.get('comments_csvs', []):
                     for path in sorted(self.root_dir.glob(pattern)):
