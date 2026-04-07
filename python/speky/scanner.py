@@ -17,11 +17,15 @@ import logging
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import tree_sitter_go as tsgo
 import tree_sitter_python as tspython
 import tree_sitter_rust as tsrust
 from tree_sitter import Language, Node, Parser
+
+if TYPE_CHECKING:
+    from .models import Manifest
 
 logger = logging.getLogger(__name__)
 
@@ -48,30 +52,35 @@ _SYMBOL_TYPES: dict[str, frozenset[str]] = {
 class CodeReference:
     """A speky tag found in source code."""
 
-    file: str
+    file: Path
     line: int
     target_id: str
     symbol: str | None  # None for free references (tag not adjacent to a named symbol)
     is_test: bool  # True if the associated symbol is a test function
     url: str | None = field(default=None)  # clickable link to the source line, if source_links configured
+    manifest: Manifest | None = field(default=None, compare=False)
+
+    @property
+    def filename(self) -> str:
+        return str(self.file.relative_to(self.manifest.root_dir))
 
 
-def scan_sources(sources: list[Path], project_name: str, root: Path) -> list[CodeReference]:
+def scan_sources(sources: list[Path], project_name: str) -> list[CodeReference]:
     """Scan a list of source files for speky tags."""
     refs: list[CodeReference] = []
     for source in sources:
         if source.is_file():
-            refs.extend(_scan_file(source, project_name, root))
+            refs.extend(_scan_file(source, project_name))
         elif source.is_dir():
             for path in sorted(source.rglob('*')):
                 if path.suffix in _SCANNERS:
-                    refs.extend(_scan_file(path, project_name, root))
+                    refs.extend(_scan_file(path, project_name))
         else:
             logger.warning('Code source not found: %s', source)
     return refs
 
 
-def _scan_file(path: Path, project_name: str, root: Path) -> list[CodeReference]:
+def _scan_file(path: Path, project_name: str) -> list[CodeReference]:
     scanner = _SCANNERS.get(path.suffix)
     if not scanner:
         return []
@@ -80,11 +89,10 @@ def _scan_file(path: Path, project_name: str, root: Path) -> list[CodeReference]
     except OSError as err:
         logger.warning('Cannot read %s: %s', path, err)
         return []
-    relative = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
-    return scanner(source, project_name, relative)
+    return scanner(source, project_name, path)
 
 
-def _scan_python(source: bytes, project_name: str, file: str) -> list[CodeReference]:
+def _scan_python(source: bytes, project_name: str, file: Path) -> list[CodeReference]:
     tree = Parser(_PY_LANG).parse(source)
     refs: list[CodeReference] = []
     _walk(tree.root_node, source, '.py', project_name, file, refs)
@@ -92,14 +100,14 @@ def _scan_python(source: bytes, project_name: str, file: str) -> list[CodeRefere
     return refs
 
 
-def _scan_go(source: bytes, project_name: str, file: str) -> list[CodeReference]:
+def _scan_go(source: bytes, project_name: str, file: Path) -> list[CodeReference]:
     tree = Parser(_GO_LANG).parse(source)
     refs: list[CodeReference] = []
     _walk(tree.root_node, source, '.go', project_name, file, refs)
     return refs
 
 
-def _scan_rust(source: bytes, project_name: str, file: str) -> list[CodeReference]:
+def _scan_rust(source: bytes, project_name: str, file: Path) -> list[CodeReference]:
     tree = Parser(_RS_LANG).parse(source)
     refs: list[CodeReference] = []
     _walk(tree.root_node, source, '.rs', project_name, file, refs)
@@ -113,7 +121,7 @@ _SCANNERS = {
 }
 
 
-def _walk(node: Node, source: bytes, ext: str, project_name: str, file: str, refs: list[CodeReference]):
+def _walk(node: Node, source: bytes, ext: str, project_name: str, file: Path, refs: list[CodeReference]):
     if node.type in _COMMENT_TYPES[ext]:
         text = _text(node, source)
         for m in ANNOTATION_RE.finditer(text):
@@ -182,7 +190,7 @@ def _is_test(symbol: Node, siblings: list[Node], symbol_idx: int, source: bytes,
     return False
 
 
-def _collect_python_docstrings(root: Node, source: bytes, project_name: str, file: str, refs: list[CodeReference]):
+def _collect_python_docstrings(root: Node, source: bytes, project_name: str, file: Path, refs: list[CodeReference]):
     """Collect tags from Python docstrings (first string literal in a function/class/module body)."""
     if root.type in ('function_definition', 'class_definition'):
         body = next((c for c in root.children if c.type == 'block'), None)
