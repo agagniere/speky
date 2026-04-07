@@ -44,13 +44,13 @@ _SYMBOL_TYPES: dict[str, frozenset[str]] = {
 }
 
 
-@dataclass
+@dataclass(order=True)
 class CodeReference:
     """A speky tag found in source code."""
 
-    target_id: str
     file: str
     line: int
+    target_id: str
     symbol: str | None  # None for free references (tag not adjacent to a named symbol)
     is_test: bool  # True if the associated symbol is a test function
 
