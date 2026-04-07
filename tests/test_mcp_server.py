@@ -13,9 +13,9 @@ SAMPLES_DIR = Path(__file__).parent / 'samples'
 def simple_specs():
     """Load simple test specifications."""
     specs = Specification()
-    specs.read_file(str(SAMPLES_DIR / 'simple_requirements.yaml'))
-    specs.read_file(str(SAMPLES_DIR / 'simple_tests.yaml'))
-    specs.read_file(str(SAMPLES_DIR / 'simple_comments.yaml'))
+    specs.read_file(SAMPLES_DIR / 'simple_requirements.yaml')
+    specs.read_file(SAMPLES_DIR / 'simple_tests.yaml')
+    specs.read_file(SAMPLES_DIR / 'simple_comments.yaml')
     specs.check_references()
     return specs
 
@@ -24,7 +24,7 @@ def simple_specs():
 def complex_specs():
     """Load all test sample specifications via manifest."""
     specs = Specification()
-    specs.read_file(str(SAMPLES_DIR / 'more_samples.yaml'))
+    specs.read_file(SAMPLES_DIR / 'more_samples.yaml')
     specs.check_references()
     specs.scan_code_sources()
     return specs

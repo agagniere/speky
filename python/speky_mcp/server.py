@@ -84,10 +84,10 @@ def run(argv: list[str] | None = None):
 
     specs = Specification()
     for filename in args.paths:
-        specs.read_file(filename)
+        specs.read_file(Path(filename))
     if args.comment_csvs:
         for filename in args.comment_csvs:
-            specs.read_comment_csv(filename)
+            specs.read_comment_csv(Path(filename))
 
     specs.check_references()
     specs.scan_code_sources()
