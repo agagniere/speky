@@ -9,7 +9,7 @@ from pathlib import Path
 
 import yaml
 
-from .models import Comment, Requirement, Test
+from .models import Comment, Requirement, SourceLinkConfig, Test
 from .utils import ensure_fields
 
 logger = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ class Specification:
         self.tags = defaultdict(list)
         self.root_dir = Path()
         self.loaded_files: set[str] = set()
-        self.scan_configs: list[tuple[str, Path, list[str]]] = []
+        self.scan_configs: list[tuple[str, Path, list[str], SourceLinkConfig | None]] = []
         self.code_refs_by_id: dict[str, list] = defaultdict(list)
 
     def load_requirement(self, requirement: Requirement, category: str):
@@ -135,7 +135,12 @@ class Specification:
                 self.root_dir = (manifest_dir / data.get('root_directory', '.')).resolve()
                 logger.debug('Now loading from %s', self.root_dir)
                 if sources := data.get('code_sources'):
-                    self.scan_configs.append((data['name'], self.root_dir, sources))
+                    link_config = (
+                        SourceLinkConfig.from_dict(data['source_links'], manifest_dir)
+                        if 'source_links' in data
+                        else None
+                    )
+                    self.scan_configs.append((data['name'], self.root_dir, sources, link_config))
                 for pattern in data['files']:
                     for path in sorted(self.root_dir.glob(pattern)):
                         self.read_file(str(path))
@@ -189,12 +194,17 @@ class Specification:
             return
         from .scanner import scan_sources
 
-        for project_name, root_dir, patterns in self.scan_configs:
+        for project_name, root_dir, patterns, link_config in self.scan_configs:
             files = []
             for pattern in patterns:
                 files.extend(sorted(root_dir.glob(pattern)))
             logger.info('Scanning %d source file(s) for project %r', len(files), project_name)
             for ref in scan_sources(files, project_name, root_dir):
+                if link_config:
+                    abs_path = (root_dir / ref.file).resolve()
+                    base_url = link_config.url_for(abs_path)
+                    if base_url:
+                        ref.url = f'{base_url}#L{ref.line}'
                 self.code_refs_by_id[ref.target_id].append(ref)
         unknown = sorted(ref_id for ref_id in self.code_refs_by_id if ref_id not in self.by_id)
         if unknown:
