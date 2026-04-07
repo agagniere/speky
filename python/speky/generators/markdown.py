@@ -240,6 +240,11 @@ def link_to(item) -> str:
     return Markdown.link(item.title, f'/{item.folder}/{item.id}')
 
 
+def source_file_label(source_file: str, specs) -> str:
+    url = specs.spec_file_urls.get(source_file)
+    return Markdown.link(Markdown.literal(source_file), url) if url else Markdown.literal(source_file)
+
+
 def code_reference(ref) -> str:
     location = Markdown.literal(f'{ref.file}:{ref.line}')
     if ref.url:
@@ -299,7 +304,7 @@ def requirement_to_myst(self, output: MystWriter, specs):
                 dropdown.empty_line()
         output.empty_line()
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
-        dropdown.write_line(f'{Markdown.bold("Source file")}: {Markdown.literal(self.source_file)}')
+        dropdown.write_line(f'{Markdown.bold("Source file")}: {source_file_label(self.source_file, specs)}')
         dropdown.empty_line()
         if self.id in specs.code_refs_by_id:
             dropdown.write_line(Markdown.bold('Implemented in:'))
@@ -326,7 +331,7 @@ def test_to_myst(self, output: MystWriter, specs):
         with output.dropdown(0, 'Automated in', 'success', True, 'check-circle-fill') as dropdown:
             write_list_of_code_links(dropdown, test_code_refs)
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
-        dropdown.write_line(f'{Markdown.bold("Source file")}: `{self.source_file}`')
+        dropdown.write_line(f'{Markdown.bold("Source file")}: {source_file_label(self.source_file, specs)}')
         if misc_code_refs:
             dropdown.write_line(Markdown.bold('Code references:'))
             write_list_of_code_links(dropdown, misc_code_refs)
