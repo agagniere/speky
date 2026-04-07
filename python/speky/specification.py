@@ -137,6 +137,7 @@ class Specification:
                 current_manifest = Manifest(
                     name=data['name'],
                     root_dir=root_dir,
+                    source_file=absolute,
                     code_sources=data.get('code_sources', []),
                     link_config=link_config,
                     parent_manifest=manifest,

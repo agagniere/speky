@@ -249,6 +249,11 @@ def source_file_label(item) -> str:
     return Markdown.link(Markdown.literal(item.source_file), url) if url else Markdown.literal(item.source_file)
 
 
+def manifest_label(manifest) -> str:
+    url = manifest.link_config.url_for(manifest.source_file)
+    return Markdown.link(Markdown.literal(manifest.name), url) if url else Markdown.literal(manifest.name)
+
+
 def code_reference(ref) -> str:
     location = Markdown.literal(f'{ref.filename}:{ref.line}')
     if ref.url:
@@ -310,6 +315,9 @@ def requirement_to_myst(self, output: MystWriter, specs):
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
         dropdown.write_line(f'{Markdown.bold("Source file")}: {source_file_label(self)}')
         dropdown.empty_line()
+        if self.manifest:
+            dropdown.write_line(f'{Markdown.bold("Loaded from")}: {manifest_label(self.manifest)}')
+            dropdown.empty_line()
         if self.id in specs.code_refs_by_id:
             dropdown.write_line(Markdown.bold('Implemented in:'))
             write_list_of_code_links(dropdown, specs.code_refs_by_id[self.id])
@@ -336,6 +344,10 @@ def test_to_myst(self, output: MystWriter, specs):
             write_list_of_code_links(dropdown, test_code_refs)
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
         dropdown.write_line(f'{Markdown.bold("Source file")}: {source_file_label(self)}')
+        dropdown.empty_line()
+        if self.manifest:
+            dropdown.write_line(f'{Markdown.bold("Loaded from")}: {manifest_label(self.manifest)}')
+            dropdown.empty_line()
         if misc_code_refs:
             dropdown.write_line(Markdown.bold('Code references:'))
             write_list_of_code_links(dropdown, misc_code_refs)
