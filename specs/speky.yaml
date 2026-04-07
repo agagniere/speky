@@ -12,3 +12,6 @@ comments_csvs:
 code_sources:
   - python/speky/*.py
   - python/speky/generators/*.py
+source_links:
+  url: auto
+  branch: auto

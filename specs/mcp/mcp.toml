@@ -12,3 +12,6 @@ code_sources = [
   "python/speky_mcp/*.py",
   "tests/test_mcp_server.py",
 ]
+[source_links]
+url = "auto"
+branch = "auto"
