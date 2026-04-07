@@ -52,7 +52,7 @@ class CodeReference:
     file: str
     line: int
     symbol: str | None  # None for free references (tag not adjacent to a named symbol)
-    is_test: bool       # True if the associated symbol is a test function
+    is_test: bool  # True if the associated symbol is a test function
 
 
 def scan_sources(sources: list[Path], project_name: str, root: Path) -> list[CodeReference]:
@@ -80,11 +80,7 @@ def _scan_file(path: Path, project_name: str, root: Path) -> list[CodeReference]
         logger.warning('Cannot read %s: %s', path, err)
         return []
     relative = str(path.relative_to(root)) if path.is_relative_to(root) else str(path)
-    try:
-        return scanner(source, project_name, relative)
-    except Exception as err:
-        logger.warning('Cannot scan %s: %s', path, err)
-        return []
+    return scanner(source, project_name, relative)
 
 
 def _scan_python(source: bytes, project_name: str, file: str) -> list[CodeReference]:
@@ -123,13 +119,15 @@ def _walk(node: Node, source: bytes, ext: str, project_name: str, file: str, ref
             if m.group('project') != project_name:
                 continue
             symbol, is_test = _following_symbol(node, source, ext)
-            refs.append(CodeReference(
-                target_id=m.group('id'),
-                file=file,
-                line=node.start_point[0] + 1,
-                symbol=symbol,
-                is_test=is_test,
-            ))
+            refs.append(
+                CodeReference(
+                    target_id=m.group('id'),
+                    file=file,
+                    line=node.start_point[0] + 1,
+                    symbol=symbol,
+                    is_test=is_test,
+                )
+            )
         return  # don't recurse into comment text
 
     for child in node.children:
@@ -147,7 +145,7 @@ def _following_symbol(comment: Node, source: bytes, ext: str) -> tuple[str | Non
     if idx < 0:
         return None, False
 
-    for sibling in siblings[idx + 1:]:
+    for sibling in siblings[idx + 1 :]:
         if sibling.type in _COMMENT_TYPES[ext]:
             continue  # consecutive comments are still "adjacent"
         if sibling.type in _SYMBOL_TYPES[ext]:
@@ -196,17 +194,19 @@ def _collect_python_docstrings(root: Node, source: bytes, project_name: str, fil
                     is_test = bool(name and name.startswith(('test', 'Test')))
                     for m in ANNOTATION_RE.finditer(text):
                         if m.group('project') == project_name:
-                            refs.append(CodeReference(
-                                target_id=m.group('id'),
-                                file=file,
-                                line=string.start_point[0] + 1,
-                                symbol=name,
-                                is_test=is_test,
-                            ))
+                            refs.append(
+                                CodeReference(
+                                    target_id=m.group('id'),
+                                    file=file,
+                                    line=string.start_point[0] + 1,
+                                    symbol=name,
+                                    is_test=is_test,
+                                )
+                            )
 
     for child in root.children:
         _collect_python_docstrings(child, source, project_name, file, refs)
 
 
 def _text(node: Node, source: bytes) -> str:
-    return source[node.start_byte:node.end_byte].decode('utf8', errors='replace')
+    return source[node.start_byte : node.end_byte].decode('utf8', errors='replace')

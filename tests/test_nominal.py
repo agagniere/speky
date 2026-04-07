@@ -20,5 +20,6 @@ def test_simple_sample(sample):
     )
 
 
+# The manifest loads all samples
 def test_more_samples(sample):
     speky.run(['--check-only', sample('more_samples')])

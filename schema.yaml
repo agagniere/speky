@@ -52,9 +52,11 @@ step:
 ---
 project:
   kind: str(equals='project')
+  name: str(min=2)
   files: list(str())
   root_directory: str(required=False)
   comments_csvs: list(str(), required=False)
+  code_sources: list(str(), required=False)
 
 ---
 id: str(min=2, matches='[A-Z0-9_-]+')

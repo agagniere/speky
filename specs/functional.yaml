@@ -118,7 +118,7 @@ requirements:
     and pass that manifest to the speky CLI instead of listing individual files.
 
     A manifest is a YAML or TOML file with `kind: project` containing:
-    - `name`: an optional project identifier, used as the namespace in code reference tags
+    - `name`: the project identifier, used as the namespace in reference tags
       (e.g. `speky:my-project#SF001`)
     - `files`: a list of glob patterns matching specification files to load
     - `root_directory`: an optional path relative to the manifest, used as the base for
@@ -134,7 +134,7 @@ requirements:
     The user shall be able to list code source directories in the project manifest,
     so that Speky can scan them for references to requirements and tests.
 
-    The manifest shall accept an optional `code_sources` field: a list of directory paths
+    The manifest shall accept an optional `code_sources` field: a list of glob patterns
     relative to `root_directory`.
 
     Example:
@@ -144,8 +144,8 @@ requirements:
     files:
       - specs/*.yaml
     code_sources:
-      - src/
-      - tests/
+      - src/**/*.py
+      - tests/**/*.py
     ```
   tags: [input, tooling]
   ref: [SF014]
