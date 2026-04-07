@@ -57,6 +57,12 @@ project:
   root_directory: str(required=False)
   comments_csvs: list(str(), required=False)
   code_sources: list(str(), required=False)
+  source_links: include('source_links', required=False)
 
 ---
-id: str(min=2, matches='[A-Z0-9_-]+')
+source_links:
+  url: str()
+  branch: str(required=False)
+
+---
+id: str(min=2, matches='[A-Z][A-Z0-9_-]+')
