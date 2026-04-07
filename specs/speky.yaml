@@ -1,13 +1,14 @@
 kind: project
 name: speky
-code_sources:
-  - ../python/speky/*.py
-  - ../python/speky/generators/*.py
+root_directory: ..
 files:
-  - functional.yaml
-  - nonfunctional.yaml
-  - tests/*.yaml
-  - comments/*.yaml
-  - comments/*.toml
+  - specs/functional.yaml
+  - specs/nonfunctional.yaml
+  - specs/tests/*.yaml
+  - specs/comments/*.yaml
+  - specs/comments/*.toml
 comments_csvs:
-  - comments/*.csv
+  - specs/comments/*.csv
+code_sources:
+  - python/speky/*.py
+  - python/speky/generators/*.py

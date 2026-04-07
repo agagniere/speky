@@ -18,8 +18,8 @@ tests:
         "method": "initialize",
         "params": {
           "protocolVersion": "2025-11-25",
-          "capabilities": {...},
-          "clientInfo": {...}
+          "capabilities": {},
+          "clientInfo": {}
         }
       }
   - action: The server answers with an appropriate response
@@ -30,8 +30,8 @@ tests:
         "jsonrpc": "2.0",
         "result": {
           "protocolVersion": "2025-11-25",
-          "capabilities": {...},
-          "serverInfo": {...}
+          "capabilities": {},
+          "serverInfo": {}
         }
       }
   - action: The client notifies the initialization is complete
