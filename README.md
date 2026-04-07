@@ -46,6 +46,7 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    ```yaml
    # speky.yaml
    kind: project
+   name: my-project
    files:
      - requirements.yaml
      - tests.yaml

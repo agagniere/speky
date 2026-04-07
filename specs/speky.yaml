@@ -1,4 +1,8 @@
 kind: project
+name: speky
+code_sources:
+  - ../python/speky/*.py
+  - ../python/speky/generators/*.py
 files:
   - functional.yaml
   - nonfunctional.yaml

@@ -33,6 +33,8 @@ class Specification:
         self.tags = defaultdict(list)
         self.root_dir = Path()
         self.loaded_files: set[str] = set()
+        self.scan_configs: list[tuple[str, Path, list[str]]] = []
+        self.code_refs_by_id: dict[str, list] = defaultdict(list)
 
     def load_requirement(self, requirement: Requirement, category: str):
         """
@@ -128,10 +130,12 @@ class Specification:
                 for comment in data['comments']:
                     self.load_comment(Comment.from_dict(default | comment, display_name))
             case 'project':
-                ensure_fields(f'Manifest "{file_name}"', data, ['files'])
+                ensure_fields(f'Manifest "{file_name}"', data, ['name', 'files'])
                 manifest_dir = Path(file_name).parent
                 self.root_dir = (manifest_dir / data.get('root_directory', '.')).resolve()
                 logger.debug('Now loading from %s', self.root_dir)
+                if sources := data.get('code_sources'):
+                    self.scan_configs.append((data['name'], self.root_dir, sources))
                 for pattern in data['files']:
                     for path in sorted(self.root_dir.glob(pattern)):
                         self.read_file(str(path))
@@ -174,3 +178,21 @@ class Specification:
                 source_file = comment_list[0].source_file
                 message = f'Requirement or Test {referred}, referred from a comment in "{source_file}", does not exist'
                 raise KeyError(message)
+
+    def scan_code_sources(self):
+        """
+        speky:speky#SF016
+
+        Scan declared code sources for speky reference tags.
+        """
+        if not self.scan_configs:
+            return
+        from .scanner import scan_sources
+
+        for project_name, root_dir, patterns in self.scan_configs:
+            files = []
+            for pattern in patterns:
+                files.extend(sorted(root_dir.glob(pattern)))
+            logger.info('Scanning %d source file(s) for project %r', len(files), project_name)
+            for ref in scan_sources(files, project_name, root_dir):
+                self.code_refs_by_id[ref.target_id].append(ref)

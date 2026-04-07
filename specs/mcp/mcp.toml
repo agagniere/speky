@@ -1,5 +1,10 @@
 kind = "project"
+name = "speky_mcp"
 root_directory = ".."
+code_sources = [
+  "../python/speky_mcp/*.py",
+  "../tests/test_mcp_server.py",
+]
 files = [
   "mcp/nonfunctional.yaml",
   "mcp/query.yaml",

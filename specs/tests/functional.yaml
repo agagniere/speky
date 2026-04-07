@@ -346,6 +346,7 @@ tests:
       sample_lang: yaml
       sample: |
         kind: project
+        name: my-project
         files:
           - requirements.yaml
           - tests.yaml
@@ -361,7 +362,7 @@ tests:
   long: Declare code sources in the manifest and verify Speky discovers tagged references
   prereq: [TF012]
   steps:
-    - action: Add a `name` and `code_sources` to the manifest
+    - action: Add `code_sources` to the manifest
       run: cat speky.yaml
       sample_lang: yaml
       sample: |

@@ -90,6 +90,7 @@ def run(argv: list[str] | None = None):
             specs.read_comment_csv(filename)
 
     specs.check_references()
+    specs.scan_code_sources()
 
     logger.info('Specifications loaded successfully')
 

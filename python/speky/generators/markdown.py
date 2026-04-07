@@ -281,6 +281,13 @@ def requirement_to_myst(self, output: MystWriter, specs):
         output.empty_line()
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
         dropdown.write_line(f'**Source file:** `{self.source_file}`')
+        if self.id in specs.code_refs_by_id:
+            dropdown.empty_line()
+            dropdown.write_line('**Code references:**')
+            for ref in specs.code_refs_by_id[self.id]:
+                location = f'`{ref.file}:{ref.line}`'
+                label = f'`{ref.symbol}` — {location}' if ref.symbol else location
+                dropdown.write_line(f'- {label}')
     output.empty_line()
     if self.id in specs.comments:
         output.write_line('-' * 10)
@@ -299,6 +306,13 @@ def test_to_myst(self, output: MystWriter, specs):
         write_list_of_links(dropdown, sorted(map(specs.by_id.__getitem__, self.ref)))
     with output.dropdown(0, 'Source', 'info', False, 'file-code') as dropdown:
         dropdown.write_line(f'**Source file:** `{self.source_file}`')
+        if self.id in specs.code_refs_by_id:
+            dropdown.empty_line()
+            dropdown.write_line('**Code references:**')
+            for ref in specs.code_refs_by_id[self.id]:
+                location = f'`{ref.file}:{ref.line}`'
+                label = f'`{ref.symbol}` — {location}' if ref.symbol else location
+                dropdown.write_line(f'- {label}')
     output.empty_line()
     output.heading('Initial state', 1)
     if self.initial:
