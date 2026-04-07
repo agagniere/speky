@@ -196,3 +196,6 @@ class Specification:
             logger.info('Scanning %d source file(s) for project %r', len(files), project_name)
             for ref in scan_sources(files, project_name, root_dir):
                 self.code_refs_by_id[ref.target_id].append(ref)
+        unknown = sorted(ref_id for ref_id in self.code_refs_by_id if ref_id not in self.by_id)
+        if unknown:
+            logger.warning('Code references to unknown IDs: %s', ', '.join(unknown))

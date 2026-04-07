@@ -47,6 +47,11 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
             {k: v for k, v in comment.__dict__.items() if k in ('date', 'external', 'from', 'text')}
             for comment in specs.comments[requirement_id]
         ]
+    if requirement_id in specs.code_refs_by_id:
+        content['code_references'] = [
+            {k: v for k, v in {'file': r.file, 'line': r.line, 'symbol': r.symbol}.items() if v is not None}
+            for r in specs.code_refs_by_id[requirement_id]
+        ]
     return content
 
 
@@ -78,6 +83,15 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
     if test.prereq:
         content['prereq'] = [
             prereq_test.json_oneliner(False) for prereq_test in sorted(map(specs.by_id.__getitem__, test.prereq))
+        ]
+    if test_id in specs.code_refs_by_id:
+        content['code_references'] = [
+            {
+                k: v
+                for k, v in {'file': r.file, 'line': r.line, 'symbol': r.symbol, 'is_test': r.is_test}.items()
+                if v is not None
+            }
+            for r in specs.code_refs_by_id[test_id]
         ]
     return content
 

@@ -22,15 +22,11 @@ def simple_specs():
 
 @pytest.fixture
 def complex_specs():
-    """Load all test sample specifications."""
+    """Load all test sample specifications via manifest."""
     specs = Specification()
-    specs.read_file(str(SAMPLES_DIR / 'simple_requirements.yaml'))
-    specs.read_file(str(SAMPLES_DIR / 'simple_tests.yaml'))
-    specs.read_file(str(SAMPLES_DIR / 'simple_comments.yaml'))
-    specs.read_file(str(SAMPLES_DIR / 'more_requirements.toml'))
-    specs.read_file(str(SAMPLES_DIR / 'more_tests.yaml'))
-    specs.read_file(str(SAMPLES_DIR / 'more_comments.yaml'))
+    specs.read_file(str(SAMPLES_DIR / 'more_samples.yaml'))
     specs.check_references()
+    specs.scan_code_sources()
     return specs
 
 
@@ -734,3 +730,54 @@ class TestListAllIds:
 
         assert content['requirements'] == ['RF01', 'RF02', 'RF03', 'RF04']
         assert content['tests'] == ['T01', 'T02', 'T03', 'T04']
+
+
+class TestCodeReferences:
+    """Tests for code_references field in get_requirement and get_test."""
+
+    def test_get_requirement_with_code_references(self, complex_specs):
+        """speky:speky_mcp#TMCP043 — get_requirement includes code_references when present."""
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'get_requirement', 'arguments': {'id': 'RF03'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        refs = response['result']['structuredContent']['code_references']
+
+        assert len(refs) == 1
+        assert refs[0]['file'] == 'more_source.py'
+        assert refs[0]['symbol'] == 'my_function'
+        assert 'is_test' not in refs[0]
+
+    def test_get_requirement_without_code_references(self, complex_specs):
+        """Verify code_references is absent when no references exist for the requirement."""
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'get_requirement', 'arguments': {'id': 'RF04'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+
+        assert 'code_references' not in response['result']['structuredContent']
+
+    def test_get_test_with_code_references(self, complex_specs):
+        """speky:speky_mcp#TMCP044 — get_test includes code_references with is_test flag."""
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'get_test', 'arguments': {'id': 'T03'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        refs = response['result']['structuredContent']['code_references']
+
+        assert len(refs) == 1
+        assert refs[0]['file'] == 'more_source.go'
+        assert refs[0]['symbol'] == 'CreateFiles'
+        assert refs[0]['is_test'] is False

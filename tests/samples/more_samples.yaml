@@ -1,5 +1,8 @@
 kind: project
 name: more_samples
+code_sources:
+  - more_source.py
+  - more_source.go
 files:
   - simple_*.yaml
   - more_*.yaml
