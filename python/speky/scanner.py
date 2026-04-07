@@ -183,7 +183,7 @@ def _is_test(symbol: Node, siblings: list[Node], symbol_idx: int, source: bytes,
 
 
 def _collect_python_docstrings(root: Node, source: bytes, project_name: str, file: str, refs: list[CodeReference]):
-    """Collect tags from Python docstrings (first string literal in a function/class body)."""
+    """Collect tags from Python docstrings (first string literal in a function/class/module body)."""
     if root.type in ('function_definition', 'class_definition'):
         body = next((c for c in root.children if c.type == 'block'), None)
         if body:
@@ -205,6 +205,23 @@ def _collect_python_docstrings(root: Node, source: bytes, project_name: str, fil
                                     is_test=is_test,
                                 )
                             )
+    elif root.type == 'module':
+        first = next((c for c in root.children if c.is_named), None)
+        if first and first.type == 'expression_statement':
+            string = next((c for c in first.children if c.type == 'string'), None)
+            if string:
+                text = _text(string, source)
+                for m in ANNOTATION_RE.finditer(text):
+                    if m.group('project') == project_name:
+                        refs.append(
+                            CodeReference(
+                                target_id=m.group('id'),
+                                file=file,
+                                line=string.start_point[0] + 1,
+                                symbol=None,
+                                is_test=False,
+                            )
+                        )
 
     for child in root.children:
         _collect_python_docstrings(child, source, project_name, file, refs)
