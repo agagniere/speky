@@ -200,7 +200,7 @@ class TestGetRequirement:
         assert 'not found' in error_msg
 
     def test_get_requirement_wrong_type(self, simple_specs):
-        """speky:speky_mcp#TMCP006 — Test error when ID is a test, not a requirement."""
+        """speky:speky_mcp#TMCP016 — Test error when ID is a test, not a requirement."""
         request = {
             'jsonrpc': '2.0',
             'method': 'tools/call',

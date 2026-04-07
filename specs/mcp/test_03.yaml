@@ -161,7 +161,7 @@ tests:
           }
         }
       }
-- id: TMCP006b
+- id: TMCP016
   ref: [MCP003]
   short: get_requirement errors on non-requirement ID
   long: |

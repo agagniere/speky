@@ -149,6 +149,39 @@ requirements:
     ```
   tags: [input, tooling]
   ref: [SF014]
+- id: SF017
+  short: Source links in manifest
+  long: |
+    The user shall be able to declare a `source_links` section in the project manifest
+    to enable clickable links from code references to the corresponding lines in the
+    hosted repository (GitHub, GitLab, Codeberg, or any compatible platform).
+
+    The `source_links` section shall accept:
+    - `url`: the base URL of the repository (e.g. `https://github.com/owner/repo`).
+      The special value `auto` instructs Speky to detect it by running
+      `git remote get-url origin` and normalizing the result to an HTTPS URL.
+    - `branch`: the branch or ref used to build links (e.g. `main`).
+      The special value `auto` instructs Speky to detect the current branch by running
+      `git rev-parse --abbrev-ref HEAD`.
+      Defaults to `auto` when omitted.
+
+    Generated links shall have the form:
+    `{url}/blob/{branch}/{path_from_git_root}#L{line}`
+
+    Example:
+    ```yaml
+    source_links:
+      url: https://github.com/owner/repo
+      branch: main
+    ```
+
+    With auto-detection:
+    ```yaml
+    source_links:
+      url: auto
+    ```
+  tags: [input, tooling]
+  ref: [SF015, SF016]
 - id: SF016
   short: Scan code for requirement references
   long: |
