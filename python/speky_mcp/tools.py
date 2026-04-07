@@ -49,7 +49,11 @@ def handle_get_requirement(arguments: dict, specs: Specification) -> dict:
         ]
     if requirement_id in specs.code_refs_by_id:
         content['code_references'] = [
-            {k: v for k, v in {'file': r.file, 'line': r.line, 'symbol': r.symbol}.items() if v is not None}
+            {
+                k: v
+                for k, v in {'file': r.file, 'line': r.line, 'symbol': r.symbol, 'url': r.url}.items()
+                if v is not None
+            }
             for r in specs.code_refs_by_id[requirement_id]
         ]
     return content
@@ -88,7 +92,13 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         content['code_references'] = [
             {
                 k: v
-                for k, v in {'file': r.file, 'line': r.line, 'symbol': r.symbol, 'is_test': r.is_test}.items()
+                for k, v in {
+                    'file': r.file,
+                    'line': r.line,
+                    'symbol': r.symbol,
+                    'is_test': r.is_test,
+                    'url': r.url,
+                }.items()
                 if v is not None
             }
             for r in specs.code_refs_by_id[test_id]
