@@ -15,3 +15,6 @@ code_sources:
 source_links:
   url: auto
   branch: auto
+coverage_categories:
+  - functional
+  - non-functional

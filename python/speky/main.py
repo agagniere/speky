@@ -105,6 +105,7 @@ def run(argv: list[str] | None = None):
             specs.read_comment_csv(Path(filename))
     specs.check_references()
     specs.scan_code_sources()
+    specs.compute_coverage()
 
     if not cli_args.check_only:
         specification_to_myst(specs, cli_args.output_folder, cli_args.sort)

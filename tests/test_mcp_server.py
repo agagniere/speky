@@ -27,6 +27,7 @@ def complex_specs():
     specs.read_file(SAMPLES_DIR / 'more_samples.yaml')
     specs.check_references()
     specs.scan_code_sources()
+    specs.compute_coverage()
     return specs
 
 

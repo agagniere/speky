@@ -170,6 +170,7 @@ class Manifest:
         self.link_config = link_config
         self.parent = parent_manifest
         self.coverage_categories = coverage_categories or []
+        self.coverage: dict[str, tuple[list, list, list, list]] = {}
 
     def relative_path(self, absolute: Path) -> str:
         """Return the display name of a file: path relative to root_dir."""
