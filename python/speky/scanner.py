@@ -19,6 +19,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING
 
+import tree_sitter_bash as tsbash
 import tree_sitter_go as tsgo
 import tree_sitter_python as tspython
 import tree_sitter_rust as tsrust
@@ -31,17 +32,20 @@ logger = logging.getLogger(__name__)
 
 ANNOTATION_RE = re.compile(r'speky:(?P<project>[A-Za-z0-9_.-]+)#(?P<id>[A-Za-z0-9_-]+)')
 
+_SH_LANG = Language(tsbash.language())
 _PY_LANG = Language(tspython.language())
 _GO_LANG = Language(tsgo.language())
 _RS_LANG = Language(tsrust.language())
 
 _COMMENT_TYPES: dict[str, frozenset[str]] = {
+    '.sh': frozenset({'comment'}),
     '.py': frozenset({'comment'}),
     '.go': frozenset({'comment'}),
     '.rs': frozenset({'line_comment'}),
 }
 
 _SYMBOL_TYPES: dict[str, frozenset[str]] = {
+    '.sh': frozenset({'function_definition'}),
     '.py': frozenset({'function_definition', 'class_definition', 'decorated_definition'}),
     '.go': frozenset({'function_declaration', 'method_declaration'}),
     '.rs': frozenset({'function_item'}),
@@ -115,7 +119,15 @@ def _scan_rust(source: bytes, project_names: set[str], file: Path) -> list[CodeR
     return refs
 
 
+def _scan_bash(source: bytes, project_names: set[str], file: Path) -> list[CodeReference]:
+    tree = Parser(_SH_LANG).parse(source)
+    refs: list[CodeReference] = []
+    _walk(tree.root_node, source, '.sh', project_names, file, refs)
+    return refs
+
+
 _SCANNERS = {
+    '.sh': _scan_bash,
     '.py': _scan_python,
     '.go': _scan_go,
     '.rs': _scan_rust,
@@ -129,6 +141,10 @@ def _walk(node: Node, source: bytes, ext: str, project_names: set[str], file: Pa
             if m.group('project').lower() not in project_names:
                 continue
             symbol, is_test, symbol_node = _following_symbol(node, source, ext)
+            if ext == '.sh' and file.name.startswith('test'):
+                is_test = True
+            elif ext == '.go' and file.name.endswith('_test.go'):
+                is_test = True
             line = (symbol_node.start_point[0] + 1) if symbol_node else (node.start_point[0] + 1)
             refs.append(
                 CodeReference(
@@ -171,7 +187,7 @@ def _following_symbol(comment: Node, source: bytes, ext: str) -> tuple[str | Non
 def _symbol_name(node: Node, source: bytes) -> str | None:
     """Extract the identifier name from a function/class/method definition node."""
     for child in node.children:
-        if child.type in ('identifier', 'field_identifier'):
+        if child.type in ('identifier', 'field_identifier', 'word'):
             return _text(child, source)
         if child.type in ('function_definition', 'class_definition', 'function_item'):
             return _symbol_name(child, source)
@@ -182,7 +198,7 @@ def _is_test(symbol: Node, siblings: list[Node], symbol_idx: int, source: bytes,
     if ext == '.py':
         return bool(name and name.startswith(('test', 'Test')))
     if ext == '.go':
-        return bool(name and name.startswith('Test')) or '_test.go' in symbol.end_point[0:0]
+        return bool(name and name.startswith('Test'))
     if ext == '.rs':
         for sibling in reversed(siblings[:symbol_idx]):
             if sibling.type == 'attribute_item' and 'test' in _text(sibling, source):

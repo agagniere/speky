@@ -9,6 +9,7 @@ dependencies = [
     "tree-sitter-python>=0.23",
     "tree-sitter-go>=0.23",
     "tree-sitter-rust>=0.23",
+    "tree-sitter-bash>=0.25.1",
 ]
 authors = [{name = "Antoine GAGNIERE"}]
 license = 'MIT'
