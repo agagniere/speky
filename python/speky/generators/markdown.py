@@ -128,6 +128,8 @@ class Card(MystEnvironment):
         margin: str | None = None,
         header: str | None = None,
         footer: str | None = None,
+        class_card: str | None = None,
+        class_header: str | None = None,
     ):
         super().__init__(output, title, height)
         self.args['text-align'] = text_align
@@ -135,6 +137,10 @@ class Card(MystEnvironment):
             self.args['width'] = width
         if margin:
             self.args['margin'] = margin
+        if class_card:
+            self.args['class-card'] = class_card
+        if class_header:
+            self.args['class-header'] = class_header
         self.header = header
         self.footer = footer
 
@@ -377,7 +383,12 @@ def requirement_to_myst(self, output: MystWriter, specs):
         output.write_line('-' * 10)
         output.write_line(Markdown.bold('Comments'))
         for comment in sorted(specs.comments[self.id]):
-            with output.card(0, getattr(comment, 'from'), 'left' if comment.external else 'right') as card:
+            with output.card(
+                0,
+                getattr(comment, 'from'),
+                'left',
+                class_card='sd-bg-secondary' if comment.external else None,
+            ) as card:
                 card.write_line(comment.text)
 
 
@@ -426,5 +437,10 @@ def test_to_myst(self, output: MystWriter, specs):
     if self.id in specs.comments:
         output.heading('Comments', 1)
         for comment in sorted(specs.comments[self.id]):
-            with output.card(0, getattr(comment, 'from'), 'left' if comment.external else 'right') as card:
+            with output.card(
+                0,
+                getattr(comment, 'from'),
+                'left',
+                class_card='sd-bg-secondary' if comment.external else None,
+            ) as card:
                 card.write_line(comment.text)
