@@ -58,6 +58,7 @@ project:
   comments_csvs: list(str(), required=False)
   code_sources: list(str(), required=False)
   source_links: include('source_links', required=False)
+  coverage_categories: list(str(min=2), required=False)
 
 ---
 source_links:

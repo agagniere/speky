@@ -187,7 +187,7 @@ class MystWriter(MarkdownWriter):
         return Grid(self, columns, gutter)
 
 
-_BUCKET_COLORS = ['success', 'warning', 'danger', 'secondary']
+_BUCKET_COLORS = ['success', 'primary', 'warning', 'danger']
 _BUCKET_LABELS = ['Automated', 'Partially Manual', 'Manual', 'No Test Plan']
 _BUCKET_ICONS = ['check-circle-fill', 'gear', 'pencil', 'x-circle-fill']
 
@@ -205,9 +205,11 @@ def coverage_to_myst(specs, folder_name: str):
                 if not total:
                     continue
                 output.heading(f'{category.title()} ({total} requirements)', 2)
-                for label, color, icon, items in zip(_BUCKET_LABELS, _BUCKET_COLORS, _BUCKET_ICONS, buckets):
+                for label, color, icon, items in zip(
+                    _BUCKET_LABELS, _BUCKET_COLORS, _BUCKET_ICONS, buckets, strict=True
+                ):
                     title = f'{label} ({len(items)} — {len(items) / total:.0%})'
-                    with output.dropdown(0, title, color, False, icon) as dropdown:
+                    with output.dropdown(0, title, color if items else 'secondary', False, icon) as dropdown:
                         write_list_of_links(dropdown, items)
             output.empty_line()
 
