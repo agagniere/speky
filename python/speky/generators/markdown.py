@@ -168,9 +168,33 @@ class MystWriter(MarkdownWriter):
         return Card(height, self, title, align, **kwargs)
 
 
+_BUCKET_COLORS = ['success', 'warning', 'danger', 'secondary']
+_BUCKET_LABELS = ['Automated', 'Partially Manual', 'Manual', 'No Test Plan']
+_BUCKET_ICONS = ['check-circle-fill', 'gear', 'pencil', 'x-circle-fill']
+
+
+def coverage_to_myst(specs, folder_name: str, categories: list[str]):
+    with open(os.path.join(folder_name, 'coverage.md'), encoding='utf8', mode='w') as f:
+        output = MystWriter(f)
+        output.heading('Test Coverage', 0)
+        for category in categories:
+            requirements = specs.requirements.get(category, [])
+            total = len(requirements)
+            if not total:
+                continue
+            buckets = specs.coverage_buckets(category)
+            output.heading(f'{category.title()} ({total} requirements)', 1)
+            for label, color, icon, items in zip(_BUCKET_LABELS, _BUCKET_COLORS, _BUCKET_ICONS, buckets):
+                title = f'{label} ({len(items)} — {len(items) / total:.0%})'
+                with output.dropdown(0, title, color, False, icon) as dropdown:
+                    write_list_of_links(dropdown, items)
+            output.empty_line()
+
+
 def specification_to_myst(self, folder_name: str, sort: bool):
     os.makedirs(os.path.join(folder_name, 'requirements'), exist_ok=True)
     os.makedirs(os.path.join(folder_name, 'tests'), exist_ok=True)
+    coverage_categories = list(dict.fromkeys(c for m in self.manifests for c in m.coverage_categories))
     with open(os.path.join(folder_name, 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('{{project}} Specification', 0)
@@ -178,6 +202,10 @@ def specification_to_myst(self, folder_name: str, sort: bool):
             toc.write_line('requirements/index')
             toc.write_line('tests/index')
             toc.write_line('by_tag')
+            if coverage_categories:
+                toc.write_line('coverage')
+    if coverage_categories:
+        coverage_to_myst(self, folder_name, coverage_categories)
     with open(os.path.join(folder_name, 'requirements', 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
         output.heading('Requirements', 0)

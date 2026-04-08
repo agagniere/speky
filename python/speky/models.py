@@ -161,6 +161,7 @@ class Manifest:
         code_sources: list[str],
         link_config: SourceLinkConfig | NullSourceLinks,
         parent_manifest: Manifest | None,
+        coverage_categories: list[str] | None = None,
     ):
         self.name = name
         self.root_dir = root_dir
@@ -168,6 +169,7 @@ class Manifest:
         self.code_sources = code_sources
         self.link_config = link_config
         self.parent = parent_manifest
+        self.coverage_categories = coverage_categories or []
 
     def relative_path(self, absolute: Path) -> str:
         """Return the display name of a file: path relative to root_dir."""

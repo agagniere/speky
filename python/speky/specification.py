@@ -141,6 +141,7 @@ class Specification:
                     code_sources=data.get('code_sources', []),
                     link_config=link_config,
                     parent_manifest=manifest,
+                    coverage_categories=data.get('coverage_categories'),
                 )
                 self.manifests.append(current_manifest)
                 for pattern in data['files']:
@@ -212,3 +213,25 @@ class Specification:
         unknown = sorted(ref_id for ref_id in self.code_refs_by_id if ref_id not in self.by_id)
         if unknown:
             logger.warning('Code references to unknown IDs: %s', ', '.join(unknown))
+
+    def is_test_automated(self, test_id: str) -> bool:
+        """True if the test has at least one code reference flagged as a test function."""
+        return any(r.is_test for r in self.code_refs_by_id.get(test_id, []))
+
+    def coverage_buckets(self, category: str) -> tuple[list, list, list, list]:
+        """Partition requirements of a category into (automated, partial, manual, no_plan)."""
+        requirements = self.requirements.get(category, [])
+        automated, partial, manual, no_plan = [], [], [], []
+        for r in sorted(requirements):
+            if r.id not in self.testers_of:
+                no_plan.append(r)
+            else:
+                tests = self.testers_of[r.id]
+                auto_count = sum(1 for t in tests if self.is_test_automated(t.id))
+                if auto_count == len(tests):
+                    automated.append(r)
+                elif auto_count == 0:
+                    manual.append(r)
+                else:
+                    partial.append(r)
+        return automated, partial, manual, no_plan
