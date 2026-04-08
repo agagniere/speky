@@ -152,6 +152,22 @@ class Card(MystEnvironment):
         super().__exit__(*args)
 
 
+class Grid(MystEnvironment):
+    name = 'grid'
+
+    def __init__(self, output: MarkdownWriter, columns: str, gutter: int = 3):
+        super().__init__(output, title=columns, height=1)
+        self.args['gutter'] = gutter
+
+
+class GridItemCard(Card):
+    name = 'grid-item-card'
+
+    def __init__(self, output: MarkdownWriter, title: str, color: str, text_align: str = 'center'):
+        super().__init__(0, output, None, text_align, header=title)
+        self.args['class-header'] = f'sd-bg-{color} sd-text-white'
+
+
 class MystWriter(MarkdownWriter):
     def quote(self, quote_lines: list[str], attribution: str | None = None):
         if attribution:
@@ -166,6 +182,9 @@ class MystWriter(MarkdownWriter):
 
     def card(self, height, title, align, **kwargs):
         return Card(height, self, title, align, **kwargs)
+
+    def grid(self, columns: str, gutter: int = 3):
+        return Grid(self, columns, gutter)
 
 
 _BUCKET_COLORS = ['success', 'warning', 'danger', 'secondary']
