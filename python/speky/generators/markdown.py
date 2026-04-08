@@ -289,8 +289,7 @@ def specification_to_myst(self, folder_name: str, sort: bool):
             else:
                 output.heading(tag.title(), 1)
                 last = tag
-            for requirement in requirements:
-                output.write_line(f'- {link_to(requirement)}')
+            write_list_of_links(output, requirements)
 
 
 def link_to(item) -> str:
