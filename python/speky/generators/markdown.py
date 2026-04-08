@@ -363,7 +363,8 @@ def requirement_to_myst(self, output: MystWriter, specs):
     if self.properties:
         with output.dropdown(0, 'Properties', 'primary', False, 'note') as dropdown:
             for key, value in sorted(self.properties.items()):
-                dropdown.write_line(f'{Markdown.bold(key)}: {value}')
+                display = Markdown.link(value, value) if str(value).startswith('http') else value
+                dropdown.write_line(f'{Markdown.bold(key)}: {display}')
                 dropdown.empty_line()
     if self.id in specs.testers_of:
         with output.dropdown(0, 'Tested by', 'success', True, 'check-circle-fill') as dropdown:
