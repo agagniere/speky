@@ -91,6 +91,7 @@ def run(argv: list[str] | None = None):
 
     specs.check_references()
     specs.scan_code_sources()
+    specs.compute_coverage()
 
     logger.info('Specifications loaded successfully')
 

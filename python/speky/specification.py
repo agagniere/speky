@@ -218,20 +218,22 @@ class Specification:
         """True if the test has at least one code reference flagged as a test function."""
         return any(r.is_test for r in self.code_refs_by_id.get(test_id, []))
 
-    def coverage_buckets(self, category: str) -> tuple[list, list, list, list]:
-        """Partition requirements of a category into (automated, partial, manual, no_plan)."""
-        requirements = self.requirements.get(category, [])
-        automated, partial, manual, no_plan = [], [], [], []
-        for r in sorted(requirements):
-            if r.id not in self.testers_of:
-                no_plan.append(r)
-            else:
-                tests = self.testers_of[r.id]
-                auto_count = sum(1 for t in tests if self.is_test_automated(t.id))
-                if auto_count == len(tests):
-                    automated.append(r)
-                elif auto_count == 0:
-                    manual.append(r)
-                else:
-                    partial.append(r)
-        return automated, partial, manual, no_plan
+    def compute_coverage(self):
+        """Compute coverage buckets for each manifest that declares coverage_categories."""
+        for manifest in self.manifests:
+            for category in manifest.coverage_categories:
+                requirements = [r for r in self.requirements.get(category, []) if r.manifest is manifest]
+                automated, partial, manual, no_plan = [], [], [], []
+                for r in sorted(requirements):
+                    if r.id not in self.testers_of:
+                        no_plan.append(r)
+                    else:
+                        tests = self.testers_of[r.id]
+                        auto_count = sum(1 for t in tests if self.is_test_automated(t.id))
+                        if auto_count == len(tests):
+                            automated.append(r)
+                        elif auto_count == 0:
+                            manual.append(r)
+                        else:
+                            partial.append(r)
+                manifest.coverage[category] = (automated, partial, manual, no_plan)

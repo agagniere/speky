@@ -151,14 +151,16 @@ def handle_test_plan_coverage(arguments: dict, specs: Specification) -> dict:
     if category and category not in specs.requirements:
         raise ToolError(f'Category {category!r} not found')
 
-    categories = [category] if category else list(specs.requirements)
     automated, partial, manual, no_test_plan = [], [], [], []
-    for cat in categories:
-        a, p, m, n = specs.coverage_buckets(cat)
-        automated.extend(r.json_oneliner(True) for r in a)
-        partial.extend(r.json_oneliner(True) for r in p)
-        manual.extend(r.json_oneliner(True) for r in m)
-        no_test_plan.extend(r.json_oneliner(True) for r in n)
+    for manifest in specs.manifests:
+        for cat, buckets in manifest.coverage.items():
+            if category and cat != category:
+                continue
+            a, p, m, n = buckets
+            automated.extend(r.json_oneliner(True) for r in a)
+            partial.extend(r.json_oneliner(True) for r in p)
+            manual.extend(r.json_oneliner(True) for r in m)
+            no_test_plan.extend(r.json_oneliner(True) for r in n)
     return {
         'no_test_plan': no_test_plan,
         'manual_test_plan': manual,

@@ -12,6 +12,11 @@ code_sources = [
   "python/speky_mcp/*.py",
   "tests/test_mcp_server.py",
 ]
+coverage_categories = [
+  "functional",
+  "non-functional"
+]
+
 [source_links]
 url = "auto"
 branch = "auto"
