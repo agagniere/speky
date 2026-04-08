@@ -199,17 +199,23 @@ class Specification:
             return
         from .scanner import scan_sources
 
+        manifest_by_name = {m.name: m for m in self.manifests}
+
+        # Collect all files, deduplicated by resolved path
+        all_files: set[Path] = set()
         for manifest in manifests_with_sources:
-            files = []
             for pattern in manifest.code_sources:
-                files.extend(sorted(manifest.root_dir.glob(pattern)))
-            logger.info('Scanning %d source file(s) for project %r', len(files), manifest.name)
-            for ref in scan_sources(files, manifest.name):
-                ref.manifest = manifest
-                base_url = manifest.link_config.url_for(ref.file)
-                if base_url:
-                    ref.url = f'{base_url}#L{ref.line}'
-                self.code_refs_by_id[ref.target_id].append(ref)
+                for path in manifest.root_dir.glob(pattern):
+                    all_files.add(path.resolve())
+
+        logger.info('Scanning %d unique source file(s)', len(all_files))
+        for ref in scan_sources(sorted(all_files), set(manifest_by_name)):
+            manifest = manifest_by_name[ref.project]
+            ref.manifest = manifest
+            base_url = manifest.link_config.url_for(ref.file)
+            if base_url:
+                ref.url = f'{base_url}#L{ref.line}'
+            self.code_refs_by_id[ref.target_id].append(ref)
         unknown = sorted(ref_id for ref_id in self.code_refs_by_id if ref_id not in self.by_id)
         if unknown:
             logger.warning('Code references to unknown IDs: %s', ', '.join(unknown))

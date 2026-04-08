@@ -52,6 +52,7 @@ _SYMBOL_TYPES: dict[str, frozenset[str]] = {
 class CodeReference:
     """A speky tag found in source code."""
 
+    project: str
     file: Path
     line: int
     target_id: str
@@ -65,22 +66,22 @@ class CodeReference:
         return str(self.file.relative_to(self.manifest.root_dir))
 
 
-def scan_sources(sources: list[Path], project_name: str) -> list[CodeReference]:
+def scan_sources(sources: list[Path], project_names: set[str]) -> list[CodeReference]:
     """Scan a list of source files for speky tags."""
     refs: list[CodeReference] = []
     for source in sources:
         if source.is_file():
-            refs.extend(_scan_file(source, project_name))
+            refs.extend(_scan_file(source, project_names))
         elif source.is_dir():
             for path in sorted(source.rglob('*')):
                 if path.suffix in _SCANNERS:
-                    refs.extend(_scan_file(path, project_name))
+                    refs.extend(_scan_file(path, project_names))
         else:
             logger.warning('Code source not found: %s', source)
     return refs
 
 
-def _scan_file(path: Path, project_name: str) -> list[CodeReference]:
+def _scan_file(path: Path, project_names: set[str]) -> list[CodeReference]:
     scanner = _SCANNERS.get(path.suffix)
     if not scanner:
         return []
@@ -89,28 +90,28 @@ def _scan_file(path: Path, project_name: str) -> list[CodeReference]:
     except OSError as err:
         logger.warning('Cannot read %s: %s', path, err)
         return []
-    return scanner(source, project_name, path)
+    return scanner(source, project_names, path)
 
 
-def _scan_python(source: bytes, project_name: str, file: Path) -> list[CodeReference]:
+def _scan_python(source: bytes, project_names: set[str], file: Path) -> list[CodeReference]:
     tree = Parser(_PY_LANG).parse(source)
     refs: list[CodeReference] = []
-    _walk(tree.root_node, source, '.py', project_name, file, refs)
-    _collect_python_docstrings(tree.root_node, source, project_name, file, refs)
+    _walk(tree.root_node, source, '.py', project_names, file, refs)
+    _collect_python_docstrings(tree.root_node, source, project_names, file, refs)
     return refs
 
 
-def _scan_go(source: bytes, project_name: str, file: Path) -> list[CodeReference]:
+def _scan_go(source: bytes, project_names: set[str], file: Path) -> list[CodeReference]:
     tree = Parser(_GO_LANG).parse(source)
     refs: list[CodeReference] = []
-    _walk(tree.root_node, source, '.go', project_name, file, refs)
+    _walk(tree.root_node, source, '.go', project_names, file, refs)
     return refs
 
 
-def _scan_rust(source: bytes, project_name: str, file: Path) -> list[CodeReference]:
+def _scan_rust(source: bytes, project_names: set[str], file: Path) -> list[CodeReference]:
     tree = Parser(_RS_LANG).parse(source)
     refs: list[CodeReference] = []
-    _walk(tree.root_node, source, '.rs', project_name, file, refs)
+    _walk(tree.root_node, source, '.rs', project_names, file, refs)
     return refs
 
 
@@ -121,16 +122,17 @@ _SCANNERS = {
 }
 
 
-def _walk(node: Node, source: bytes, ext: str, project_name: str, file: Path, refs: list[CodeReference]):
+def _walk(node: Node, source: bytes, ext: str, project_names: set[str], file: Path, refs: list[CodeReference]):
     if node.type in _COMMENT_TYPES[ext]:
         text = _text(node, source)
         for m in ANNOTATION_RE.finditer(text):
-            if m.group('project') != project_name:
+            if m.group('project') not in project_names:
                 continue
             symbol, is_test, symbol_node = _following_symbol(node, source, ext)
             line = (symbol_node.start_point[0] + 1) if symbol_node else (node.start_point[0] + 1)
             refs.append(
                 CodeReference(
+                    project=m.group('project'),
                     target_id=m.group('id'),
                     file=file,
                     line=line,
@@ -141,7 +143,7 @@ def _walk(node: Node, source: bytes, ext: str, project_name: str, file: Path, re
         return  # don't recurse into comment text
 
     for child in node.children:
-        _walk(child, source, ext, project_name, file, refs)
+        _walk(child, source, ext, project_names, file, refs)
 
 
 def _following_symbol(comment: Node, source: bytes, ext: str) -> tuple[str | None, bool, Node | None]:
@@ -190,7 +192,7 @@ def _is_test(symbol: Node, siblings: list[Node], symbol_idx: int, source: bytes,
     return False
 
 
-def _collect_python_docstrings(root: Node, source: bytes, project_name: str, file: Path, refs: list[CodeReference]):
+def _collect_python_docstrings(root: Node, source: bytes, project_names: set[str], file: Path, refs: list[CodeReference]):
     """Collect tags from Python docstrings (first string literal in a function/class/module body)."""
     if root.type in ('function_definition', 'class_definition'):
         body = next((c for c in root.children if c.type == 'block'), None)
@@ -203,9 +205,10 @@ def _collect_python_docstrings(root: Node, source: bytes, project_name: str, fil
                     name = _symbol_name(root, source)
                     is_test = bool(name and name.startswith(('test', 'Test')))
                     for m in ANNOTATION_RE.finditer(text):
-                        if m.group('project') == project_name:
+                        if m.group('project') in project_names:
                             refs.append(
                                 CodeReference(
+                                    project=m.group('project'),
                                     target_id=m.group('id'),
                                     file=file,
                                     line=root.start_point[0] + 1,
@@ -220,9 +223,10 @@ def _collect_python_docstrings(root: Node, source: bytes, project_name: str, fil
             if string:
                 text = _text(string, source)
                 for m in ANNOTATION_RE.finditer(text):
-                    if m.group('project') == project_name:
+                    if m.group('project') in project_names:
                         refs.append(
                             CodeReference(
+                                project=m.group('project'),
                                 target_id=m.group('id'),
                                 file=file,
                                 line=string.start_point[0] + 1,
@@ -232,7 +236,7 @@ def _collect_python_docstrings(root: Node, source: bytes, project_name: str, fil
                         )
 
     for child in root.children:
-        _collect_python_docstrings(child, source, project_name, file, refs)
+        _collect_python_docstrings(child, source, project_names, file, refs)
 
 
 def _text(node: Node, source: bytes) -> str:
