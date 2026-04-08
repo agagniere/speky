@@ -199,7 +199,7 @@ class Specification:
             return
         from .scanner import scan_sources
 
-        manifest_by_name = {m.name: m for m in self.manifests}
+        manifest_by_name = {m.name.lower(): m for m in self.manifests}
 
         # Collect all files, deduplicated by resolved path
         all_files: set[Path] = set()

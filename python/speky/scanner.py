@@ -126,13 +126,13 @@ def _walk(node: Node, source: bytes, ext: str, project_names: set[str], file: Pa
     if node.type in _COMMENT_TYPES[ext]:
         text = _text(node, source)
         for m in ANNOTATION_RE.finditer(text):
-            if m.group('project') not in project_names:
+            if m.group('project').lower() not in project_names:
                 continue
             symbol, is_test, symbol_node = _following_symbol(node, source, ext)
             line = (symbol_node.start_point[0] + 1) if symbol_node else (node.start_point[0] + 1)
             refs.append(
                 CodeReference(
-                    project=m.group('project'),
+                    project=m.group('project').lower(),
                     target_id=m.group('id'),
                     file=file,
                     line=line,
@@ -205,10 +205,10 @@ def _collect_python_docstrings(root: Node, source: bytes, project_names: set[str
                     name = _symbol_name(root, source)
                     is_test = bool(name and name.startswith(('test', 'Test')))
                     for m in ANNOTATION_RE.finditer(text):
-                        if m.group('project') in project_names:
+                        if m.group('project').lower() in project_names:
                             refs.append(
                                 CodeReference(
-                                    project=m.group('project'),
+                                    project=m.group('project').lower(),
                                     target_id=m.group('id'),
                                     file=file,
                                     line=root.start_point[0] + 1,
@@ -226,7 +226,7 @@ def _collect_python_docstrings(root: Node, source: bytes, project_names: set[str
                     if m.group('project') in project_names:
                         refs.append(
                             CodeReference(
-                                project=m.group('project'),
+                                project=m.group('project').lower(),
                                 target_id=m.group('id'),
                                 file=file,
                                 line=string.start_point[0] + 1,
