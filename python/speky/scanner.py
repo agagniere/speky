@@ -60,6 +60,7 @@ class CodeReference:
     file: Path
     line: int
     target_id: str
+    language: str  # e.g. 'python', 'go', 'rust', 'bash'
     symbol: str | None  # None for free references (tag not adjacent to a named symbol)
     is_test: bool  # True if the associated symbol is a test function
     url: str | None = field(default=None)  # clickable link to the source line, if source_links configured
@@ -126,6 +127,13 @@ def _scan_bash(source: bytes, project_names: set[str], file: Path) -> list[CodeR
     return refs
 
 
+_LANGUAGES = {
+    '.sh': 'bash',
+    '.py': 'python',
+    '.go': 'go',
+    '.rs': 'rust',
+}
+
 _SCANNERS = {
     '.sh': _scan_bash,
     '.py': _scan_python,
@@ -152,6 +160,7 @@ def _walk(node: Node, source: bytes, ext: str, project_names: set[str], file: Pa
                     target_id=m.group('id'),
                     file=file,
                     line=line,
+                    language=_LANGUAGES[ext],
                     symbol=symbol,
                     is_test=is_test,
                 )
@@ -228,6 +237,7 @@ def _collect_python_docstrings(root: Node, source: bytes, project_names: set[str
                                     target_id=m.group('id'),
                                     file=file,
                                     line=root.start_point[0] + 1,
+                                    language='python',
                                     symbol=name,
                                     is_test=is_test,
                                 )
@@ -246,6 +256,7 @@ def _collect_python_docstrings(root: Node, source: bytes, project_names: set[str
                                 target_id=m.group('id'),
                                 file=file,
                                 line=string.start_point[0] + 1,
+                                language='python',
                                 symbol=None,
                                 is_test=False,
                             )

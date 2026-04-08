@@ -311,11 +311,22 @@ def manifest_label(manifest) -> str:
     return Markdown.link(Markdown.literal(manifest.name), url) if url else Markdown.literal(manifest.name)
 
 
+_LANGUAGE_ICONS = {
+    'python': '{fab}`python`',
+    'go': '{fab}`golang`',
+    'rust': '{fab}`rust`',
+    'bash': '{fas}`terminal`',
+}
+
+
 def code_reference(ref) -> str:
+    icon = _LANGUAGE_ICONS.get(ref.language)
     location = Markdown.literal(f'{ref.filename}:{ref.line}')
     if ref.url:
-        return Markdown.link(Markdown.literal(ref.symbol) if ref.symbol else location, ref.url)
-    return f'{Markdown.literal(ref.symbol)} at {location}' if ref.symbol else location
+        link = Markdown.link(Markdown.literal(ref.symbol) if ref.symbol else location, ref.url)
+        return f'{icon} {link}' if icon else link
+    text = f'{Markdown.literal(ref.symbol)} at {location}' if ref.symbol else location
+    return f'{icon} {text}' if icon else text
 
 
 def make_list_writer(function):
