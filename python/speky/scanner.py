@@ -217,7 +217,9 @@ def _is_test(symbol: Node, siblings: list[Node], symbol_idx: int, source: bytes,
     return False
 
 
-def _collect_python_docstrings(root: Node, source: bytes, project_names: set[str], file: Path, refs: list[CodeReference]):
+def _collect_python_docstrings(
+    root: Node, source: bytes, project_names: set[str], file: Path, refs: list[CodeReference]
+):
     """Collect tags from Python docstrings (first string literal in a function/class/module body)."""
     if root.type in ('function_definition', 'class_definition'):
         body = next((c for c in root.children if c.type == 'block'), None)
