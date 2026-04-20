@@ -1,0 +1,15 @@
+{
+  "name": "speky",
+  "owner": { "name": "Antoine GAGNIERE" },
+  "plugins": [
+    {
+      "name": "speky",
+      "description": "Speky requirements and test specification manager with usage guidelines",
+      "source": {
+        "source": "github",
+        "repo": "agagniere/speky",
+        "ref": "plugin"
+      }
+    }
+  ]
+}

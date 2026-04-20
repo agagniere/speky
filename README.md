@@ -118,4 +118,5 @@ Written 100% by hand (without even a language server):
 Written with LLM assistance:
 - MCP server specification, implementation and related tests
 - [DEVELOPMENT.md](DEVELOPMENT.md), [MCP.md](MCP.md), [AGENTS.md](AGENTS.md)
+- All files in [.claude-plugin](.claude-plugin), [skills](skills)
 - `python/speky/scanner.py`
