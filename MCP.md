@@ -224,24 +224,6 @@ List all requirements and tests that reference a given item.
 }
 ```
 
-### `list_untested_requirements`
-
-List requirements that have no associated tests.
-
-**Arguments** (all optional):
-- `category` (string): Restrict to a specific category. An error is returned if the category does not exist.
-
-**Returns:** `requirements` — sorted list of untested requirements, each with:
-- `id`, `category`: Always present
-- `short`: Short description (if present)
-- `tags`: List of tags (if present)
-
-**Examples:**
-```json
-{"name": "list_untested_requirements", "arguments": {}}
-{"name": "list_untested_requirements", "arguments": {"category": "functional"}}
-```
-
 ### `list_all_tags`
 
 List all tags used across all loaded requirements.
@@ -300,7 +282,7 @@ Claude can:
 
 **User:** "Which requirements have no tests yet?"
 
-Claude can use `list_untested_requirements` to get the full list, optionally filtered by category.
+Claude can use `test_plan_coverage` to get a project-wide coverage summary, then `search_requirements` to filter by category if needed.
 
 ### Verifying Implementation
 

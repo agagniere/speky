@@ -59,7 +59,7 @@ Exposes specs over JSON-RPC 2.0 to LLM clients (e.g., Claude).
 - `tools.py` — Tool implementations (search, get, list operations)
 - `protocol.py` — JSON-RPC error types
 
-**MCP tools available:** `get_requirement`, `get_test`, `search_requirements`, `search_tests`, `list_references_to`, `list_untested_requirements`, `list_all_tags`, `list_all_ids`
+**MCP tools available:** `get_requirement`, `get_test`, `search_requirements`, `search_tests`, `list_references_to`, `test_plan_coverage`, `list_all_tags`, `list_all_ids`
 
 See `MCP.md` for detailed tool documentation and architecture.
 
