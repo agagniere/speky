@@ -249,38 +249,113 @@ def handle_list_all_tags(arguments: dict, specs: Specification) -> dict:
 
 TOOL_REGISTRY: dict[str, dict] = {
     'get_requirement': {
-        'description': 'Get a requirement by ID',
-        'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
+        'description': (
+            'Get the full details of a requirement by ID, including its description, tags, '
+            'referenced requirements, tests that cover it, comments, and code references.'
+        ),
+        'inputSchema': {
+            'type': 'object',
+            'properties': {'id': {'type': 'string', 'description': "Requirement ID (e.g. 'RF01')"}},
+            'required': ['id'],
+        },
         'handler': handle_get_requirement,
     },
     'get_test': {
-        'description': 'Get a test by ID',
-        'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
+        'description': (
+            'Get the full details of a test by ID, including its description, steps, '
+            'prerequisites, requirements it covers, and code references.'
+        ),
+        'inputSchema': {
+            'type': 'object',
+            'properties': {'id': {'type': 'string', 'description': "Test ID (e.g. 'T01')"}},
+            'required': ['id'],
+        },
         'handler': handle_get_test,
     },
     'search_requirements': {
-        'description': 'Search requirements, optionally filtering by tag and/or category',
-        'inputSchema': {'type': 'object', 'properties': {'tag': {'type': 'string'}, 'category': {'type': 'string'}}},
+        'description': (
+            'Search and filter requirements by tag and/or category. '
+            'Returns summary entries; use get_requirement for full details. '
+            'Call with no arguments to list all requirements.'
+        ),
+        'inputSchema': {
+            'type': 'object',
+            'properties': {
+                'tag': {
+                    'type': 'string',
+                    'description': (
+                        "Filter by tag, exact match (e.g. 'security' or 'output:pdf'). "
+                        'Use list_all_tags to discover available tags. '
+                        'Returns an error if the tag does not exist.'
+                    ),
+                },
+                'category': {
+                    'type': 'string',
+                    'description': (
+                        "Filter by category (e.g. 'functional'). "
+                        'Returns an error if the category does not exist.'
+                    ),
+                },
+            },
+        },
         'handler': handle_search_requirements,
     },
     'search_tests': {
-        'description': 'Search tests, optionally filtering by category and/or requirement ID',
+        'description': (
+            'Search and filter tests by category and/or the requirement they cover. '
+            'Returns summary entries; use get_test for full details. '
+            'Call with no arguments to list all tests.'
+        ),
         'inputSchema': {
             'type': 'object',
-            'properties': {'category': {'type': 'string'}, 'tester_of': {'type': 'string'}},
+            'properties': {
+                'category': {
+                    'type': 'string',
+                    'description': (
+                        "Filter by category (e.g. 'functional'). "
+                        'Returns an error if the category does not exist.'
+                    ),
+                },
+                'tester_of': {
+                    'type': 'string',
+                    'description': (
+                        'Filter by requirement ID — returns only tests that reference '
+                        'that requirement in their ref field. '
+                        'Returns an error if the requirement ID does not exist.'
+                    ),
+                },
+            },
         },
         'handler': handle_search_tests,
     },
     'list_references_to': {
-        'description': 'List all requirements and tests that reference a given ID',
-        'inputSchema': {'type': 'object', 'properties': {'id': {'type': 'string'}}, 'required': ['id']},
+        'description': 'List all requirements and tests that reference a given ID in their ref field.',
+        'inputSchema': {
+            'type': 'object',
+            'properties': {
+                'id': {'type': 'string', 'description': 'Requirement or test ID to look up.'},
+            },
+            'required': ['id'],
+        },
         'handler': handle_list_references_to,
     },
     'test_plan_coverage': {
-        'description': 'Partition requirements by test plan coverage: no tests, manual only, partially automated, or fully automated',
+        'description': (
+            'Partition requirements into four coverage buckets based on their associated tests: '
+            'no tests, manual tests only, partially automated, or fully automated. '
+            'Useful for identifying requirements with no test plan.'
+        ),
         'inputSchema': {
             'type': 'object',
-            'properties': {'category': {'type': 'string'}},
+            'properties': {
+                'category': {
+                    'type': 'string',
+                    'description': (
+                        "Restrict the report to one category (e.g. 'functional'). "
+                        'Returns an error if the category does not exist.'
+                    ),
+                },
+            },
         },
         'handler': handle_test_plan_coverage,
     },
@@ -313,12 +388,18 @@ TOOL_REGISTRY: dict[str, dict] = {
         'handler': handle_least_tested_requirements,
     },
     'list_all_tags': {
-        'description': 'List all tags used across all requirements',
+        'description': (
+            'List all tags used across all requirements. '
+            'Use the returned values as inputs to the tag argument of search_requirements.'
+        ),
         'inputSchema': {'type': 'object', 'properties': {}},
         'handler': handle_list_all_tags,
     },
     'list_all_ids': {
-        'description': 'List all requirement and test IDs',
+        'description': (
+            'List all requirement and test IDs present in the loaded specifications. '
+            'Use these as inputs to get_requirement and get_test.'
+        ),
         'inputSchema': {'type': 'object', 'properties': {}},
         'handler': handle_list_all_ids,
     },
