@@ -76,11 +76,32 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    open sphinx/html/index.html
    ```
 
-## Use with an LLM agent (MCP)
+## Use with Claude Code
 
-Requires [uv](https://github.com/astral-sh/uv)
+### 1. Install the plugin
 
-Add to your MCP client's config:
+The plugin adds workflow skills that guide Claude when writing and navigating specifications.
+
+```shell
+/plugin marketplace add agagniere/speky
+/plugin install speky@speky
+```
+
+### 2. Connect the MCP server
+
+The MCP server exposes your project's specifications as queryable tools. Requires [uv](https://github.com/astral-sh/uv).
+
+```shell
+claude mcp add --scope project speky -- uvx --from git+https://github.com/agagniere/speky speky-mcp speky.yaml
+```
+
+Replace `speky.yaml` with the path to your manifest, or list individual YAML/TOML specification files.
+
+> **Note:** If you don't have a specification yet, the `/write-specs` skill will guide you through creating one and configuring the MCP server automatically.
+
+## Use with other MCP clients
+
+Requires [uv](https://github.com/astral-sh/uv). Add to your client's config:
 
 ```json
 {
@@ -94,12 +115,6 @@ Add to your MCP client's config:
 ```
 
 Replace `speky.yaml` with the path to your manifest, or list individual YAML/TOML specification files.
-
-For Claude Code specifically:
-
-```shell
-claude mcp add --scope project speky -- uvx --from git+https://github.com/agagniere/speky speky-mcp speky.yaml
-```
 
 ## Used by
 
