@@ -7,7 +7,7 @@ user-invocable: false
 
 # Speky Workflow Guidelines
 
-Speky organizes a project's detailed specification into **requirements** (what the system must do) and **tests** (how to verify it). Items are identified by short IDs like `RF01`, `RNF02`, `T03`.
+Speky organizes a project's detailed specification into **requirements** (what the system must do) and **tests** (how to verify it). Items are identified by short IDs like `RF001`, `RN02`, `T003`.
 
 ## Tool selection
 

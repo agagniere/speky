@@ -123,7 +123,24 @@ If no `specs/` directory (or equivalent) exists in the project, ask the user whe
 
 ## Step 7 — Write and validate the first requirement
 
-Write a single requirement from the plan as a Speky TOML file and show it to the user. Ask:
+See `tests/samples/more_requirements.toml` in speky repo for the format,
+and the `sample-req.toml` file bundled in this skill for an example of a good functional requirement.
+
+Requirements from the plan where short summaries, now you can go in more details on what user actions are expected and about observable effects.
+
+For requirements that are rephrased from an existing requirement (not from code),
+include the original requirement (or the most significant excerpt) in the `client_statement` field.
+
+For requirements that come from a webpage, include the URL as a `source` field inside the `properties` of that requirement.
+
+Use tags to allow readers to find a requirement from:
+- its theme
+- the associated system component
+etc
+
+Tags support one level of hierarchy to create sub-groups, e.g. `protocol`, `protocol:http`, `protocol:grpc`
+
+Write a single functional requirement from the plan as a Speky TOML file and show it to the user. Ask:
 
 > "Does this format and phrasing meet your expectations?"
 
@@ -132,6 +149,8 @@ Incorporate any feedback before proceeding. This first requirement sets the styl
 ## Step 8 — Write all requirements
 
 Write all remaining requirements as TOML files. Group them into files of roughly 4–10 requirements each, grouping by category, theme, or functional area. Use one file per group.
+
+Refer to the index .md files created in previous steps to correctly source requirements.
 
 ## Step 9 — Write the manifest
 
@@ -175,3 +194,7 @@ git commit
 ```
 
 Write a commit message that briefly describes what was specified (e.g. "Add initial Speky specification for <project or feature name>").
+
+## Step 13 - Restart
+
+Tell the user to exit then resume their Claude session, to connect to the newly configured MCP server
