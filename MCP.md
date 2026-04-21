@@ -264,6 +264,45 @@ List all requirements and tests that reference a given item.
 }
 ```
 
+### `test_plan_coverage`
+
+Partition requirements by test plan coverage status.
+
+**Arguments** (all optional):
+- `category` (string): Filter by category (e.g., `"functional"`). An error is returned if the category does not exist.
+
+If no argument is provided, all requirements are included.
+
+**Returns:** Four sorted lists of requirement summaries (each with `id`, `category`, and optionally `short` and `tags`):
+- `no_test_plan`: Requirements with no associated tests
+- `manual_test_plan`: Requirements covered only by manual tests
+- `partially_manual_test_plan`: Requirements covered by a mix of manual and automated tests
+- `automated_test_plan`: Requirements covered exclusively by automated tests
+
+**Examples:**
+```json
+{"name": "test_plan_coverage", "arguments": {}}
+{"name": "test_plan_coverage", "arguments": {"category": "functional"}}
+```
+
+**Response:**
+```json
+{
+  "structuredContent": {
+    "no_test_plan": [
+      {"category": "functional", "id": "RF01"}
+    ],
+    "manual_test_plan": [],
+    "partially_manual_test_plan": [
+      {"category": "functional", "id": "RF02", "short": "Second"}
+    ],
+    "automated_test_plan": [
+      {"category": "non-functional", "id": "RF03", "short": "Number 3", "tags": ["foo", "bar:baz"]}
+    ]
+  }
+}
+```
+
 ### `list_all_tags`
 
 List all tags used across all loaded requirements.
