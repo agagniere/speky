@@ -196,6 +196,46 @@ If no arguments are provided, all tests are returned. Filters can be combined.
 }
 ```
 
+### `least_tested_requirements`
+
+List all requirements ranked by ascending test coverage, with the least tested first.
+
+**Arguments** (all optional):
+- `tag` (string): Filter to requirements carrying this tag. An error is returned if the tag does not exist.
+- `category` (string): Filter to a single category. An error is returned if the category does not exist.
+- `count` (integer): Limit the number of results (e.g., `5` returns only the top 5). Negative or out-of-range values are ignored.
+
+Both `tag` and `category` may be combined. If no arguments are provided, all requirements are returned.
+
+**Sort order:**
+1. Ascending total number of test plans (untested requirements come first)
+2. Ascending number of automated test plans (fully manual before partially automated)
+3. Alphabetically by ID as a tiebreaker
+
+**Returns:** `requirements` — sorted list of requirement summaries, each with:
+- `id`, `category`: Always present
+- `short`: Short description (if present)
+- `test_plans`: Total number of tests referencing this requirement
+- `automated_test_plans`: Number of those tests with at least one automated code reference
+
+**Example:**
+```json
+{"name": "least_tested_requirements", "arguments": {"count": 3}}
+```
+
+**Response:**
+```json
+{
+  "structuredContent": {
+    "requirements": [
+      {"id": "RF04", "category": "non-functional", "test_plans": 0, "automated_test_plans": 0},
+      {"id": "RF01", "category": "functional", "test_plans": 1, "automated_test_plans": 0},
+      {"id": "RF02", "category": "functional", "short": "Second", "test_plans": 1, "automated_test_plans": 0}
+    ]
+  }
+}
+```
+
 ### `list_references_to`
 
 List all requirements and tests that reference a given item.
@@ -282,7 +322,7 @@ Claude can:
 
 **User:** "Which requirements have no tests yet?"
 
-Claude can use `test_plan_coverage` to get a project-wide coverage summary, then `search_requirements` to filter by category if needed.
+Claude can use `test_plan_coverage` to get a project-wide coverage summary partitioned into four buckets, or `least_tested_requirements` to get a ranked list sorted from least to most covered — useful for prioritizing where to write test plans next.
 
 ### Verifying Implementation
 
