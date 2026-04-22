@@ -786,3 +786,79 @@ class TestCodeReferences:
         assert refs[0]['file'] == 'more_source.go'
         assert refs[0]['symbol'] == 'CreateFiles'
         assert refs[0]['is_test'] is False
+
+
+class TestLeastTestedRequirements:
+    """Tests for least_tested_requirements tool."""
+
+    def _call(self, specs, **arguments):
+        response = handle_request(
+            {
+                'jsonrpc': '2.0',
+                'method': 'tools/call',
+                'id': 2,
+                'params': {'name': 'least_tested_requirements', 'arguments': arguments},
+            },
+            specs,
+            initialized=True,
+        )
+        return response['result']
+
+    def test_sorted_by_coverage(self, complex_specs):
+        """speky:speky_mcp#TMCP045 — All requirements returned sorted by ascending test count."""
+        requirements = self._call(complex_specs)['structuredContent']['requirements']
+
+        assert [(r['id'], r['test_plans'], r['automated_test_plans']) for r in requirements] == [
+            ('RF04', 0, 0),
+            ('RF01', 1, 0),
+            ('RF02', 1, 0),
+            ('RF03', 2, 1),
+        ]
+        assert requirements[2]['short'] == 'Second'
+        assert requirements[3]['short'] == 'Number 3'
+
+    def test_filter_by_category(self, complex_specs):
+        """speky:speky_mcp#TMCP046 — Filter by category returns only matching requirements."""
+        requirements = self._call(complex_specs, category='non-functional')['structuredContent']['requirements']
+
+        assert [r['id'] for r in requirements] == ['RF04', 'RF03']
+        assert all(r['category'] == 'non-functional' for r in requirements)
+
+    def test_filter_by_tag(self, complex_specs):
+        """speky:speky_mcp#TMCP047 — Filter by tag returns only tagged requirements."""
+        requirements = self._call(complex_specs, tag='foo')['structuredContent']['requirements']
+
+        assert len(requirements) == 1
+        assert requirements[0]['id'] == 'RF03'
+
+    def test_count_limit(self, complex_specs):
+        """speky:speky_mcp#TMCP048 — count limits the number of results to the N least tested."""
+        requirements = self._call(complex_specs, count=2)['structuredContent']['requirements']
+
+        assert [r['id'] for r in requirements] == ['RF04', 'RF01']
+
+    def test_unknown_category_error(self, simple_specs):
+        """speky:speky_mcp#TMCP049 — Error returned when category does not exist."""
+        result = self._call(simple_specs, category='nonexistent')
+
+        assert result['isError'] is True
+        assert 'nonexistent' in result['structuredContent']['error']
+
+    def test_unknown_tag_error(self, simple_specs):
+        """speky:speky_mcp#TMCP050 — Error returned when tag does not exist."""
+        result = self._call(simple_specs, tag='nonexistent')
+
+        assert result['isError'] is True
+        assert 'nonexistent' in result['structuredContent']['error']
+
+    def test_negative_count_ignored(self, complex_specs):
+        """speky:speky_mcp#TMCP051 — Negative count is ignored and all requirements are returned."""
+        requirements = self._call(complex_specs, count=-1)['structuredContent']['requirements']
+
+        assert [r['id'] for r in requirements] == ['RF04', 'RF01', 'RF02', 'RF03']
+
+    def test_large_count_ignored(self, complex_specs):
+        """speky:speky_mcp#TMCP052 — Count larger than result set is ignored and all requirements are returned."""
+        requirements = self._call(complex_specs, count=9999)['structuredContent']['requirements']
+
+        assert [r['id'] for r in requirements] == ['RF04', 'RF01', 'RF02', 'RF03']
