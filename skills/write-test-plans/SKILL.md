@@ -93,9 +93,9 @@ Assign IDs that continue from the highest existing test ID in the project. If un
 
 ## Step 7 — Update the manifest
 
-Open the project manifest (typically `${user_config.spec_folder}/speky.yaml`, `${user_config.spec_folder}/mcp/mcp.toml`, or similar).
+Open the project manifest at `${user_config.spec_folder}/${user_config.manifest_name}`.
 
-Check whether it already includes a glob pattern that would match the new test files (e.g. `${user_config.spec_folder}/tests/*.toml`). If not, add the appropriate pattern to the `files` list.
+Check whether it already includes a glob pattern that would match the new test files (e.g. `tests/*.toml` relative to the manifest). If not, add the appropriate pattern to the `files` list.
 
 ## Step 8 — Validate
 
@@ -122,4 +122,4 @@ Write a commit message naming the requirements being covered, e.g. `"Add test pl
 
 Tell the user:
 
-> "The new test plans have been committed. **Restart the MCP server** (exit and resume your Claude session) so the server picks up the changes."
+> "The new test plans have been committed. **Restart the `speky` MCP server** so it picks up the changes. In Claude Code, use `/mcp` → select the server → restart."

@@ -59,9 +59,18 @@ Category is a free-form field, but four values cover most cases:
 
 When writing requirements, pick the category that reflects the *intent*, not just the wording.
 
+## MCP servers
+
+Two MCP servers are available:
+
+- **`speky`** — the current project's specification. Use this for all requirement and test lookups in the project you are working on.
+- **`speky-selfspec`** — Speky's own specification. Use this as a reference when you need examples of well-formed requirements or tests, or to understand how Speky itself works.
+
+Always qualify tool calls with the correct server when both are connected.
+
 ## Adding or modifying specifications
 
 - Requirements and tests are defined in YAML or TOML files, which can be placed anywhere, usually under `${user_config.spec_folder}/`.
-- The manifest (`${user_config.spec_folder}/speky.yaml` or similar) lists which files to load — new files must be referenced there.
-- After editing spec files, the MCP server must be restarted to pick up changes (it loads specs at startup).
+- The manifest (`${user_config.spec_folder}/${user_config.manifest_name}`) lists which files to load — new files must be referenced there.
+- After editing spec files, restart the `speky` MCP server to pick up changes (it loads specs at startup).
 - IDs must be unique across the entire loaded specification set.

@@ -6,7 +6,9 @@ disable-model-invocation: false
 argument-hint: "[path to project root, defaults to current directory]"
 ---
 
-You are helping the user write a formal Speky specification for an existing project. Follow these steps in order, waiting for user input where indicated.
+You are helping the user write a formal Speky specification for an existing project. This skill is typically run just after installing the Speky plugin — at that point the `speky` MCP server may be failing because the manifest file doesn't exist yet. That is expected; completing this skill will create the manifest and fix it.
+
+Follow these steps in order, waiting for user input where indicated.
 
 ## Step 1 — Identify relevant files
 
@@ -150,47 +152,29 @@ Refer to the index .md files created in previous steps to correctly source requi
 
 ## Step 8 — Write the manifest
 
-Create a Speky manifest file at `${user_config.spec_folder}/speky.yaml` listing all the requirement files written in the previous step.
+Create a Speky manifest file at `${user_config.spec_folder}/${user_config.manifest_name}` listing all the requirement files written in the previous step.
 
-## Step 9 — Configure the MCP server
-
-Add or update `.mcp.json` at the project root to load the new manifest:
-
-```json
-{
-  "mcpServers": {
-    "speky": {
-      "command": "uvx",
-      "args": ["--from", "git+https://github.com/agagniere/speky", "speky-mcp", "${user_config.spec_folder}/speky.yaml"]
-    }
-  }
-}
-```
-
-Replace the manifest path if it differs.
-
-## Step 10 — Validate
+## Step 9 — Validate
 
 Run speky to validate the specification:
 
 ```bash
-uvx --from git+https://github.com/agagniere/speky speky ${user_config.spec_folder}/speky.yaml --check-only
+uvx --from git+https://github.com/agagniere/speky speky ${user_config.spec_folder}/${user_config.manifest_name} --check-only
 ```
 
 Fix any validation errors before finishing.
 
-## Step 11 — Commit
+## Step 10 — Commit
 
 Stage and commit all new specification files:
 
 ```bash
 git add ${user_config.spec_folder}/
-git add .mcp.json
 git commit
 ```
 
 Write a commit message that briefly describes what was specified (e.g. "Add initial Speky specification for <project or feature name>").
 
-## Step 12 - Restart
+## Step 11 — Restart the MCP server
 
-Tell the user to exit then resume their Claude session, to connect to the newly configured MCP server
+Tell the user to restart the `speky` MCP server so it picks up the new manifest. In Claude Code, this can be done with `/mcp` → select the server → restart.
