@@ -40,6 +40,288 @@ tests:
         }
       }
 
+- id: TMCP045
+  ref: [MCP012]
+  short: least_tested_requirements returns all requirements sorted by coverage
+  long: Call least_tested_requirements with no arguments and verify all requirements are returned sorted by ascending test count
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with no arguments
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {}
+        }
+      }
+  - action: |
+      Verify all requirements are returned sorted by ascending test count, then ascending
+      automated count, then alphabetically by ID:
+      - RF04 first (0 tests)
+      - RF01 then RF02 (1 test each, 0 automated)
+      - RF03 last (2 tests, 1 automated)
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"id": "RF04", "category": "non-functional", "test_plans": 0, "automated_test_plans": 0},
+              {"id": "RF01", "category": "functional", "test_plans": 1, "automated_test_plans": 0},
+              {"id": "RF02", "category": "functional", "short": "Second", "test_plans": 1, "automated_test_plans": 0},
+              {"id": "RF03", "category": "non-functional", "short": "Number 3", "test_plans": 2, "automated_test_plans": 1}
+            ]
+          }
+        }
+      }
+
+- id: TMCP046
+  ref: [MCP012]
+  short: least_tested_requirements filtered by category
+  long: Call least_tested_requirements with a category filter and verify only requirements from that category appear
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with category `non-functional`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"category": "non-functional"}
+        }
+      }
+  - action: Verify only non-functional requirements appear, RF04 before RF03
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"id": "RF04", "category": "non-functional", "test_plans": 0, "automated_test_plans": 0},
+              {"id": "RF03", "category": "non-functional", "short": "Number 3", "test_plans": 2, "automated_test_plans": 1}
+            ]
+          }
+        }
+      }
+
+- id: TMCP047
+  ref: [MCP012]
+  short: least_tested_requirements filtered by tag
+  long: Call least_tested_requirements with a tag filter and verify only tagged requirements appear
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with tag `foo`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"tag": "foo"}
+        }
+      }
+  - action: Verify only RF03 is returned, as it is the only requirement tagged with `foo`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"id": "RF03", "category": "non-functional", "short": "Number 3", "test_plans": 2, "automated_test_plans": 1}
+            ]
+          }
+        }
+      }
+
+- id: TMCP048
+  ref: [MCP012]
+  short: least_tested_requirements limited by count
+  long: Call least_tested_requirements with count=2 and verify only the 2 least tested requirements are returned
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with count `2`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"count": 2}
+        }
+      }
+  - action: Verify only the 2 least tested requirements are returned — RF04 and RF01
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"id": "RF04", "category": "non-functional", "test_plans": 0, "automated_test_plans": 0},
+              {"id": "RF01", "category": "functional", "test_plans": 1, "automated_test_plans": 0}
+            ]
+          }
+        }
+      }
+
+- id: TMCP049
+  ref: [MCP012]
+  short: least_tested_requirements errors on unknown category
+  long: |
+    The user shall receive a tool execution error when filtering by a category
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with a non-existent category
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"category": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the category was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Category 'nonexistent' not found"
+          }
+        }
+      }
+
+- id: TMCP050
+  ref: [MCP012]
+  short: least_tested_requirements errors on unknown tag
+  long: |
+    The user shall receive a tool execution error when filtering by a tag
+    that does not exist in the loaded specifications.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with a non-existent tag
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"tag": "nonexistent"}
+        }
+      }
+  - action: Verify a tool execution error is returned indicating the tag was not found
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "isError": true,
+          "structuredContent": {
+            "error": "Tag 'nonexistent' not found"
+          }
+        }
+      }
+
+- id: TMCP051
+  ref: [MCP012]
+  short: least_tested_requirements ignores negative count
+  long: A negative count value shall be ignored and all requirements shall be returned.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with count `-1`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"count": -1}
+        }
+      }
+  - action: Verify all requirements are returned as if count were not specified
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"id": "RF04", "category": "non-functional", "test_plans": 0, "automated_test_plans": 0},
+              {"id": "RF01", "category": "functional", "test_plans": 1, "automated_test_plans": 0},
+              {"id": "RF02", "category": "functional", "short": "Second", "test_plans": 1, "automated_test_plans": 0},
+              {"id": "RF03", "category": "non-functional", "short": "Number 3", "test_plans": 2, "automated_test_plans": 1}
+            ]
+          }
+        }
+      }
+
+- id: TMCP052
+  ref: [MCP012]
+  short: least_tested_requirements ignores count larger than result set
+  long: A count larger than the number of available requirements shall be ignored and all requirements shall be returned.
+  prereq: [TMCP003]
+  steps:
+  - action: The client calls `least_tested_requirements` with count `9999`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "least_tested_requirements",
+          "arguments": {"count": 9999}
+        }
+      }
+  - action: Verify all requirements are returned as if count were not specified
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "requirements": [
+              {"id": "RF04", "category": "non-functional", "test_plans": 0, "automated_test_plans": 0},
+              {"id": "RF01", "category": "functional", "test_plans": 1, "automated_test_plans": 0},
+              {"id": "RF02", "category": "functional", "short": "Second", "test_plans": 1, "automated_test_plans": 0},
+              {"id": "RF03", "category": "non-functional", "short": "Number 3", "test_plans": 2, "automated_test_plans": 1}
+            ]
+          }
+        }
+      }
+
 - id: TMCP044
   ref: [MCP004]
   short: get_test includes code references with is_test flag

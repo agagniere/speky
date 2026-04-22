@@ -169,6 +169,47 @@ def handle_test_plan_coverage(arguments: dict, specs: Specification) -> dict:
     }
 
 
+def handle_least_tested_requirements(arguments: dict, specs: Specification) -> dict:
+    """speky:speky_mcp#MCP012"""
+    tag = arguments.get('tag')
+    category = arguments.get('category')
+
+    if tag and tag not in specs.tags:
+        raise ToolError(f'Tag {tag!r} not found')
+    if category and category not in specs.requirements:
+        raise ToolError(f'Category {category!r} not found')
+
+    if tag and category:
+        by_tag = {r.id for r in specs.tags[tag]}
+        candidates = [r for r in specs.requirements[category] if r.id in by_tag]
+    elif tag:
+        candidates = specs.tags[tag]
+    elif category:
+        candidates = specs.requirements[category]
+    else:
+        candidates = [r for reqs in specs.requirements.values() for r in reqs]
+
+    results = []
+    for r in candidates:
+        tests = specs.testers_of.get(r.id, [])
+        total = len(tests)
+        automated = sum(1 for t in tests if specs.is_test_automated(t.id))
+        entry = {
+            'id': r.id,
+            'category': r.category,
+            'test_plans': total,
+            'automated_test_plans': automated,
+        }
+        if r.short:
+            entry['short'] = r.short
+        results.append(entry)
+
+    results.sort(key=lambda r: (r['test_plans'], r['automated_test_plans'], r['id']))
+    if (count := arguments.get('count')) and count > 0:
+        results = results[:count]
+    return {'requirements': results}
+
+
 def handle_search_tests(arguments: dict, specs: Specification) -> dict:
     """speky:speky_mcp#MCP011"""
     tester_of = arguments.get('tester_of')
@@ -242,6 +283,34 @@ TOOL_REGISTRY: dict[str, dict] = {
             'properties': {'category': {'type': 'string'}},
         },
         'handler': handle_test_plan_coverage,
+    },
+    'least_tested_requirements': {
+        'description': 'List requirements sorted by ascending test coverage: fewest total test plans first, then fewest automated test plans',
+        'inputSchema': {
+            'type': 'object',
+            'properties': {
+                'tag': {
+                    'type': 'string',
+                    'description': (
+                        "Filter by tag, exact match (e.g. 'security' or 'output:pdf'). "
+                        'Use list_all_tags to discover available tags. '
+                        'Returns an error if the tag does not exist.'
+                    ),
+                },
+                'category': {
+                    'type': 'string',
+                    'description': (
+                        "Restrict the report to one category (e.g. 'functional'). "
+                        'Returns an error if the category does not exist.'
+                    ),
+                },
+                'count': {
+                    'type': 'integer',
+                    'description': 'Maximum number of requirements to return. Omit to return all.',
+                },
+            },
+        },
+        'handler': handle_least_tested_requirements,
     },
     'list_all_tags': {
         'description': 'List all tags used across all requirements',
