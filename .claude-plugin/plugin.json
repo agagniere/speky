@@ -28,5 +28,13 @@
         "specs/mcp/mcp.toml"
       ]
     }
+  },
+  "userConfig": {
+    "spec_folder": {
+      "title": "Specification folder",
+      "description": "Where specification files are placed",
+      "type": "directory",
+      "default": "specs"
+    }
   }
 }

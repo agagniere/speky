@@ -117,11 +117,7 @@ Once the user approves the list, write the final requirements as a plan file at 
 
 Tell the user the plan has been saved to `/tmp/speky-plan-${CLAUDE_SESSION_ID}.md`, then continue with the steps below.
 
-## Step 6 — Determine where to store the specification
-
-If no `specs/` directory (or equivalent) exists in the project, ask the user where they want to store the specification files.
-
-## Step 7 — Write and validate the first requirement
+## Step 6 — Write and validate the first requirement
 
 See `tests/samples/more_requirements.toml` in speky repo for the format,
 and the `sample-req.toml` file bundled in this skill for an example of a good functional requirement.
@@ -146,17 +142,17 @@ Write a single functional requirement from the plan as a Speky TOML file and sho
 
 Incorporate any feedback before proceeding. This first requirement sets the style for all the rest.
 
-## Step 8 — Write all requirements
+## Step 7 — Write all requirements
 
 Write all remaining requirements as TOML files. Group them into files of roughly 4–10 requirements each, grouping by category, theme, or functional area. Use one file per group.
 
 Refer to the index .md files created in previous steps to correctly source requirements.
 
-## Step 9 — Write the manifest
+## Step 8 — Write the manifest
 
-Create a Speky manifest file at `specs/speky.yaml` listing all the requirement files written in the previous step.
+Create a Speky manifest file at `${user_config.spec_folder}/speky.yaml` listing all the requirement files written in the previous step.
 
-## Step 10 — Configure the MCP server
+## Step 9 — Configure the MCP server
 
 Add or update `.mcp.json` at the project root to load the new manifest:
 
@@ -165,7 +161,7 @@ Add or update `.mcp.json` at the project root to load the new manifest:
   "mcpServers": {
     "speky": {
       "command": "uvx",
-      "args": ["--from", "git+https://github.com/agagniere/speky", "speky-mcp", "specs/speky.yaml"]
+      "args": ["--from", "git+https://github.com/agagniere/speky", "speky-mcp", "${user_config.spec_folder}/speky.yaml"]
     }
   }
 }
@@ -173,28 +169,28 @@ Add or update `.mcp.json` at the project root to load the new manifest:
 
 Replace the manifest path if it differs.
 
-## Step 11 — Validate
+## Step 10 — Validate
 
 Run speky to validate the specification:
 
 ```bash
-uvx --from git+https://github.com/agagniere/speky speky specs/speky.yaml --check-only
+uvx --from git+https://github.com/agagniere/speky speky ${user_config.spec_folder}/speky.yaml --check-only
 ```
 
 Fix any validation errors before finishing.
 
-## Step 12 — Commit
+## Step 11 — Commit
 
 Stage and commit all new specification files:
 
 ```bash
-git add specs/
+git add ${user_config.spec_folder}/
 git add .mcp.json
 git commit
 ```
 
 Write a commit message that briefly describes what was specified (e.g. "Add initial Speky specification for <project or feature name>").
 
-## Step 13 - Restart
+## Step 12 - Restart
 
 Tell the user to exit then resume their Claude session, to connect to the newly configured MCP server

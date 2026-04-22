@@ -56,7 +56,7 @@ For each scenario, determine the **initial state**:
 
 For each target requirement `<ID>`:
 
-1. Derive the test file path from `source_file`: take its parent directory, append `tests/`, and name the file `test_<ID>.toml`. For example, if `source_file` is `specs/mcp/query.yaml`, write to `specs/mcp/tests/test_MCP005.toml`; if it is `specs/functional.yaml`, write to `specs/tests/test_F012.toml`.
+1. Derive the test file path from `source_file`: take its parent directory, append `tests/`, and name the file `test_<ID>.toml`. For example, if `source_file` is `${user_config.spec_folder}/mcp/query.yaml`, write to `${user_config.spec_folder}/mcp/tests/test_MCP005.toml`; if it is `${user_config.spec_folder}/functional.yaml`, write to `${user_config.spec_folder}/tests/test_F012.toml`.
 2. Write all new scenarios for that requirement into that single file.
 
 Use TOML format:
@@ -93,9 +93,9 @@ Assign IDs that continue from the highest existing test ID in the project. If un
 
 ## Step 7 — Update the manifest
 
-Open the project manifest (typically `specs/speky.yaml`, `specs/mcp/mcp.toml`, or similar).
+Open the project manifest (typically `${user_config.spec_folder}/speky.yaml`, `${user_config.spec_folder}/mcp/mcp.toml`, or similar).
 
-Check whether it already includes a glob pattern that would match the new test files (e.g. `specs/tests/*.toml`). If not, add the appropriate pattern to the `files` list.
+Check whether it already includes a glob pattern that would match the new test files (e.g. `${user_config.spec_folder}/tests/*.toml`). If not, add the appropriate pattern to the `files` list.
 
 ## Step 8 — Validate
 
@@ -112,7 +112,7 @@ Fix any validation errors before continuing.
 Stage and commit:
 
 ```bash
-git add specs/
+git add ${user_config.spec_folder}/
 git commit
 ```
 
