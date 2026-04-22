@@ -1,7 +1,7 @@
 ---
 name: speky-workflow
 description: Guidelines for working with Speky requirements and tests via the speky MCP server tools
-when_to_use: When working with requirements, tests, specifications, or using any speky MCP tools (get_requirement, get_test, search_requirements, search_tests, list_all_ids, list_all_tags, list_references_to, test_plan_coverage)
+when_to_use: When working with requirements, tests, specifications, or using any speky MCP tools (get_requirement, get_test, search_requirements, search_tests, list_all_ids, list_all_tags, list_references_to, test_plan_coverage, least_tested_requirements)
 user-invocable: false
 ---
 
@@ -17,6 +17,7 @@ Speky organizes a project's detailed specification into **requirements** (what t
 - Use `list_all_tags` to discover available tags before filtering by one.
 - Use `list_references_to` to find what depends on a given item (e.g., before modifying or deleting it).
 - Use `test_plan_coverage` to find coverage gaps — it gives a project-wide summary without requiring manual inspection.
+- Use `least_tested_requirements` to find where to write new tests — it ranks requirements by ascending test count and accepts `tag`, `category`, and `count` filters.
 
 ## Reading results
 
@@ -28,6 +29,7 @@ Speky organizes a project's detailed specification into **requirements** (what t
 
 - A requirement is covered if it appears in at least one test's `ref` list (visible as `tested_by` on the requirement).
 - Use `test_plan_coverage` for a project-wide summary before concluding anything about overall coverage.
+- Use `least_tested_requirements` (with optional `tag` or `category` filter) to pinpoint the requirements most in need of new tests.
 - Do not infer coverage from description alone — always check `tested_by`.
 
 ## Writing test plans
