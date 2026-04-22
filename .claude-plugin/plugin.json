@@ -9,5 +9,8 @@
   "homepage": "https://agagniere.github.io/speky",
   "repository": "https://github.com/agagniere/speky",
   "license": "MIT",
-  "keywords": ["specification", "requirements"]
+  "keywords": [
+    "specification",
+    "requirements"
+  ]
 }
