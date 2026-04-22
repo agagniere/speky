@@ -292,8 +292,7 @@ TOOL_REGISTRY: dict[str, dict] = {
                 'category': {
                     'type': 'string',
                     'description': (
-                        "Filter by category (e.g. 'functional'). "
-                        'Returns an error if the category does not exist.'
+                        "Filter by category (e.g. 'functional'). Returns an error if the category does not exist."
                     ),
                 },
             },
@@ -312,8 +311,7 @@ TOOL_REGISTRY: dict[str, dict] = {
                 'category': {
                     'type': 'string',
                     'description': (
-                        "Filter by category (e.g. 'functional'). "
-                        'Returns an error if the category does not exist.'
+                        "Filter by category (e.g. 'functional'). Returns an error if the category does not exist."
                     ),
                 },
                 'tester_of': {
@@ -360,7 +358,11 @@ TOOL_REGISTRY: dict[str, dict] = {
         'handler': handle_test_plan_coverage,
     },
     'least_tested_requirements': {
-        'description': 'List requirements sorted by ascending test coverage: fewest total test plans first, then fewest automated test plans',
+        'description': (
+            'List requirements ranked by ascending test coverage, returning test_plans and automated_test_plans counts per entry. '
+            'Useful for prioritizing where to write new tests. '
+            'Sort order: fewest total test plans first, then fewest automated test plans, then alphabetically by ID.'
+        ),
         'inputSchema': {
             'type': 'object',
             'properties': {
@@ -390,7 +392,7 @@ TOOL_REGISTRY: dict[str, dict] = {
     'list_all_tags': {
         'description': (
             'List all tags used across all requirements. '
-            'Use the returned values as inputs to the tag argument of search_requirements.'
+            'Use the returned values as inputs to the tag argument of search_requirements or least_tested_requirements.'
         ),
         'inputSchema': {'type': 'object', 'properties': {}},
         'handler': handle_list_all_tags,
