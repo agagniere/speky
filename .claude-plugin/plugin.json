@@ -15,18 +15,32 @@
     "requirements"
   ],
   "mcpServers": {
-    "speky-specs": {
+    "speky": {
+      "type": "stdio",
       "command": "uv",
       "args": [
-        "--directory",
-        "${CLAUDE_PLUGIN_ROOT}",
-        "--cache-dir",
-        "${CLAUDE_PLUGIN_DATA}/uvcache",
+        "run",
+        "speky-mcp",
+        "${user_config.spec_folder}/speky.yaml"
+      ],
+      "env": {
+        "UV_CACHE_DIR": "${CLAUDE_PLUGIN_DATA}/uvcache",
+        "UV_PROJECT": "${CLAUDE_PLUGIN_ROOT}"
+      }
+    },
+    "speky-selfspec": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
         "run",
         "speky-mcp",
         "specs/speky.yaml",
         "specs/mcp/mcp.toml"
-      ]
+      ],
+      "env": {
+        "UV_CACHE_DIR": "${CLAUDE_PLUGIN_DATA}/uvcache",
+        "UV_WORKING_DIR": "${CLAUDE_PLUGIN_ROOT}"
+      }
     }
   },
   "userConfig": {
