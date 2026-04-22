@@ -83,8 +83,11 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
 The plugin adds workflow skills that guide Claude when writing and navigating specifications.
 
 ```shell
-/plugin marketplace add agagniere/speky
-/plugin install speky@speky
+claude plugin marketplace add agagniere/speky
+claude plugin install speky@speky --scope project
+# '--scope project' to add to your repo for everyone
+# '--scope local' to add to the repo just for you (gitignored)
+# '--scope user' to enable for you regardless of the repo
 ```
 
 ### 2. Connect the MCP server

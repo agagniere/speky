@@ -1,10 +1,11 @@
 {
   "name": "speky",
-  "description": "Best use Speky requirements and test specification manager",
+  "description": "Skills to best use Speky, the requirements and test specification manager.",
   "version": "0.4.0",
   "author": {
     "name": "Antoine Gagniere",
-    "email": "antoine@gagniere.dev"
+    "email": "antoine@gagniere.dev",
+    "url": "https://github.com/agagniere"
   },
   "homepage": "https://agagniere.github.io/speky",
   "repository": "https://github.com/agagniere/speky",
@@ -12,5 +13,20 @@
   "keywords": [
     "specification",
     "requirements"
-  ]
+  ],
+  "mcpServers": {
+    "speky-specs": {
+      "command": "uv",
+      "args": [
+        "--directory",
+        "${CLAUDE_PLUGIN_ROOT}",
+        "--cache-dir",
+        "${CLAUDE_PLUGIN_DATA}/uvcache",
+        "run",
+        "speky-mcp",
+        "specs/speky.yaml",
+        "specs/mcp/mcp.toml"
+      ]
+    }
+  }
 }
