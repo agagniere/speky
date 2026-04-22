@@ -1,15 +1,16 @@
 {
   "name": "speky",
-  "owner": { "name": "Antoine GAGNIERE" },
+  "owner": {
+    "name": "Antoine Gagniere",
+    "email": "antoine@gagniere.dev"
+  },
+  "metadata": {
+    "description": "Plugins used to work with the Speky specification tool"
+  },
   "plugins": [
     {
       "name": "speky",
-      "description": "Speky requirements and test specification manager with usage guidelines",
-      "source": {
-        "source": "github",
-        "repo": "agagniere/speky",
-        "ref": "plugin"
-      }
+      "source": "./"
     }
   ]
 }

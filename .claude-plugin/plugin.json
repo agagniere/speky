@@ -1,6 +1,13 @@
 {
   "name": "speky",
-  "description": "Speky requirements and test specification manager",
-  "version": "0.3.3-dev",
-  "author": { "name": "Antoine GAGNIERE" }
+  "description": "Best use Speky requirements and test specification manager",
+  "version": "0.4.0",
+  "author": {
+    "name": "Antoine Gagniere",
+    "email": "antoine@gagniere.dev"
+  },
+  "homepage": "https://agagniere.github.io/speky",
+  "repository": "https://github.com/agagniere/speky",
+  "license": "MIT",
+  "keywords": ["specification", "requirements"]
 }

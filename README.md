@@ -97,7 +97,7 @@ claude mcp add --scope project speky -- uvx --from git+https://github.com/agagni
 
 Replace `speky.yaml` with the path to your manifest, or list individual YAML/TOML specification files.
 
-> **Note:** If you don't have a specification yet, the `/write-specs` skill will guide you through creating one and configuring the MCP server automatically.
+> **Note:** If you don't have a specification yet, the `/speky:init` skill will guide you through creating one and configuring the MCP server automatically.
 
 ## Use with other MCP clients
 
