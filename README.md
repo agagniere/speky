@@ -9,30 +9,9 @@ then generate a PDF and a static website.
 - [x] PDF with all relevant cross references
 - [x] Static website
 - [ ] Differential PDF to see what changed since last version
-
-## Generate a PDF
-
-Requires [Typst](https://github.com/typst/typst) >= 0.13.0
-
-The speky typst package will generate content from language-agnostic data, like YAML or TOML.
-
-### Install locally
-
-```shell
-make -C typst
-```
-
-### Use from typst
-
-```typst
-#import "@local/speky:0.3.0": speky
-
-#speky((
-  "requirements.yaml",
-  "tests.yaml",
-  "comments.yaml",
-).map(yaml))
-```
+- [x] Coverage report to see in a glimpse how much of your requirements are tested
+- [x] MCP server for LLMs to discover and query your spec
+- [x] Claude plugin to help onboard new projects, or write test plans
 
 ## Generate a static website
 
@@ -76,11 +55,38 @@ Requires [uv](https://github.com/astral-sh/uv) >= 0.8.0
    open sphinx/html/index.html
    ```
 
+## Generate a PDF
+
+Requires [Typst](https://github.com/typst/typst) >= 0.13.0
+
+### Install locally
+
+```shell
+SPEKYTMP=$(mktemp -d)
+git clone https://github.com/agagniere/speky $SPEKYTMP --depth=1
+make -C $SPEKYTMP/typst PACKAGE_VERSION=0.3.0
+rm -rf $SPEKYTMP
+```
+
+### Use from typst
+
+```typst
+#import "@local/speky:0.3.0": speky
+
+#speky((
+  "requirements.yaml",
+  "tests.yaml",
+  "comments.yaml",
+).map(yaml))
+```
+
 ## Use with Claude Code
+
+Requires [uv](https://github.com/astral-sh/uv).
 
 ### 1. Install the plugin
 
-The plugin adds workflow skills that guide Claude when writing and navigating specifications.
+The plugin adds workflow skills and two MCP servers.
 
 ```shell
 claude plugin marketplace add agagniere/speky
@@ -90,17 +96,22 @@ claude plugin install speky@speky --scope project
 # '--scope user' to enable for you regardless of the repo
 ```
 
-### 2. Connect the MCP server
+The plugin registers two MCP servers automatically:
+- **`speky`** — queries your project's specification
+- **`speky-selfspec`** — queries Speky's own spec, available as a reference at any time
 
-The MCP server exposes your project's specifications as queryable tools. Requires [uv](https://github.com/astral-sh/uv).
+### 2. Configure (if needed)
 
-```shell
-claude mcp add --scope project speky -- uvx --from git+https://github.com/agagniere/speky speky-mcp speky.yaml
-```
+By default, specs are stored in `specs/` with a manifest named `spec.yaml`. Configure these when they differ from your project layout:
 
-Replace `speky.yaml` with the path to your manifest, or list individual YAML/TOML specification files.
+| Setting         | Default     | Description                                 |
+|-----------------|-------------|---------------------------------------------|
+| `spec_folder`   | `specs`     | Folder where specification files are placed |
+| `manifest_name` | `spec.yaml` | Filename of the main manifest               |
 
-> **Note:** If you don't have a specification yet, the `/speky:init` skill will guide you through creating one and configuring the MCP server automatically.
+### 3. First time?
+
+If you don't have a specification yet, the `speky` MCP server will fail to start — the manifest doesn't exist yet. That's expected. Run `/speky:init` in Claude Code: it will guide you through writing your first requirements and creating the manifest. Then restart the `speky` MCP server via `/mcp`.
 
 ## Use with other MCP clients
 
