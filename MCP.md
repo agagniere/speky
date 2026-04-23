@@ -27,7 +27,7 @@ claude plugin marketplace add agagniere/speky --scope project
 claude plugin install speky@speky --scope project
 ```
 
-See the [README](README.md#use-with-claude-code) for configuration options (`spec_folder`, `manifest_name`).
+The plugin expects specifications in `specs/` with a manifest at `specs/spec.yaml`. Run `/speky:init` to set this up.
 
 **Additional options:**
 - Add `-C path/to/comments.csv` to include CSV comment files not covered by the manifest

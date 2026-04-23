@@ -21,7 +21,7 @@
       "args": [
         "run",
         "speky-mcp",
-        "${user_config.spec_folder}/${user_config.manifest_name}"
+        "specs/spec.yaml"
       ],
       "env": {
         "UV_CACHE_DIR": "${CLAUDE_PLUGIN_DATA}/uvcache",
@@ -41,20 +41,6 @@
         "UV_CACHE_DIR": "${CLAUDE_PLUGIN_DATA}/uvcache",
         "UV_WORKING_DIR": "${CLAUDE_PLUGIN_ROOT}"
       }
-    }
-  },
-  "userConfig": {
-    "spec_folder": {
-      "title": "Specification folder",
-      "description": "Where specification files are placed",
-      "type": "directory",
-      "default": "specs"
-    },
-    "manifest_name": {
-      "title": "Manifest name",
-      "description": "Filename of the main manifest of the repo's specification",
-      "type": "file",
-      "default": "spec.yaml"
     }
   }
 }

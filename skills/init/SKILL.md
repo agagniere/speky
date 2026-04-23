@@ -152,31 +152,31 @@ Refer to the index .md files created in previous steps to correctly source requi
 
 ## Step 8 — Write the manifest
 
-Create a Speky manifest file at `${user_config.spec_folder}/${user_config.manifest_name}`. See the `sample-manifest.yaml` bundled in this skill for the format.
+Create a Speky manifest file at `specs/spec.yaml`. See the `sample-manifest.yaml` bundled in this skill for the format.
 
 Fill in the following fields:
 
 - **`name`**: a short project identifier — it becomes the namespace in reference tags (e.g. `speky:<name>#RF001`).
-- **`root_directory`**: a path relative to the manifest file, used as the base for all glob patterns below. Since the manifest typically lives inside `${user_config.spec_folder}/`, set this to `..` so patterns resolve from the project root.
+- **`root_directory`**: a path relative to the manifest file, used as the base for all glob patterns below. Since the manifest typically lives inside `specs/`, set this to `..` so patterns resolve from the project root.
 - **`files`**: glob patterns matching the specification files written in the previous steps. These are relative to `root_directory`.
 - **`code_sources`**: glob patterns matching the relevant source files identified in Step 1. Speky scans these for reference tags (comments like `speky:<name>#<ID>`) to link code back to requirements. These are also relative to `root_directory`.
 
 ## Step 9 — Set up website generation
 
-Place a `conf.py` and `Makefile` in `${user_config.spec_folder}/` so the user can generate a static website from the specification. Use the `sample-conf.py` and `sample-Makefile` bundled in this skill as starting points.
+Place a `conf.py` and `Makefile` in `specs/` so the user can generate a static website from the specification. Use the `sample-conf.py` and `sample-Makefile` bundled in this skill as starting points.
 
 Adapt them to the project:
 - In `conf.py`: set `project` to the project name.
-- In `Makefile`: set `ManifestSource` to `${user_config.manifest_name}`, `UV_CACHE_DIR` to `${CLAUDE_PLUGIN_DATA}/uvcache`, and `UV_PROJECT` to `${CLAUDE_PLUGIN_ROOT}`.
+- In `Makefile`: set `UV_CACHE_DIR` to `${CLAUDE_PLUGIN_DATA}/uvcache` and `UV_PROJECT` to `${CLAUDE_PLUGIN_ROOT}`.
 
-The user can then run `make -C ${user_config.spec_folder} html` to build, or `make -C ${user_config.spec_folder} open` to build and open in a browser.
+The user can then run `make -C specs html` to build, or `make -C specs open` to build and open in a browser.
 
 ## Step 10 — Validate
 
 Run speky to validate the specification:
 
 ```bash
-uvx --from git+https://github.com/agagniere/speky speky ${user_config.spec_folder}/${user_config.manifest_name} --check-only
+make -C specs check
 ```
 
 Fix any validation errors before finishing.
@@ -186,7 +186,7 @@ Fix any validation errors before finishing.
 Stage and commit all new specification files:
 
 ```bash
-git add ${user_config.spec_folder}/
+git add specs/
 git commit
 ```
 

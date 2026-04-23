@@ -70,7 +70,7 @@ Always qualify tool calls with the correct server when both are connected.
 
 ## Adding or modifying specifications
 
-- Requirements and tests are defined in YAML or TOML files, which can be placed anywhere, usually under `${user_config.spec_folder}/`.
-- The manifest (`${user_config.spec_folder}/${user_config.manifest_name}`) lists which files to load — new files must be referenced there.
+- Requirements and tests are defined in YAML or TOML files, which can be placed anywhere, usually under `specs/`.
+- The manifest (`specs/spec.yaml`) lists which files to load — new files must be referenced there.
 - After editing spec files, restart the `speky` MCP server to pick up changes (it loads specs at startup).
 - IDs must be unique across the entire loaded specification set.

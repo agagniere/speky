@@ -102,16 +102,7 @@ The plugin registers two MCP servers automatically:
 - **`speky`** — queries your project's specification
 - **`speky-selfspec`** — queries Speky's own spec, available as a reference at any time
 
-### 2. Configure (if needed)
-
-By default, specs are stored in `specs/` with a manifest named `spec.yaml`. Configure these when they differ from your project layout:
-
-| Setting         | Default     | Description                                 |
-|-----------------|-------------|---------------------------------------------|
-| `spec_folder`   | `specs`     | Folder where specification files are placed |
-| `manifest_name` | `spec.yaml` | Filename of the main manifest               |
-
-### 3. First time?
+### 2. First time?
 
 If you don't have a specification yet, the `speky` MCP server will fail to start — the manifest doesn't exist yet. That's expected. Run `/speky:init` in Claude Code: it will guide you through writing your first requirements and creating the manifest. Then restart the `speky` MCP server via `/mcp`.
 
