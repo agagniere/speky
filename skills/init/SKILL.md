@@ -169,6 +169,8 @@ Adapt them to the project:
 - In `conf.py`: set `project` to the project name.
 - In `Makefile`: set `UV_CACHE_DIR` to `${CLAUDE_PLUGIN_DATA}/uvcache` and `UV_PROJECT` to `${CLAUDE_PLUGIN_ROOT}`.
 
+Also create a `specs/.gitignore` listing the build output folders (`markdown/` and `site/` by default, matching the Makefile variables).
+
 The user can then run `make -C specs html` to build, or `make -C specs open` to build and open in a browser.
 
 ## Step 10 — Validate
