@@ -152,7 +152,14 @@ Refer to the index .md files created in previous steps to correctly source requi
 
 ## Step 8 — Write the manifest
 
-Create a Speky manifest file at `${user_config.spec_folder}/${user_config.manifest_name}` listing all the requirement files written in the previous step.
+Create a Speky manifest file at `${user_config.spec_folder}/${user_config.manifest_name}`. See the `sample-manifest.yaml` bundled in this skill for the format.
+
+Fill in the following fields:
+
+- **`name`**: a short project identifier — it becomes the namespace in reference tags (e.g. `speky:<name>#RF001`).
+- **`root_directory`**: a path relative to the manifest file, used as the base for all glob patterns below. Since the manifest typically lives inside `${user_config.spec_folder}/`, set this to `..` so patterns resolve from the project root.
+- **`files`**: glob patterns matching the specification files written in the previous steps. These are relative to `root_directory`.
+- **`code_sources`**: glob patterns matching the relevant source files identified in Step 1. Speky scans these for reference tags (comments like `speky:<name>#<ID>`) to link code back to requirements. These are also relative to `root_directory`.
 
 ## Step 9 — Validate
 

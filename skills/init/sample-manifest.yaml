@@ -1,0 +1,19 @@
+kind: project
+name: my-project
+# root_directory is relative to this manifest file.
+# Since the manifest lives inside specs/, set this to ".."
+# so that all glob patterns below resolve from the project root.
+root_directory: ..
+files:
+  - specs/requirements.yaml
+  - specs/nonfunctional.yaml
+  - specs/tests/*.yaml
+code_sources:
+  - src/**/*.py
+  - tests/**/*.py
+source_links:
+  url: auto
+  branch: auto
+coverage_categories:
+  - functional
+  - non-functional
