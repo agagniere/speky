@@ -89,11 +89,13 @@ Requires [uv](https://github.com/astral-sh/uv).
 The plugin adds workflow skills and two MCP servers.
 
 ```shell
-claude plugin marketplace add agagniere/speky
+# Share with everyone in the repo (both commands need the same scope)
+claude plugin marketplace add agagniere/speky --scope project
 claude plugin install speky@speky --scope project
-# '--scope project' to add to your repo for everyone
-# '--scope local' to add to the repo just for you (gitignored)
-# '--scope user' to enable for you regardless of the repo
+
+# Or just for yourself
+claude plugin marketplace add agagniere/speky --scope user
+claude plugin install speky@speky --scope user
 ```
 
 The plugin registers two MCP servers automatically:

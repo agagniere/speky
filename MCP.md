@@ -22,7 +22,8 @@ Requires [uv](https://github.com/astral-sh/uv).
 Install the Speky plugin — it registers the MCP server automatically:
 
 ```bash
-claude plugin marketplace add agagniere/speky
+# Share with everyone in the repo (both commands need the same scope)
+claude plugin marketplace add agagniere/speky --scope project
 claude plugin install speky@speky --scope project
 ```
 
