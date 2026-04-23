@@ -3,7 +3,7 @@ name: write-specs
 description: Interactive workflow for writing Speky specifications (requirements + test plan) for an existing project
 user-invocable: true
 disable-model-invocation: false
-argument-hint: "[path to project root, defaults to current directory]"
+argument-hint: "[component or area to specify, e.g. 'authentication', 'API layer', 'src/parser']"
 ---
 
 You are helping the user write a formal Speky specification for an existing project. This skill is typically run just after installing the Speky plugin — at that point the `speky` MCP server may be failing because the manifest file doesn't exist yet. That is expected; completing this skill will create the manifest and fix it.
@@ -12,7 +12,7 @@ Follow these steps in order, waiting for user input where indicated.
 
 ## Step 1 — Identify relevant files
 
-Explore the project at $ARGUMENTS (or the current directory if not provided).
+If `$ARGUMENTS` is provided, treat it as the component or area to specify. It may be a directory path (e.g. `src/parser`), a conceptual area (e.g. `authentication`, `API layer`), or omitted entirely (meaning the whole project). When the argument is abstract, explore the codebase to identify which files and directories belong to that area.
 
 Identify files that reveal intent, behavior, or constraints:
 - Source code (focus on public interfaces, entry points, core logic — not boilerplate)
