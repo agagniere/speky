@@ -161,7 +161,17 @@ Fill in the following fields:
 - **`files`**: glob patterns matching the specification files written in the previous steps. These are relative to `root_directory`.
 - **`code_sources`**: glob patterns matching the relevant source files identified in Step 1. Speky scans these for reference tags (comments like `speky:<name>#<ID>`) to link code back to requirements. These are also relative to `root_directory`.
 
-## Step 9 — Validate
+## Step 9 — Set up website generation
+
+Place a `conf.py` and `Makefile` in `${user_config.spec_folder}/` so the user can generate a static website from the specification. Use the `sample-conf.py` and `sample-Makefile` bundled in this skill as starting points.
+
+Adapt them to the project:
+- In `conf.py`: set `project` to the project name.
+- In `Makefile`: set `ManifestSource` to `${user_config.manifest_name}`, `UV_CACHE_DIR` to `${CLAUDE_PLUGIN_DATA}/uvcache`, and `UV_PROJECT` to `${CLAUDE_PLUGIN_ROOT}`.
+
+The user can then run `make -C ${user_config.spec_folder} html` to build, or `make -C ${user_config.spec_folder} open` to build and open in a browser.
+
+## Step 10 — Validate
 
 Run speky to validate the specification:
 
@@ -171,7 +181,7 @@ uvx --from git+https://github.com/agagniere/speky speky ${user_config.spec_folde
 
 Fix any validation errors before finishing.
 
-## Step 10 — Commit
+## Step 11 — Commit
 
 Stage and commit all new specification files:
 
@@ -182,6 +192,6 @@ git commit
 
 Write a commit message that briefly describes what was specified (e.g. "Add initial Speky specification for <project or feature name>").
 
-## Step 11 — Restart the MCP server
+## Step 12 — Restart the MCP server
 
 Tell the user to restart the `speky` MCP server so it picks up the new manifest. In Claude Code, this can be done with `/mcp` → select the server → restart.
