@@ -56,8 +56,8 @@ uv run --dev ruff check --fix python tests
 ### Validate Specifications
 
 ```bash
-# Validate YAML files without generating output
-uv run speky specs/*.yaml --project-name "My Project" --check-only
+# Validate via manifest without generating output
+uv run speky specs/speky.yaml --check-only
 
 # Validate using the Makefile
 make -C specs check
@@ -66,10 +66,8 @@ make -C specs check
 ### Generate HTML Output
 
 ```bash
-# Generate Myst Markdown
-uv run speky requirements.yaml tests.yaml comments.yaml \
-  --output-folder markdown \
-  --project-name "My Project"
+# Generate Myst Markdown from manifest
+uv run speky specs/speky.yaml --output-folder markdown
 
 # Generate HTML with Sphinx (requires sphinx installation)
 uv run --with furo,sphinx-design,sphinx-copybutton,myst-parser \
@@ -97,7 +95,7 @@ The MCP server is under development.
 uv tool install git+https://github.com/agagniere/speky#master
 
 # Run MCP server
-speky-mcp requirements.yaml tests.yaml comments.yaml
+speky-mcp specs/speky.yaml
 ```
 
 ## Project Structure

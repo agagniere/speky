@@ -19,13 +19,14 @@ Requires [uv](https://github.com/astral-sh/uv).
 
 ### Configuring Claude Code
 
-Run this command at your project root:
+Install the Speky plugin — it registers the MCP server automatically:
 
 ```bash
-claude mcp add --scope project speky -- uvx --from git+https://github.com/agagniere/speky speky-mcp specs/speky.yaml
+claude plugin marketplace add agagniere/speky
+claude plugin install speky@speky --scope project
 ```
 
-Replace `specs/speky.yaml` with the path to your manifest file, or list individual YAML/TOML specification files.
+See the [README](README.md#use-with-claude-code) for configuration options (`spec_folder`, `manifest_name`).
 
 **Additional options:**
 - Add `-C path/to/comments.csv` to include CSV comment files not covered by the manifest
