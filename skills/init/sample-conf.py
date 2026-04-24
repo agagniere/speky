@@ -11,6 +11,15 @@ primary_domain = None
 source_suffix = {'.rst': 'restructuredtext', '.md': 'markdown'}
 
 html_theme = 'furo'
+html_theme_options = {
+    'navigation_with_keys': True,
+}
+
+html_css_files = [
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+]
+
+copybutton_prompt_text = '$ '
 
 myst_enable_extensions = [
     'colon_fence',

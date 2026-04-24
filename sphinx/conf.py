@@ -43,6 +43,10 @@ html_css_files = [
     "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
 ]
 
+# -- Copy Button Options -----------------------------------------------------
+
+copybutton_prompt_text = '$ '
+
 # -- Myst Parser Options -----------------------------------------------------
 
 myst_fence_as_directive = []
