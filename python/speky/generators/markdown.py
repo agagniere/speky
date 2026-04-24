@@ -2,8 +2,12 @@
 speky:speky#SF003
 """
 
+import importlib.resources
 import os
+import shutil
 from typing import TextIO
+
+assets = importlib.resources.files(__package__).parent.joinpath('assets')
 
 
 class Markdown:
@@ -223,6 +227,10 @@ def coverage_to_myst(specs, folder_name: str):
 def specification_to_myst(self, folder_name: str, sort: bool):
     os.makedirs(os.path.join(folder_name, 'requirements'), exist_ok=True)
     os.makedirs(os.path.join(folder_name, 'tests'), exist_ok=True)
+    css_dir = os.path.join(folder_name, 'css')
+    os.makedirs(css_dir, exist_ok=True)
+    with importlib.resources.as_file(assets.joinpath('speky.css')) as css_path:
+        shutil.copy2(css_path, os.path.join(css_dir, 'speky.css'))
     has_coverage = any(m.coverage for m in self.manifests)
     with open(os.path.join(folder_name, 'index.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)

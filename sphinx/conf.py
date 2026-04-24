@@ -33,7 +33,7 @@ source_suffix = {'.rst': 'restructuredtext', '.md': 'markdown'}
 
 html_theme       = 'furo'
 html_logo        = 'assets/Speky.png'
-html_static_path = ['assets']
+html_static_path = ['markdown/css']
 
 html_theme_options = {
     'navigation_with_keys': True,

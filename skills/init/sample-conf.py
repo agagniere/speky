@@ -15,8 +15,10 @@ html_theme_options = {
     'navigation_with_keys': True,
 }
 
+html_static_path = ['markdown/css']
 html_css_files = [
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css",
+    "speky.css",
 ]
 
 copybutton_prompt_text = '$ '
