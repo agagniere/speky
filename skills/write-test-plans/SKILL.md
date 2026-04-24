@@ -54,6 +54,8 @@ For each scenario, determine the **initial state**:
 
 ## Step 6 — Write the test files
 
+Follow the conventions in `test-plan-style.md` bundled in this skill for writing steps, especially around `action`, `run`, `expected`, and `sample` fields. Speky's own tests are also good references — query them via the `speky-selfspec` MCP server (e.g. `search_tests` or `get_test`) to see real examples.
+
 For each target requirement `<ID>`:
 
 1. Derive the test file path from `source_file`: take its parent directory, append `tests/`, and name the file `test_<ID>.toml`. For example, if `source_file` is `specs/mcp/query.yaml`, write to `specs/mcp/tests/test_MCP005.toml`; if it is `specs/functional.yaml`, write to `specs/tests/test_F012.toml`.

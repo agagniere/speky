@@ -41,7 +41,7 @@ Speky organizes a project's detailed specification into **requirements** (what t
 Each test step has one required field and several optional ones:
 
 - **`action`** (required): describes what the tester does in this step. Always present, even when other fields are set — it gives context to the reader.
-- **`run`**: a shell command to execute. When present, the step is automatable.
+- **`run`**: a shell command to execute. When present, the step is automatable. Prefer long-form flags (e.g. `--output` over `-o`) for readability.
 - **`expected`**: an excerpt of the expected stdout from the `run` command. Use `[...]` for elided parts. Only valid when `run` is set — do not use it for steps without a command.
 - **`sample`** + **`sample_lang`**: a code/data snippet illustrating the step (e.g. the content of a file being created, a JSON payload, a config fragment). Use `sample_lang` for syntax highlighting (e.g. `yaml`, `json`, `python`, `toml`). Unlike `expected`, a `sample` can appear on any step — it shows what something looks like, not what a command outputs.
 
