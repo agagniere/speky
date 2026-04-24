@@ -1,0 +1,9 @@
+.highlight-console .gp,
+body[data-theme="dark"] .highlight-console .gp,
+body:not([data-theme="light"]) .highlight-console .gp {
+    color: #628a70;
+}
+
+.highlight-console .go {
+    opacity: 0.5;
+}

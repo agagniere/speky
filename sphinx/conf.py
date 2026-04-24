@@ -23,11 +23,9 @@ extensions = [
     'sphinx_design',
 ]
 
-templates_path = ['_templates']
+templates_path = []
 exclude_patterns = []
-
 primary_domain = None
-
 source_suffix = {'.rst': 'restructuredtext', '.md': 'markdown'}
 
 # -- Options for HTML output -------------------------------------------------
@@ -35,12 +33,14 @@ source_suffix = {'.rst': 'restructuredtext', '.md': 'markdown'}
 
 html_theme       = 'furo'
 html_logo        = 'assets/Speky.png'
+html_static_path = ['assets']
 
 html_theme_options = {
     'navigation_with_keys': True,
 }
 html_css_files = [
-    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css"
+    "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css",
+    "speky.css",
 ]
 
 # -- Copy Button Options -----------------------------------------------------

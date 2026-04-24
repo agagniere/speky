@@ -267,7 +267,7 @@ tests:
     - action: Obtain the schema
       run: |
         curl --pogress-bar -O https://raw.githubusercontent.com/agagniere/speky/refs/heads/master/schema.yaml
-      expected: '#[...]# 100.0%'
+      expected: '[...] 100.0%'
     - action: Run Yamale on the YAMLs
       run: yamale -s schema.yaml requirements.yaml tests.yaml comments.yaml
       expected: |
