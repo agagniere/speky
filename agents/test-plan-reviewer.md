@@ -16,7 +16,7 @@ You support two modes. Detect which from the caller's message.
 
 **Existing mode** — the caller gives a test ID (e.g. `T012`, `TMCP003`).
 - Call `get_test` on it to fetch the full record. That record is the input you review.
-- Note: Speky's MCP does not expose "which tests use X as a `prereq`." Downstream prereq impact has to be raised as a question to the caller, not measured. See §11.
+- The `continued_by` field of the response lists downstream tests that have this one in their `prereq`. Use it for §11.
 - Same review dimensions apply, with the adjustments noted below.
 
 If the caller pastes multiple tests or names multiple IDs, ask them to pick one. One review per call.
@@ -82,9 +82,9 @@ For each test, report on the dimensions below. Be specific — cite the exact st
 - **Existing mode:** skip the availability check. Don't propose renaming an existing ID unless the caller asked for that explicitly — renaming breaks every test that lists it as a `prereq`.
 
 ### 11. Impact (existing mode only)
-- Speky's MCP cannot directly list tests that use this one as a `prereq`. Treat downstream prereq impact as a question to the caller, not a measurement.
-- If a proposed rewrite would change this test's final state (the state assumed by anyone listing it as a `prereq`), flag it explicitly and ask the caller to manually confirm no downstream test silently depended on the previous final state.
-- A wording-only change (style, clarity, same observable outcome) is low-risk; a step-reordering or new failure path is not.
+- Read the `continued_by` field from `get_test`. Each entry is a downstream test that lists this one as a `prereq` and assumes its final state.
+- The more entries, the more load-bearing this test is, and the costlier any change to its final state becomes.
+- A wording-only change (style, clarity, same observable outcome) is low-risk regardless of `continued_by` size; a step-reordering or new failure path is high-risk when `continued_by` is non-empty. Call this out explicitly.
 
 ## Output format
 
@@ -115,8 +115,9 @@ PASS | CHANGES NEEDED | BLOCK
 - (Existing mode: state the ID under review and skip the availability line.)
 
 ## Impact (existing mode only)
+- Continued by: <N> tests (<list ids>).
 - Final state change: yes | no.
-- Rewrite risk: low | moderate | high — <one-line reason>. If "yes" above, ask the caller to manually verify downstream tests that may list this one as a `prereq` (not queryable via MCP).
+- Rewrite risk: low | moderate | high — <one-line reason>.
 
 ## Proposed rewrite (optional)
 Include only when you have a concrete rewording. Show only the changed steps or fields, not the whole block. In existing mode, note `source_file` so the caller knows where to edit.
