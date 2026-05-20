@@ -186,6 +186,13 @@ class Specification:
                 if referred not in self.by_id:
                     message = f'Requirement {referred}, referred from {req.id} in "{req.source_file}", does not exist'
                     raise KeyError(message)
+        for item in self.by_id.values():
+            if item.kind != 'test' or not item.prereq:
+                continue
+            for prereq_id in item.prereq:
+                if prereq_id not in self.by_id:
+                    message = f'Test {prereq_id}, referred as prerequisite from {item.id} in "{item.source_file}", does not exist'
+                    raise KeyError(message)
         for referred, comment_list in self.comments.items():
             if referred not in self.by_id:
                 source_file = comment_list[0].source_file

@@ -1,0 +1,10 @@
+kind: tests
+category: functional
+tests:
+- id: TF01
+  short: Foo
+  ref: [TF01]
+  long: This test lists a prereq that does not exist
+  prereq: [T999]
+  steps:
+    - action: Do this
