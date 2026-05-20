@@ -342,6 +342,35 @@ class TestGetTest:
         assert 'RF01' in error_msg
         assert 'requirement' in error_msg
 
+    def test_get_test_continued_by(self, complex_specs):
+        """speky:speky_mcp#TMCP053 — get_test exposes continued_by for tests used as prereq."""
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {
+                'name': 'get_test',
+                'arguments': {'id': 'T03'},
+            },
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+
+        content = response['result']['structuredContent']
+
+        assert content['id'] == 'T03'
+        assert content['category'] == 'non-functional'
+        assert content['short'] == 'Create files'
+
+        # T03 has no upstream prereq
+        assert 'prereq' not in content
+
+        # T03 is listed as prereq by T04 — continued_by should reflect that
+        assert 'continued_by' in content
+        assert len(content['continued_by']) == 1
+        assert content['continued_by'][0]['id'] == 'T04'
+        assert content['continued_by'][0]['short'] == 'Yet another test'
+
 
 class TestSearchRequirements:
     """Tests for search_requirements tool."""

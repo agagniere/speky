@@ -88,6 +88,8 @@ def handle_get_test(arguments: dict, specs: Specification) -> dict:
         content['prereq'] = [
             prereq_test.json_oneliner(False) for prereq_test in sorted(map(specs.by_id.__getitem__, test.prereq))
         ]
+    if test_id in specs.dependant_tests:
+        content['continued_by'] = [dep.json_oneliner(False) for dep in sorted(specs.dependant_tests[test_id])]
     if test_id in specs.code_refs_by_id:
         content['code_references'] = [
             {

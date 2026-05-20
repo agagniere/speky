@@ -27,6 +27,7 @@ class Specification:
         self.tests = defaultdict(list)
         self.references = defaultdict(list)
         self.testers_of = defaultdict(list)
+        self.dependant_tests = defaultdict(list)
         self.comments = defaultdict(list)
         self.by_id = {}
         self.tags = defaultdict(list)
@@ -66,6 +67,9 @@ class Specification:
         self.tests[category].append(test)
         for req in test.ref:
             self.testers_of[req].append(test)
+        if test.prereq:
+            for prereq_id in test.prereq:
+                self.dependant_tests[prereq_id].append(test)
 
     def load_comment(self, comment: Comment):
         """

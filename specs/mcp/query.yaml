@@ -54,6 +54,7 @@ requirements:
     - `source_file`: Path to the specification file this test was loaded from
     - `initial`: Initial state description (if present)
     - `prereq`: List of prerequisite test IDs (if present)
+    - `continued_by`: List of tests that have this test in their `prereq` field (if any)
     - `steps`: List of test steps, each containing:
       - `action`: The action description
       - `run`: Shell command to execute (if present)
@@ -69,4 +70,5 @@ requirements:
   tags: [mcp:tools, mcp:query]
   properties:
     since: '`0.2.0`'
+    version: 2
     author: Claude

@@ -1,5 +1,5 @@
 ---
-name: write-specs
+name: init
 description: Interactive workflow for writing Speky specifications (requirements + test plan) for an existing project
 user-invocable: true
 disable-model-invocation: false

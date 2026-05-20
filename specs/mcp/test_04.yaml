@@ -164,3 +164,48 @@ tests:
           }
         }
       }
+- id: TMCP053
+  ref: [MCP004]
+  short: get_test exposes continued_by for tests used as prereq
+  long: |
+    The user shall see the downstream chain in the response. A test that is
+    listed as a `prereq` by other tests shall appear with a `continued_by`
+    field naming them, mirroring how `prereq` exposes the upstream chain.
+  prereq: [TMCP003]
+  steps:
+  - action: The client sends a `get_test` request for test `T03`, which is used as a prereq by T04
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T03"}
+        }
+      }
+  - action: |
+      Verify the response includes `continued_by` listing T04, alongside the
+      other fields of T03. T03 itself has no `prereq`.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "category": "non-functional",
+            "continued_by": [{"id": "T04", "short": "Yet another test"}],
+            "id": "T03",
+            "initial": "Nothing",
+            "long": "First step before T04",
+            "ref": [{"id": "RF03"}],
+            "short": "Create files",
+            "steps": [
+              {"action": "Store secret", "run": "echo secret > topsecret.txt"},
+              {"action": "Store some values", "run": "echo '{\"foo\": \"bar\", \"baz\": 21}' > foo.json"}
+            ]
+          }
+        }
+      }
