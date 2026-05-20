@@ -84,6 +84,7 @@ A first-party Claude Code plugin shipped from this repo. `.claude-plugin/plugin.
 - `test-plan-author` — drafts a test plan TOML block for a requirement ID
 - `requirement-reviewer` — reviews a draft or existing requirement against atomicity / testability / fit
 - `test-plan-reviewer` — reviews a draft or existing test plan against step-style rules and downstream impact
+- `code-test-reviewer` — reviews an automated test (unit/integration/e2e) against its Speky test plan, mapping each plan step to code assertions and flagging gaps
 
 ## Testing
 

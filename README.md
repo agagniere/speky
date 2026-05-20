@@ -12,6 +12,7 @@ then generate a PDF and a static website.
 - [x] Coverage report to see in a glimpse how much of your requirements are tested
 - [x] MCP server for LLMs to discover and query your spec
 - [x] Claude plugin to help onboard new projects, or write test plans
+- [x] Subagents that review requirements and test plans (and can also draft new ones)
 
 ## Generate a static website
 
