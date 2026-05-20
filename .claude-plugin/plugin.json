@@ -1,7 +1,6 @@
 {
   "name": "speky",
   "description": "Skills to best use Speky, the requirements and test specification manager.",
-  "version": "0.4.0",
   "author": {
     "name": "Antoine Gagniere",
     "email": "antoine@gagniere.dev",
@@ -14,6 +13,8 @@
     "specification",
     "requirements"
   ],
+  "skills": ["./claude_plugin/skills/"],
+  "agents": ["./claude_plugin/agents/"],
   "mcpServers": {
     "speky": {
       "type": "stdio",

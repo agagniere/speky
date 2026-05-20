@@ -72,11 +72,18 @@ The `@local/speky` Typst package for rendering specs as PDFs. Install with `make
 ### `specs/` — Speky's own specifications
 The tool is itself specified using Speky files in `specs/`. Entry point is `specs/speky.yaml` (manifest). The MCP sub-project uses `specs/mcp/mcp.toml` (TOML manifest with `root_directory = ".."`). These serve as both documentation and integration test fixtures.
 
-### `.claude-plugin/` and `skills/` — Claude Code plugin
-A first-party Claude Code plugin shipped from this repo. `.claude-plugin/plugin.json` registers two MCP servers (`speky` for the consumer's project, `speky-selfspec` for Speky's own spec). `skills/` provides three workflow skills consumed by Claude:
+### `.claude-plugin/` and `claude_plugin/` — Claude Code plugin
+A first-party Claude Code plugin shipped from this repo. `.claude-plugin/plugin.json` registers two MCP servers (`speky` for the consumer's project, `speky-selfspec` for Speky's own spec) and points at custom `skills` / `agents` directories under `claude_plugin/`.
+
+`claude_plugin/skills/` provides three workflow skills consumed by Claude:
 - `init/` — onboards a new project (manifest, sample requirements, Sphinx `conf.py`, Makefile)
 - `speky-workflow/` — day-to-day workflow guidance, including test steps
 - `write-test-plans/` — style guide and templates for authoring test plans
+
+`claude_plugin/agents/` provides read-only subagents:
+- `test-plan-author` — drafts a test plan TOML block for a requirement ID
+- `requirement-reviewer` — reviews a draft or existing requirement against atomicity / testability / fit
+- `test-plan-reviewer` — reviews a draft or existing test plan against step-style rules and downstream impact
 
 ## Testing
 
