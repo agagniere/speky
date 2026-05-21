@@ -13,6 +13,14 @@ requirement:
   tags: list(str(min=2, max=20), required=False)
   ref: list(include('id'), required=False)
   properties: map(str(), any(str(), int()),required=False)
+  code: list(include('code_ref'), required=False)
+
+---
+code_ref:
+  file: str()
+  symbol: str(required=False)
+  line: int(required=False)
+  is_test: bool(required=False)
 
 ---
 comments:
@@ -41,6 +49,7 @@ test:
   initial: str(required=False)
   prereq: list(include('id'), required=False)
   steps: list(include('step'))
+  code: list(include('code_ref'), required=False)
 
 step:
   action: str()

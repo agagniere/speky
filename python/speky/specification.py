@@ -202,31 +202,43 @@ class Specification:
     def scan_code_sources(self):
         """
         speky:speky#SF016
+        speky:speky#SF018
 
-        Scan declared code sources for speky reference tags.
+        Scan declared code sources for speky reference tags, and process declared
+        `code` entries on requirements and tests.
         """
-        manifests_with_sources = [m for m in self.manifests if m.code_sources]
-        if not manifests_with_sources:
-            return
-        from .scanner import scan_sources
+        from .scanner import build_declared_reference, scan_sources
 
+        manifests_with_sources = [m for m in self.manifests if m.code_sources]
         manifest_by_name = {m.name.lower(): m for m in self.manifests}
 
-        # Collect all files, deduplicated by resolved path
-        all_files: set[Path] = set()
-        for manifest in manifests_with_sources:
-            for pattern in manifest.code_sources:
-                for path in manifest.root_dir.glob(pattern):
-                    all_files.add(path.resolve())
+        if manifests_with_sources:
+            # Collect all files, deduplicated by resolved path
+            all_files: set[Path] = set()
+            for manifest in manifests_with_sources:
+                for pattern in manifest.code_sources:
+                    for path in manifest.root_dir.glob(pattern):
+                        all_files.add(path.resolve())
 
-        logger.info('Scanning %d unique source file(s)', len(all_files))
-        for ref in scan_sources(sorted(all_files), set(manifest_by_name)):
-            manifest = manifest_by_name[ref.project]
-            ref.manifest = manifest
-            base_url = manifest.link_config.url_for(ref.file)
-            if base_url:
-                ref.url = f'{base_url}#L{ref.line}'
-            self.code_refs_by_id[ref.target_id].append(ref)
+            logger.info('Scanning %d unique source file(s)', len(all_files))
+            for ref in scan_sources(sorted(all_files), set(manifest_by_name)):
+                manifest = manifest_by_name[ref.project]
+                ref.manifest = manifest
+                base_url = manifest.link_config.url_for(ref.file)
+                if base_url:
+                    ref.url = f'{base_url}#L{ref.line}'
+                self.code_refs_by_id[ref.target_id].append(ref)
+
+        for item in self.by_id.values():
+            for entry in getattr(item, 'code', None) or []:
+                ref = build_declared_reference(item, entry)
+                if ref is None:
+                    continue
+                base_url = ref.manifest.link_config.url_for(ref.file)
+                if base_url:
+                    ref.url = f'{base_url}#L{ref.line}'
+                self.code_refs_by_id[ref.target_id].append(ref)
+
         unknown = sorted(ref_id for ref_id in self.code_refs_by_id if ref_id not in self.by_id)
         if unknown:
             logger.warning('Code references to unknown IDs: %s', ', '.join(unknown))

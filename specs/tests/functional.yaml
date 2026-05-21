@@ -397,3 +397,32 @@ tests:
             pass
     - action: Run speky again and verify the foreign tag does not appear in the output
       run: speky speky.yaml --check-only
+- id: TF014
+  ref: [SF018]
+  short: Declare code references from the spec
+  long: Reference code locations directly from a requirement, without editing the source
+  prereq: [TF013]
+  steps:
+    - action: Remove the tag from `src/feature.py` so that its comment no longer mentions Speky
+      run: cat src/feature.py
+      sample_lang: python
+      sample: |
+        def feature():
+            pass
+    - action: Declare a code reference on `RF01` directly in `requirements.yaml`
+      run: cat requirements.yaml
+      sample_lang: yaml
+      sample: |
+        kind: requirements
+        category: functional
+        requirements:
+        - id: RF01
+          long: The first requirement
+          code:
+          - file: src/feature.py
+            symbol: feature
+    - action: Run speky and verify the reference to RF01 is still reported
+      run: speky speky.yaml --check-only
+    - action: |
+        Regenerate the HTML output and confirm `RF01`'s "Source" dropdown lists
+        `feature` under "Implemented in:".

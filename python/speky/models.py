@@ -73,7 +73,7 @@ class Requirement(SpecItem):
     """speky:speky#SF001 — Requirement specification item."""
 
     folder = 'requirements'
-    optional_fields = SpecItem.optional_fields + ['tags', 'client_statement', 'properties', 'ref']
+    optional_fields = SpecItem.optional_fields + ['tags', 'client_statement', 'properties', 'ref', 'code']
 
 
 class Test(SpecItem):
@@ -81,7 +81,7 @@ class Test(SpecItem):
 
     folder = 'tests'
     mandatory_fields = SpecItem.mandatory_fields + ['ref', 'steps']
-    optional_fields = SpecItem.optional_fields + ['initial', 'prereq']
+    optional_fields = SpecItem.optional_fields + ['initial', 'prereq', 'code']
 
     step_fields = {'action', 'run', 'expected', 'sample', 'sample_lang'}
 
