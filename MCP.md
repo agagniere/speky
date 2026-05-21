@@ -52,6 +52,7 @@ Query a requirement by ID.
 - `referenced_by`: List of requirements that reference this one with `{id, short?}`
 - `tested_by`: List of tests covering this requirement with `{id, short?}`
 - `comments`: List of comments with `{date, from, text, external}`
+- `code_references`: List of pointers to source code locations associated with this requirement. Each entry has `{file, line, symbol?, url?}`. Populated from `speky:<name>#<ID>` tags found by scanning `code_sources`, and from declarative `code` entries on the requirement itself (see [Declaring code references from the spec](#declaring-code-references-from-the-spec)).
 
 **Example:**
 ```json
@@ -74,7 +75,11 @@ Query a requirement by ID.
       {"id": "T03", "short": "Create files"},
       {"id": "T04", "short": "Yet another test"}
     ],
-    "comments": [...]
+    "comments": [...],
+    "code_references": [
+      {"file": "src/foo.py", "line": 6, "symbol": "do_the_thing"},
+      {"file": "src/bar.py", "line": 42}
+    ]
   }
 }
 ```
@@ -98,6 +103,7 @@ Query a test by ID.
   - `expected`: Expected outcome (if present)
   - `sample`: Sample code/output (if present)
   - `sample_lang`: Language of the sample (if present)
+- `code_references`: List of pointers to source code locations associated with this test. Each entry has `{file, line, symbol?, is_test, url?}`. `is_test: true` flags the reference as an automated test implementation (used by `least_tested_requirements` and `test_plan_coverage` to count automated coverage). Populated from `speky:<name>#<ID>` tags found by scanning `code_sources`, and from declarative `code` entries on the test itself (see [Declaring code references from the spec](#declaring-code-references-from-the-spec)).
 
 **Example:**
 ```json
@@ -123,6 +129,9 @@ Query a test by ID.
         "run": "ls *secret*",
         "expected": "topsecret.txt"
       }
+    ],
+    "code_references": [
+      {"file": "tests/test_feature.py", "line": 12, "symbol": "test_my_function", "is_test": true}
     ]
   }
 }
@@ -341,6 +350,55 @@ List all requirement and test IDs in the loaded specifications.
   }
 }
 ```
+
+## Declaring code references from the spec
+
+Code references can be sourced two ways:
+
+1. **From source comments** — Speky scans files listed in the manifest's `code_sources` and harvests `speky:<name>#<ID>` tags from comments and docstrings (Python, Go, Rust, Bash).
+2. **Declaratively from the spec** — A requirement or test can carry an optional `code` field listing pointers to source locations. No tag is needed in the source file.
+
+Both sources feed the same `code_references` list returned by `get_requirement` and `get_test`.
+
+**Declarative `code` field schema:**
+
+Each entry accepts:
+- `file` (required): path to the source file, relative to the manifest's `root_directory`.
+- `symbol` (optional): function, class, or method name in that file. When set, Speky resolves it to a line number via tree-sitter and auto-detects whether it is a test (Python `test`/`Test` prefix, Go `Test` prefix, Rust `#[test]` attribute).
+- `line` (optional): explicit 1-based line number. Takes precedence over symbol-based resolution. Defaults to 1 when neither `symbol` nor `line` is set.
+- `is_test` (optional): override the auto-detected `is_test` flag.
+
+**Resolution precedence:**
+- `line`: explicit value > symbol-resolved line > `1`.
+- `is_test`: explicit value > symbol-resolved test detection > file-name conventions (`test*.sh`, `*_test.go`) > `false`.
+
+Speky logs a warning and skips the entry when `file` is missing or does not resolve to a real file. When `symbol` is provided but cannot be located in the file, Speky logs a warning and falls back to line 1 instead of erroring.
+
+**Example (YAML):**
+```yaml
+- id: RF01
+  long: The first requirement
+  code:
+    - file: src/foo.py
+      symbol: do_the_thing
+    - file: src/bar.py
+      line: 42
+```
+
+**Example (TOML):**
+```toml
+[[requirements]]
+id = "RF04"
+long = "A requirement implemented in Python"
+[[requirements.code]]
+file = "more_source.py"
+symbol = "another_function"
+[[requirements.code]]
+file = "more_source.py"
+line = 1
+```
+
+The same `code` field is accepted on entries in `kind: tests` files.
 
 ## Usage Examples
 
