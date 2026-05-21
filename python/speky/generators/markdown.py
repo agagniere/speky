@@ -210,7 +210,11 @@ def coverage_item(requirement, specs) -> str:
         return link
     automated = sum(1 for t in tests if specs.is_test_automated(t.id))
     plan_word = 'plan' if total == 1 else 'plans'
-    return f'{link} — {total} test {plan_word}, {automated} automated'
+    if automated == total:
+        return f'{link} — {total} automated test {plan_word}'
+    if automated == 0:
+        return f'{link} — {total} test {plan_word}'
+    return f'{link} — {automated}/{total} test {plan_word} automated'
 
 
 def write_coverage_list(output: MarkdownWriter, items: list, specs):
