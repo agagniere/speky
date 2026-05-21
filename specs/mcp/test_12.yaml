@@ -396,7 +396,7 @@ tests:
           "structuredContent": {
             "code_references": [
               {"file": "more_source.go", "line": 9, "symbol": "TestYetAnotherTest", "is_test": true},
-              {"file": "more_source.py", "line": 11, "symbol": "test_declared_helper", "is_test": true}
+              {"file": "more_source.py", "line": 10, "symbol": "test_declared_helper", "is_test": true}
             ]
           }
         }

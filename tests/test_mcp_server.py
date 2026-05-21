@@ -839,6 +839,27 @@ class TestCodeReferences:
         assert declared[0]['file'] == 'more_source.py'
         assert declared[0]['is_test'] is True
 
+    def test_declared_symbol_resolves_to_definition_line(self, complex_specs):
+        """Regression: declared symbol must resolve to its def line, matching spec TMCP055 sample."""
+        request = {
+            'jsonrpc': '2.0',
+            'method': 'tools/call',
+            'id': 2,
+            'params': {'name': 'get_test', 'arguments': {'id': 'T04'}},
+        }
+
+        response = handle_request(request, complex_specs, initialized=True)
+        refs = response['result']['structuredContent']['code_references']
+
+        declared = [r for r in refs if r.get('symbol') == 'test_declared_helper']
+        assert len(declared) == 1
+        assert declared[0]['line'] == 10
+
+        spec_path = Path(__file__).resolve().parents[1] / 'specs' / 'mcp' / 'test_12.yaml'
+        spec_text = spec_path.read_text()
+        assert '"line": 10, "symbol": "test_declared_helper"' in spec_text
+        assert '"line": 11, "symbol": "test_declared_helper"' not in spec_text
+
     def test_get_test_with_code_references(self, complex_specs):
         """speky:speky_mcp#TMCP044 — get_test includes code_references with is_test flag."""
         request = {
