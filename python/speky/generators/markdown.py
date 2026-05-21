@@ -202,6 +202,25 @@ _BUCKET_LABELS = ['Automated', 'Partially Manual', 'Manual', 'No Test Plan']
 _BUCKET_ICONS = ['check-circle-fill', 'gear', 'pencil', 'x-circle-fill']
 
 
+def coverage_item(requirement, specs) -> str:
+    link = link_to(requirement)
+    tests = specs.testers_of.get(requirement.id, [])
+    total = len(tests)
+    if not total:
+        return link
+    automated = sum(1 for t in tests if specs.is_test_automated(t.id))
+    plan_word = 'plan' if total == 1 else 'plans'
+    return f'{link} — {total} test {plan_word}, {automated} automated'
+
+
+def write_coverage_list(output: MarkdownWriter, items: list, specs):
+    if len(items) == 1:
+        output.write_line(coverage_item(items[0], specs))
+    else:
+        for item in sorted(items):
+            output.write_line(f'- {coverage_item(item, specs)}')
+
+
 def coverage_to_myst(specs, folder_name: str):
     with open(os.path.join(folder_name, 'coverage.md'), encoding='utf8', mode='w') as f:
         output = MystWriter(f)
@@ -220,7 +239,7 @@ def coverage_to_myst(specs, folder_name: str):
                 ):
                     title = f'{label} ({len(items)} — {len(items) / total:.0%})'
                     with output.dropdown(0, title, color if items else 'secondary', False, icon) as dropdown:
-                        write_list_of_links(dropdown, items)
+                        write_coverage_list(dropdown, items, specs)
             output.empty_line()
 
 
