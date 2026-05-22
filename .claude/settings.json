@@ -1,0 +1,13 @@
+{
+  "enabledPlugins": {
+    "speky@speky": true
+  },
+  "extraKnownMarketplaces": {
+    "speky": {
+      "source": {
+        "source": "github",
+        "repo": "agagniere/speky"
+      }
+    }
+  }
+}

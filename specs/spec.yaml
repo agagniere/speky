@@ -1,0 +1,5 @@
+kind: project
+name: speky-and-mcp
+files:
+  - speky.yaml
+  - mcp/mcp.toml
