@@ -13,8 +13,17 @@
     "specification",
     "requirements"
   ],
-  "skills": ["./claude_plugin/skills/"],
-  "agents": ["./claude_plugin/agents/"],
+  "skills": [
+    "./claude_plugin/skills/init",
+    "./claude_plugin/skills/speky-workflow",
+    "./claude_plugin/skills/write-test-plans"
+  ],
+  "agents": [
+    "./claude_plugin/agents/code-test-reviewer.md",
+    "./claude_plugin/agents/requirement-reviewer.md",
+    "./claude_plugin/agents/test-plan-author.md",
+    "./claude_plugin/agents/test-plan-reviewer.md"
+  ],
   "mcpServers": {
     "speky": {
       "type": "stdio",
