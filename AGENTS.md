@@ -50,9 +50,13 @@ The project has two Python packages under `python/`:
 ### `speky` — CLI tool
 - `main.py` — Argument parsing and orchestration
 - `specification.py` — Loads YAML/TOML files and `kind: project` manifests, resolves cross-references, scans source code for `speky:<project>#<ID>` tags, computes test-plan coverage
-- `models.py` — `Requirement`, `Test`, `Comment`, `Manifest`, `SourceLinkConfig` data models
-- `scanner.py` — Tree-sitter based scanner extracting code references from Python/Go/Rust/Bash sources
-- `generators/markdown.py` — MyST Markdown output
+- `models.py` — `Requirement`, `Test`, `Comment`, `Manifest`, `SourceLinkConfig` data models. Requirements and tests accept an optional `code` field (list of `{file, symbol?, line?, is_test?}` entries) to declare code references from the spec without writing `speky:<name>#<ID>` tags in the source.
+- `scanner.py` — Tree-sitter based scanner extracting code references from Python/Go/Rust/Bash sources. Also hosts `build_declared_reference` / `find_symbol`, which turn declarative `code` entries into `CodeReference` objects by resolving the named symbol via tree-sitter.
+- `generators/markdown.py` — MyST Markdown output. The generated `coverage.md` page groups requirements into Automated / Partially Manual / Manual / No Test Plan dropdowns. Each entry is annotated based on its bucket:
+  - **No Test Plan**: plain link only (e.g. `[RF01](/requirements/RF01)`)
+  - **Manual**: `[RF01](/requirements/RF01) — 4 test plans`
+  - **Partially Manual**: `[RF01](/requirements/RF01) — 2/4 test plans automated`
+  - **Automated**: `[RF01](/requirements/RF01) — 4 automated test plans`
 - `utils.py`, `log_formatter.py` — Field-import helpers and CLI log formatting
 - `assets/` — Default `logging.yaml` config and `speky.css` copied into the generated Markdown folder
 
