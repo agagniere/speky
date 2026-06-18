@@ -322,6 +322,86 @@ tests:
         }
       }
 
+- id: TMCP054
+  ref: [MCP003]
+  short: get_requirement includes declared code references
+  long: |
+    `get_requirement` shall include code references that were declared from the
+    requirement entry itself (via the `code` field), in addition to those
+    discovered by scanning source comments.
+  prereq: [TMCP003]
+  steps:
+  - action: Call `get_requirement` for a requirement that has a `code` field with
+      a symbol-based reference and an explicit-line reference
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_requirement",
+          "arguments": {"id": "RF04"}
+        }
+      }
+  - action: |
+      Verify the response lists both declared references. The symbol-based entry
+      resolves the line via tree-sitter; the explicit-line entry omits `symbol`.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "code_references": [
+              {"file": "more_source.py", "line": 6, "symbol": "another_function"},
+              {"file": "more_source.py", "line": 1}
+            ]
+          }
+        }
+      }
+
+- id: TMCP055
+  ref: [MCP004]
+  short: get_test includes declared code references with auto-detected is_test
+  long: |
+    When a test entry declares a code reference whose resolved symbol matches the
+    host language's test-function convention, `get_test` shall flag that
+    reference with `is_test: true`.
+  prereq: [TMCP003]
+  steps:
+  - action: Call `get_test` for a test whose `code` field points to a Python
+      symbol prefixed with `test_`
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "method": "tools/call",
+        "params": {
+          "name": "get_test",
+          "arguments": {"id": "T04"}
+        }
+      }
+  - action: |
+      Verify the declared entry appears in `code_references` with `is_test: true`,
+      alongside any references discovered from source comments.
+    sample_lang: json
+    sample: |
+      {
+        "id": 2,
+        "jsonrpc": "2.0",
+        "result": {
+          "structuredContent": {
+            "code_references": [
+              {"file": "more_source.go", "line": 9, "symbol": "TestYetAnotherTest", "is_test": true},
+              {"file": "more_source.py", "line": 10, "symbol": "test_declared_helper", "is_test": true}
+            ]
+          }
+        }
+      }
+
 - id: TMCP044
   ref: [MCP004]
   short: get_test includes code references with is_test flag

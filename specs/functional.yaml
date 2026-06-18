@@ -180,3 +180,41 @@ requirements:
     Supported languages: Python (`.py`), Go (`.go`), Rust (`.rs`).
   tags: [tooling]
   ref: [SF015]
+- id: SF018
+  short: Declare code references from the spec
+  long: |
+    The user shall be able to declare code references directly from a requirement or
+    test entry, without having to write a `speky:<name>#<ID>` tag in the source code.
+
+    A requirement or test shall accept an optional `code` field: a list of entries,
+    each with:
+    - `file`: path to the source file, relative to the manifest's `root_directory`
+    - `symbol` (optional): name of a function, class or method in that file. When
+      provided, Speky resolves it to a line number using tree-sitter.
+    - `line` (optional): explicit 1-based line number. Takes precedence over
+      symbol-based resolution. Defaults to 1 when neither `symbol` nor `line` is set.
+    - `is_test` (optional): override the auto-detection that flags references whose
+      symbol or file name matches the host language's test conventions.
+
+    Declared references appear in the same `code_references` list as references
+    discovered by scanning source comments.
+
+    Example:
+    ```yaml
+    - id: RF01
+      long: The first requirement
+      code:
+        - file: src/foo.py
+          symbol: do_the_thing
+        - file: src/bar.py
+          line: 42
+    ```
+  tags: [input, tooling]
+  ref: [SF015, SF016]
+  code:
+    - file: python/speky/scanner.py
+      symbol: build_declared_reference
+    - file: python/speky/models.py
+      symbol: Requirement
+    - file: python/speky/models.py
+      symbol: Test

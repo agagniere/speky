@@ -141,6 +141,119 @@ _SCANNERS = {
     '.rs': _scan_rust,
 }
 
+_PARSER_LANGS = {
+    '.sh': _SH_LANG,
+    '.py': _PY_LANG,
+    '.go': _GO_LANG,
+    '.rs': _RS_LANG,
+}
+
+
+def build_declared_reference(
+    item,
+    entry: dict,
+) -> CodeReference | None:
+    """
+    Build a CodeReference from a declarative entry on a requirement or test.
+
+    `entry` is a dict with:
+      - `file` (str, required): path relative to the manifest's root directory
+      - `symbol` (str, optional): symbol name; used to resolve `line` and `is_test` when not given
+      - `line` (int, optional): explicit 1-based line number
+      - `is_test` (bool, optional): override auto-detection
+    """
+    manifest = item.manifest
+    if manifest is None:
+        logger.warning(
+            'Code reference on %s ignored: declared code references require a project manifest',
+            item.id,
+        )
+        return None
+    file_field = entry.get('file')
+    if not file_field:
+        logger.warning('Code reference on %s ignored: missing `file` field', item.id)
+        return None
+    file = (manifest.root_dir / file_field).resolve()
+    if not file.is_file():
+        logger.warning('Code reference on %s ignored: %s does not exist', item.id, file)
+        return None
+
+    ext = file.suffix
+    language = _LANGUAGES.get(ext, '')
+    symbol = entry.get('symbol')
+    line = entry.get('line')
+    is_test = entry.get('is_test')
+
+    resolved_line = None
+    resolved_is_test = False
+    if symbol and ext in _PARSER_LANGS:
+        found = find_symbol(file, symbol)
+        if found is None:
+            logger.warning('Symbol %r not found in %s (referenced by %s)', symbol, file, item.id)
+        else:
+            resolved_line, resolved_is_test = found
+
+    if line is None:
+        line = resolved_line if resolved_line is not None else 1
+
+    if is_test is None:
+        is_test = resolved_is_test
+        if ext == '.sh' and file.name.startswith('test'):
+            is_test = True
+        elif ext == '.go' and file.name.endswith('_test.go'):
+            is_test = True
+
+    return CodeReference(
+        project=manifest.name.lower(),
+        target_id=item.id,
+        file=file,
+        line=line,
+        language=language,
+        symbol=symbol,
+        is_test=bool(is_test),
+        manifest=manifest,
+    )
+
+
+def find_symbol(path: Path, symbol_name: str) -> tuple[int, bool] | None:
+    """
+    Find the (1-based line, is_test) of a named symbol in a source file.
+
+    Returns None if the file type is unsupported, the file cannot be read,
+    or the symbol cannot be located.
+    """
+    ext = path.suffix
+    language = _PARSER_LANGS.get(ext)
+    if language is None:
+        return None
+    try:
+        source = path.read_bytes()
+    except OSError as err:
+        logger.warning('Cannot read %s: %s', path, err)
+        return None
+    tree = Parser(language).parse(source)
+    return _search_symbol(tree.root_node, source, ext, symbol_name, [], 0)
+
+
+def _search_symbol(
+    node: Node,
+    source: bytes,
+    ext: str,
+    symbol_name: str,
+    siblings: list[Node],
+    index: int,
+) -> tuple[int, bool] | None:
+    if node.type in _SYMBOL_TYPES[ext]:
+        name = _symbol_name(node, source)
+        if name == symbol_name:
+            line = node.start_point[0] + 1
+            return line, _is_test(node, siblings, index, source, ext, name)
+    for i, child in enumerate(node.children):
+        result = _search_symbol(child, source, ext, symbol_name, node.children, i)
+        if result is not None:
+            return result
+    return None
+
 
 def _walk(node: Node, source: bytes, ext: str, project_names: set[str], file: Path, refs: list[CodeReference]):
     if node.type in _COMMENT_TYPES[ext]:

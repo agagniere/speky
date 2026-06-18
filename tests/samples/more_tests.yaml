@@ -27,3 +27,6 @@ tests:
     sample_lang: json
     sample: |
       {"foo": "bar", "baz": 21}
+  code:
+  - file: more_source.py
+    symbol: test_declared_helper

@@ -17,3 +17,9 @@ version = 2
 id = "RF04"
 long = "A requirement created to reference and be referenced by RF03"
 ref = ["RF03"]
+[[requirements.code]]
+file = "more_source.py"
+symbol = "another_function"
+[[requirements.code]]
+file = "more_source.py"
+line = 1
